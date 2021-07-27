@@ -14,12 +14,15 @@ sessionCookie = ''
 nc_fqdn=os.environ['NGINX_CONTROLLER_FQDN']
 nc_user=os.environ['NGINX_CONTROLLER_USERNAME']
 nc_pass=os.environ['NGINX_CONTROLLER_PASSWORD']
+nc_mode=os.environ['NGINX_CONTROLLER_TYPE']
 
 
-# Returns the NGINX Controller connection object
+# Returns the HTTPS connection object to NGINX Controller / NGINX Instance Manager
 def nginxControllerGetConnection(fqdn):
   return http.client.HTTPSConnection(fqdn,context=ssl._create_unverified_context())
 
+
+### NGINX Controller REST API
 
 # NGINX Controller - login
 # Returns the session cookie
@@ -40,7 +43,7 @@ def nginxControllerLogin(connection,username,password):
   else:
     sessionCookie = ''
 
-  return sessionCookie
+  return res.status,sessionCookie
 
 
 # NGINX Controller - logout
@@ -83,11 +86,31 @@ def nginxControllerInstances(connection,cookie,location):
   return res.status,json.loads(data)
 
 
-# Returns a json for all online/offline instances
-@app.route('/instances', methods=['GET'])
-def getInstances():
+### NGINX Instance Manager REST API
+
+# ReturnsNGINX OSS/Plus instances managed by NIM
+def nginxInstanceManagerInstances(connection):
+  payload = ''
+  headers = {}
+  connection.request("GET", "/api/v0/instances", payload, headers)
+  res = connection.getresponse()
+  if res.status == 200:
+    data = res.read()
+  else:
+    data = '{}'
+
+  return res.status,json.loads(data)
+
+
+### NGINX Controller query functions
+
+# Returns NGINX Plus instances managed by NGINX Controller in JSON format
+def ncInstances():
   conn = nginxControllerGetConnection(nc_fqdn)
-  sessionCookie = nginxControllerLogin(conn,nc_user,nc_pass)
+  status,sessionCookie = nginxControllerLogin(conn,nc_user,nc_pass)
+
+  if status != 204:
+    return make_response(jsonify({'error': 'authentication failed'}), 401)
 
   # Fetches locations
   status,locations = nginxControllerLocations(conn,sessionCookie)
@@ -123,10 +146,13 @@ def getInstances():
   return output+']'
 
 
-@app.route('/metrics', methods=['GET'])
-def getMetrics():
+# Returns NGINX Plus instances managed by NGINX Controller in prometheus format
+def ncMetrics():
   conn = nginxControllerGetConnection(nc_fqdn)
-  sessionCookie = nginxControllerLogin(conn,nc_user,nc_pass)
+  status,sessionCookie = nginxControllerLogin(conn,nc_user,nc_pass)
+
+  if status != 204:
+    return make_response(jsonify({'error': 'authentication failed'}), 401)
 
   # Fetches locations
   status,locations = nginxControllerLocations(conn,sessionCookie)
@@ -165,10 +191,67 @@ def getMetrics():
   return output
 
 
+### NGINX Instance Manager query functions
+
+# Returns NGINX OSS/Plus instances managed by NIM in JSON format
+def nimInstances():
+  conn = nginxControllerGetConnection(nc_fqdn)
+
+  # Fetches instances
+  status,instances = nginxInstanceManagerInstances(conn)
+
+  if status != 200:
+    return make_response(jsonify({'error': 'instances fetch error'}), 404)
+
+  output = '[ {"location": "", "online": '+str(instances['listinfo']['total'])+', "offline": 0} ]'
+  return output
+
+
+# Returns NGINX OSS/Plus instances managed by NIM in prometheus format
+def nimMetrics():
+  conn = nginxControllerGetConnection(nc_fqdn)
+
+  # Fetches instances
+  status,instances = nginxInstanceManagerInstances(conn)
+
+  if status != 200:
+    return make_response(jsonify({'error': 'instances fetch error'}), 404)
+
+  output = '# HELP nginx_online_instances Online NGINX OSS/Plus instances\n'
+  output = output + '# TYPE nginx_online_instances gauge\n'
+  output = output + 'nginx_online_instances{location=""} '+str(instances['listinfo']['total'])+'\n'
+  output = output + '# HELP nginx_offline_instances Offline NGINX OSS/Plus instances\n'
+  output = output + '# TYPE nginx_offline_instances gauge\n'
+  output = output + 'nginx_offline_instances{location=""} 0\n'
+
+  return output
+
+
+
+# Returns a json for all online/offline instances
+@app.route('/instances', methods=['GET'])
+def getInstances():
+  if nc_mode == 'NGINX_CONTROLLER':
+    return ncInstances()
+  elif nc_mode == 'NGINX_INSTANCE_MANAGER':
+    return nimInstances()
+
+
+@app.route('/metrics', methods=['GET'])
+def getMetrics():
+  if nc_mode == 'NGINX_CONTROLLER':
+    return ncMetrics()
+  elif nc_mode == 'NGINX_INSTANCE_MANAGER':
+    return nimMetrics()
+
+
 @app.errorhandler(404)
 def not_found(error):
   return make_response(jsonify({'error': 'Not found'}), 404)
 
 if __name__ == '__main__':
 
-  app.run(host='0.0.0.0')
+  if nc_mode != 'NGINX_CONTROLLER' and nc_mode != 'NGINX_INSTANCE_MANAGER':
+    print('Invalid NGINX_CONTROLLER_TYPE')
+  else:
+    app.run(host='0.0.0.0')

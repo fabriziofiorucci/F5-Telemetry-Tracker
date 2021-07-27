@@ -27,12 +27,27 @@ spec:
         ports:
         - containerPort: 5000
         env:
+          # Example for NGINX Controller
+
           - name: NGINX_CONTROLLER_FQDN
             value: "nginx-controller.ff.lan"
           - name: NGINX_CONTROLLER_USERNAME
             value: "username@domain"
           - name: NGINX_CONTROLLER_PASSWORD
             value: "thepassword"
+          - name: NGINX_CONTROLLER_TYPE
+            value: NGINX_CONTROLLER
+
+          # Example for NGINX Instance Manager
+
+          #- name: NGINX_CONTROLLER_FQDN
+          #  value: "nim.ff.lan:11000"
+          #- name: NGINX_CONTROLLER_USERNAME
+          #  value: "username@domain"
+          #- name: NGINX_CONTROLLER_PASSWORD
+          #  value: "thepassword"
+          #- name: NGINX_CONTROLLER_TYPE
+          #  value: NGINX_INSTANCE_MANAGER
 
 ---
 apiVersion: v1

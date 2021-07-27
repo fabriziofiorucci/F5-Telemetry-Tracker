@@ -2,10 +2,14 @@
 
 ## Description
 
-This is a simple microservice that helps tracking NGINX Plus instances managed by NGINX Controller.
-It has been tested against NGINX Controller 3.18.
+This is a simple microservice that helps tracking NGINX Plus instances managed by NGINX Controller and NGINX Instance Manager
 
-Communication is based on the Controller's REST API, and two kinds of output are supported:
+It has been tested against:
+
+- NGINX Controller 3.18
+- NGINX Instance Manager 1.0.1
+
+Communication to NGINX Controller / NGINX Instance Manager is based on REST API, and two kinds of output are supported:
 
 - JSON
 - prometheus "metrics" format
@@ -14,7 +18,7 @@ Communication is based on the Controller's REST API, and two kinds of output are
 
 - Kubernetes or Openshift cluster
 - Private registry to push the NGINX Instance Counter image
-- NGINX Controller 3.18
+- NGINX Controller 3.18 or NGINX Instance Manager 1.0.1
 
 ## How to build
 
@@ -39,9 +43,10 @@ Edit 0.instancecounter.yaml to customize:
 - image name:
   - To be set to your private registry image
 - environment variables:
-  - NGINX_CONTROLLER_FQDN - the FQDN of your NGINX Controller instance
+  - NGINX_CONTROLLER_FQDN - the FQDN[:port] of your NGINX Controller / NGINX Instance Manager instance
   - NGINX_CONTROLLER_USERNAME - the username for NGINX Controller authentication
   - NGINX_CONTROLLER_PASSWORD - the password for NGINX Controller authentication
+  - NGINX_CONTROLLER_TYPE - either NGINX_CONTROLLER or NGINX_INSTANCE_MANAGER
 - Ingress host:
   - By default it is set to counter.nginx.ff.lan
 
