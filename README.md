@@ -22,7 +22,15 @@ Communication to NGINX Controller / NGINX Instance Manager is based on REST API,
 
 ## How to build
 
-To build and push NGINX Instance Counter to a private registry:
+The NGINX Instance Counter image is available on docker as:
+
+```
+fiorucci/nginx-instance-counter:1.0
+```
+
+The 0.instancecounter.yaml references that by default.
+
+If you need to build and push NGINX your own image to a private registry:
 
 ```
 git clone fabriziofiorucci/NGINX-InstanceCounter
