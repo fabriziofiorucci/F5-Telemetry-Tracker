@@ -23,31 +23,47 @@ spec:
     spec:
       containers:
       - name: nginx-instance-counter
-        image: fiorucci/nginx-instance-counter:1.0
+        image: fiorucci/nginx-instance-counter:1.1
         ports:
         - containerPort: 5000
         env:
+          ### REST API mode
+
           # Example for NGINX Controller
 
+          - name: NGINX_CONTROLLER_TYPE
+            value: NGINX_CONTROLLER
           - name: NGINX_CONTROLLER_FQDN
-            value: "nginx-controller.ff.lan"
+            value: "https://nginx-controller.ff.lan:443"
           - name: NGINX_CONTROLLER_USERNAME
             value: "username@domain"
           - name: NGINX_CONTROLLER_PASSWORD
             value: "thepassword"
-          - name: NGINX_CONTROLLER_TYPE
-            value: NGINX_CONTROLLER
 
           # Example for NGINX Instance Manager
 
+          #- name: NGINX_CONTROLLER_TYPE
+          #  value: NGINX_INSTANCE_MANAGER
           #- name: NGINX_CONTROLLER_FQDN
-          #  value: "nim.ff.lan:11000"
+          #  value: "https://nim.ff.lan:11000"
           #- name: NGINX_CONTROLLER_USERNAME
           #  value: "username@domain"
           #- name: NGINX_CONTROLLER_PASSWORD
           #  value: "thepassword"
-          #- name: NGINX_CONTROLLER_TYPE
-          #  value: NGINX_INSTANCE_MANAGER
+
+          ### Push mode - push interval in seconds
+          - name: STATS_PUSH_ENABLE
+            value: "true"
+          - name: STATS_PUSH_URL
+            value: "http://192.168.1.18/callHome"
+          - name: STATS_PUSH_INTERVAL
+            value: 10
+
+          # Optional parameters for Basic Auth
+          - name: STATS_PUSH_USERNAME
+            value: "authusername"
+          - name: STATS_PUSH_PASSWORD
+            value: "authpassword"
 
 ---
 apiVersion: v1
