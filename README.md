@@ -57,7 +57,7 @@ Edit 0.instancecounter.yaml to customize:
   - To be set to your private registry image (only if not using the image available on Docker Hub)
 - environment variables:
   - NGINX_CONTROLLER_TYPE - either NGINX_CONTROLLER or NGINX_INSTANCE_MANAGER
-  - NGINX_CONTROLLER_FQDN - the FQDN[:port] of your NGINX Controller / NGINX Instance Manager instance
+  - NGINX_CONTROLLER_FQDN - the FQDN of your NGINX Controller / NGINX Instance Manager instance - format must be http[s]://FQDN:port
   - NGINX_CONTROLLER_USERNAME - the username for NGINX Controller authentication
   - NGINX_CONTROLLER_PASSWORD - the password for NGINX Controller authentication
 
