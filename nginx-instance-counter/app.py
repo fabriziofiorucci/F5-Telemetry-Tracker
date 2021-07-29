@@ -1,4 +1,6 @@
-#!flask/bin/python
+#!/usr/bin/python3
+
+## #!flask/bin/python
 from flask import Flask, jsonify, abort, make_response, request
 import os
 import sys

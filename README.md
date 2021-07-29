@@ -30,10 +30,10 @@ Communication to NGINX Controller / NGINX Instance Manager is based on REST API,
 The NGINX Instance Counter image is available on Docker Hub as:
 
 ```
-fiorucci/nginx-instance-counter:1.1
+fiorucci/nginx-instance-counter:1.2
 ```
 
-The 0.instancecounter.yaml references that by default.
+The 1.instancecounter.yaml file references that by default.
 
 If you need to build and push NGINX your own image to a private registry:
 
@@ -41,8 +41,8 @@ If you need to build and push NGINX your own image to a private registry:
 git clone fabriziofiorucci/NGINX-InstanceCounter
 cd NGINX-InstanceCounter/nginx-instance-counter
 
-docker build --no-cache -t PRIVATE_REGISTRY:PORT/nginx-instance-counter:1.1 .
-docker push PRIVATE_REGISTRY:PORT/nginx-instance-counter:1.1
+docker build --no-cache -t PRIVATE_REGISTRY:PORT/nginx-instance-counter:1.2 .
+docker push PRIVATE_REGISTRY:PORT/nginx-instance-counter:1.2
 ```
 
 ## How to deploy
@@ -51,7 +51,7 @@ docker push PRIVATE_REGISTRY:PORT/nginx-instance-counter:1.1
 cd NGINX-InstanceCounter
 ```
 
-Edit 0.instancecounter.yaml to customize:
+Edit 1.instancecounter.yaml to customize:
 
 - image name:
   - To be set to your private registry image (only if not using the image available on Docker Hub)
@@ -70,7 +70,8 @@ Edit 0.instancecounter.yaml to customize:
   - By default it is set to counter.nginx.ff.lan
 
 ```
-kubectl apply -f 0.instancecounter.yaml
+kubectl apply -f 0.ns.yaml
+kubectl apply -f 1.instancecounter.yaml
 ```
 
 ## Usage - REST API mode
@@ -143,3 +144,8 @@ Authorization: Basic YWFhOmJiYg==
 
 [{"location": "test", "online": 0, "offline": 0},{"location": "unspecified", "online": 2, "offline": 5}]
 ```
+
+
+## Visualization with Prometheus and Grafana
+
+Work in progress, coming soon
