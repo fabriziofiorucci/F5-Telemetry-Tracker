@@ -160,7 +160,7 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
 
 Prometheus endpoint:
 
-NGINX Instance Manager
+Pulling from NGINX Instance Manager
 
 ```
 $ curl -s http://counter.nginx.ff.lan/metrics
@@ -172,9 +172,10 @@ nginx_oss_online_instances{subscription="NGX-Subscription-1-TRL-064788",instance
 nginx_plus_online_instances{subscription="NGX-Subscription-1-TRL-064788",instanceType="INSTANCE_MANAGER",instanceVersion="2"} 0
 ```
 
-NGINX Controller
+Pulling from NGINX Controller
 
 ```
+$ curl -s http://counter.nginx.ff.lan/metrics
 # HELP nginx_plus_online_instances Online NGINX Plus instances
 # TYPE nginx_plus_online_instances gauge
 nginx_plus_online_instances{subscription="NGX-Subscription-1-TRL-046027",instanceType="NGINX Controller",instanceVersion="3.18.0",location="test"} 0
