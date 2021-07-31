@@ -302,7 +302,6 @@ def nimInstances(mode):
 
     output = output + 'nginx_plus_online_instances{subscription="'+subscriptionId+'",instanceType="'+instanceType+'",instanceVersion="'+instanceVersion+'"} '+plusManaged+'\n'
 
-  print("NIMOUTPUT",output)
   return output
 
 
