@@ -8,6 +8,8 @@ import ssl
 import json
 import sched,time,datetime
 import requests
+import time
+import threading
 from requests import Request, Session
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
@@ -15,7 +17,6 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 app = Flask(__name__)
 
-conn = ''
 sessionCookie = ''
 nc_mode=os.environ['NGINX_CONTROLLER_TYPE']
 nc_fqdn=os.environ['NGINX_CONTROLLER_FQDN']
@@ -24,25 +25,47 @@ nc_pass=os.environ['NGINX_CONTROLLER_PASSWORD']
 
 
 # Scheduler for automated statistics push / call home
-def scheduledPush(counter):
-  if nc_mode == 'NGINX_CONTROLLER':
-    payload=ncInstances(mode='JSON')
-  elif nc_mode == 'NGINX_INSTANCE_MANAGER':
-    payload=nimInstances(mode='JSON')
+def scheduledPush(url,username,password,interval,pushmode):
+  counter = 0
 
-  try:
-    if stats_push_username == '' or stats_push_password == '':
-      r = requests.post(stats_push_url, data=payload, headers={ 'Content-Type': 'application/json'})
+  pushgatewayUrl=url+"/metrics/job/nginx-instance-counter"
+
+  while (counter>=0):
+    if nc_mode == 'NGINX_CONTROLLER':
+      if pushmode == 'CUSTOM':
+        payload=ncInstances(mode='JSON')
+      elif pushmode == 'NGINX_PUSH':
+        payload=ncInstances(mode='PUSHGATEWAY')
+    elif nc_mode == 'NGINX_INSTANCE_MANAGER':
+      if pushmode == 'CUSTOM':
+        payload=nimInstances(mode='JSON')
+      elif pushmode == 'NGINX_PUSH':
+        payload=nimInstances(mode='PUSHGATEWAY')
+
+    try:
+      if username == '' or password == '':
+        if pushmode == 'CUSTOM':
+          # Push json to custom URL
+          r = requests.post(url, data=payload, headers={'Content-Type': 'application/json'}, timeout=10)
+        elif pushmode == 'NGINX_PUSH':
+          # Push to pushgateway
+          r = requests.post(pushgatewayUrl, data=payload, timeout=10)
+      else:
+        if pushmode == 'CUSTOM':
+          # Push json to custom URL with basic auth
+          r = requests.post(url, auth=(username,password), data=payload, headers={'Content-Type': 'application/json'}, timeout=10)
+        elif pushmode == 'NGINX_PUSH':
+          # Push to pushgateway
+          r = requests.post(pushgatewayUrl, auth=(username,password), data=payload, timeout=10)
+    except:
+      e = sys.exc_info()[0]
+      print(datetime.datetime.now(),counter,'Pushing stats to',url,'failed:',e)
     else:
-      r = requests.post(stats_push_url, auth=(stats_push_username,stats_push_password), data=payload, headers={ 'Content-Type': 'application/json'})
-  except:
-    e = sys.exc_info()[0]
-    print(datetime.datetime.now(),counter,'Pushing stats to',stats_push_url,'failed:',e)
-  else:
-    print(datetime.datetime.now(),counter,'Pushing stats to',stats_push_url,'returncode',r.status_code)
+      print(datetime.datetime.now(),counter,'Pushing stats to',url,'returncode',r.status_code)
 
-  scheduler.enter(stats_push_interval,1,scheduledPush,(counter+1,))
-  scheduler.run()
+    counter = counter + 1
+
+    time.sleep(interval)
 
 
 ### NGINX Controller REST API
@@ -77,10 +100,27 @@ def nginxControllerLogout(fqdn,cookie):
   p.headers['Cookie']=cookie
   res = s.send(p,verify=False)
 
-  return ''
+  return res.status_code
 
 
-# Returns HTTP status (200/401) and NGINX Controller locations dictionary
+# Returns NGINX Controller license information
+def nginxControllerLicense(fqdn,cookie):
+  s = Session()
+  req = Request('GET',fqdn+"/api/v1/platform/license")
+
+  p = s.prepare_request(req)
+  p.headers['Cookie']=cookie
+  res = s.send(p,verify=False)
+
+  if res.status_code == 200:
+    data = res.json()
+  else:
+    data = {}
+
+  return res.status_code,data
+
+
+# Returns HTTP status (200/401) and NGINX Controller locations
 def nginxControllerLocations(fqdn,cookie):
   s = Session()
   req = Request('GET',fqdn+"/api/v1/infrastructure/locations")
@@ -97,7 +137,7 @@ def nginxControllerLocations(fqdn,cookie):
   return res.status_code,data
 
 
-# Returns HTTP status (200/401) and NGINX Plus instances dictionary for the given NGINX Controller location
+# Returns HTTP status (200/401) and NGINX Plus instances for the given NGINX Controller location
 def nginxControllerInstances(fqdn,cookie,location):
   s = Session()
   req = Request('GET',fqdn+"/api/v1/infrastructure/locations/"+location+"/instances")
@@ -116,7 +156,23 @@ def nginxControllerInstances(fqdn,cookie,location):
 
 ### NGINX Instance Manager REST API
 
-# ReturnsNGINX OSS/Plus instances managed by NIM
+# Returns NIM Controller license information
+def nginxInstanceManagerLicense(fqdn):
+  s = Session()
+  req = Request('GET',fqdn+"/api/v0/about/license")
+
+  p = s.prepare_request(req)
+  res = s.send(p,verify=False)
+
+  if res.status_code == 200:
+    data = res.json()
+  else:
+    data = {}
+
+  return res.status_code,data
+
+
+# Returns NGINX OSS/Plus instances managed by NIM
 def nginxInstanceManagerInstances(fqdn):
   s = Session()
   req = Request('GET',fqdn+"/api/v0/instances")
@@ -136,10 +192,19 @@ def nginxInstanceManagerInstances(fqdn):
 
 # Returns NGINX Plus instances managed by NGINX Controller in JSON format
 def ncInstances(mode):
+  # NGINX Controller login
   status,sessionCookie = nginxControllerLogin(nc_fqdn,nc_user,nc_pass)
-
   if status != 204:
     return make_response(jsonify({'error': 'authentication failed'}), 401)
+
+  # Fetches controller license
+  status,license = nginxControllerLicense(nc_fqdn,sessionCookie)
+  if status != 200:
+    return make_response(jsonify({'error': 'authentication failed'}), 401)
+
+  subscriptionId=license['currentStatus']['subscription']['id']
+  instanceType=license['currentStatus']['state']['currentInstance']['type']
+  instanceVersion=license['currentStatus']['state']['currentInstance']['version']
 
   # Fetches locations
   status,locations = nginxControllerLocations(nc_fqdn,sessionCookie)
@@ -147,14 +212,17 @@ def ncInstances(mode):
     return make_response(jsonify({'error': 'locations fetch error'}), 404)
 
   if mode == 'JSON':
-    output = '['
+    output = '{ "subscription": {"id": "'+subscriptionId+'","type":"'+instanceType+'","version":"'+instanceVersion+'"},"instances": ['
+    firstLoop = True
   else:
     output = ''
 
   # Iterates locations
   for l in locations['items']:
     if mode == 'JSON':
-      if output != '[':
+      if firstLoop == True :
+        firstLoop=False
+      else:
         output+=','
 
     locName = l['metadata']['name']
@@ -173,19 +241,24 @@ def ncInstances(mode):
         offline+=1
 
     if mode == 'JSON':
-      output = output + '{"location": "'+locName+'", "online": '+str(online)+', "offline": '+str(offline)+'}'
-    elif mode == 'PROMETHEUS':
-      output = output + '# HELP nginx_online_instances Online NGINX Plus instances\n'
-      output = output + '# TYPE nginx_online_instances gauge\n'
-      output = output + 'nginx_online_instances{location="'+locName+'"} '+str(online)+'\n'
-      output = output + '# HELP nginx_offline_instances Offline NGINX Plus instances\n'
-      output = output + '# TYPE nginx_offline_instances gauge\n'
-      output = output + 'nginx_offline_instances{location="'+locName+'"} '+str(offline)+'\n'
+      output = output + '{"location": "'+locName+'", "nginx_plus_online": '+str(online)+', "nginx_plus_offline": '+str(offline)+'}'
+    elif mode == 'PROMETHEUS' or mode == 'PUSHGATEWAY':
+      if mode == 'PROMETHEUS':
+        output = output + '# HELP nginx_plus_online_instances Online NGINX Plus instances\n'
+        output = output + '# TYPE nginx_plus_online_instances gauge\n'
+
+      output = output + 'nginx_plus_online_instances{subscription="'+subscriptionId+'",instanceType="'+instanceType+'",instanceVersion="'+instanceVersion+'",location="'+locName+'"} '+str(online)+'\n'
+
+      if mode == 'PROMETHEUS':
+        output = output + '# HELP nginx_plus_offline_instances Offline NGINX Plus instances\n'
+        output = output + '# TYPE nginx_plus_offline_instances gauge\n'
+
+      output = output + 'nginx_plus_offline_instances{subscription="'+subscriptionId+'",instanceType="'+instanceType+'",instanceVersion="'+instanceVersion+'",location="'+locName+'"} '+str(offline)+'\n'
 
   nginxControllerLogout(nc_fqdn,sessionCookie)
 
   if mode == 'JSON':
-    output = output + ']'
+    output = output + ']}'
 
   return output
 
@@ -194,22 +267,42 @@ def ncInstances(mode):
 
 # Returns NGINX OSS/Plus instances managed by NIM in JSON format
 def nimInstances(mode):
-  # Fetches instances
+  # Fetching NIM license
+  status,license = nginxInstanceManagerLicense(nc_fqdn)
+  if status != 200:
+    return make_response(jsonify({'error': 'authentication failed'}), 401)
+
+  subscriptionId=license['attributes']['subscription']
+  instanceType=license['licenses'][0]['product_code']
+  instanceVersion=license['licenses'][0]['version']
+  plusManaged=license['plus_instances_managed']
+  totalManaged=license['total_instances_managed']
+
+  # Fetching instances
   status,instances = nginxInstanceManagerInstances(nc_fqdn)
 
   if status != 200:
     return make_response(jsonify({'error': 'instances fetch error'}), 404)
 
-  if mode == 'JSON':
-    output = '[ {"location": "", "online": '+str(instances['listinfo']['total'])+', "offline": 0} ]'
-  elif mode == 'PROMETHEUS':
-    output = '# HELP nginx_online_instances Online NGINX OSS/Plus instances\n'
-    output = output + '# TYPE nginx_online_instances gauge\n'
-    output = output + 'nginx_online_instances{location=""} '+str(instances['listinfo']['total'])+'\n'
-    output = output + '# HELP nginx_offline_instances Offline NGINX OSS/Plus instances\n'
-    output = output + '# TYPE nginx_offline_instances gauge\n'
-    output = output + 'nginx_offline_instances{location=""} 0\n'
+  output=''
 
+  if mode == 'JSON':
+    output = '{ "subscription": {"id": "'+subscriptionId+'","type":"'+instanceType+'","version":"'+instanceVersion+'"},' + \
+             '"instances": [ {"nginx_plus_online": '+plusManaged+', "nginx_oss_online": '+str(int(totalManaged)-int(plusManaged))+'}]}'
+  elif mode == 'PROMETHEUS' or mode == 'PUSHGATEWAY':
+    if mode == 'PROMETHEUS':
+      output = '# HELP nginx_oss_online_instances Online NGINX OSS instances\n'
+      output = output + '# TYPE nginx_oss_online_instances gauge\n'
+
+    output = output + 'nginx_oss_online_instances{subscription="'+subscriptionId+'",instanceType="'+instanceType+'",instanceVersion="'+instanceVersion+'"} '+str(int(totalManaged)-int(plusManaged))+'\n'
+
+    if mode == 'PROMETHEUS':
+      output = output + '# HELP nginx_plus_online_instances Online NGINX Plus instances\n'
+      output = output + '# TYPE nginx_plus_online_instances gauge\n'
+
+    output = output + 'nginx_plus_online_instances{subscription="'+subscriptionId+'",instanceType="'+instanceType+'",instanceVersion="'+instanceVersion+'"} '+plusManaged+'\n'
+
+  print("NIMOUTPUT",output)
   return output
 
 
@@ -241,29 +334,32 @@ if __name__ == '__main__':
   if nc_mode != 'NGINX_CONTROLLER' and nc_mode != 'NGINX_INSTANCE_MANAGER':
     print('Invalid NGINX_CONTROLLER_TYPE')
   else:
+    # Push thread
     if os.environ['STATS_PUSH_ENABLE'] == 'true':
-      # Push mode
-      print('Running in push mode')
+      stats_push_mode=os.environ['STATS_PUSH_MODE']
 
-      stats_push_url=os.environ['STATS_PUSH_URL']
-      if "STATS_PUSH_USERNAME" in os.environ:
-        stats_push_username=os.environ['STATS_PUSH_USERNAME']
+      if stats_push_mode != 'NGINX_PUSH' and stats_push_mode != 'CUSTOM':
+        print('Invalid STATS_PUSH_MODE')
       else:
-        stats_push_username=''
+        stats_push_url=os.environ['STATS_PUSH_URL']
+        if "STATS_PUSH_USERNAME" in os.environ:
+          stats_push_username=os.environ['STATS_PUSH_USERNAME']
+        else:
+          stats_push_username=''
 
-      if "STATS_PUSH_PASSWORD" in os.environ:
-        stats_push_password=os.environ['STATS_PUSH_PASSWORD']
-      else:
-        stats_push_password=''
+        if "STATS_PUSH_PASSWORD" in os.environ:
+          stats_push_password=os.environ['STATS_PUSH_PASSWORD']
+        else:
+          stats_push_password=''
 
-      stats_push_interval=int(os.environ['STATS_PUSH_INTERVAL'])
+        stats_push_interval=int(os.environ['STATS_PUSH_INTERVAL'])
 
-      print('Pushing stats to',stats_push_url,'every',stats_push_interval,'seconds')
+        print('Pushing stats to',stats_push_url,'every',stats_push_interval,'seconds')
 
-      scheduler = sched.scheduler(time.time,time.sleep)
-      scheduler.enter(stats_push_interval,1,scheduledPush,(0,))
-      scheduler.run()
-    else:
-      # REST API mode
-      print('Running in REST API mode')
-      app.run(host='0.0.0.0')
+        print('Running push thread')
+        pushThread = threading.Thread(target=scheduledPush,args=(stats_push_url,stats_push_username,stats_push_password,stats_push_interval,stats_push_mode))
+        pushThread.start()
+
+    # REST API / prometheus metrics server
+    print('Running REST API/Prometheus metrics server')
+    app.run(host='0.0.0.0')

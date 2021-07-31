@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: nginx-instance-counter
-        image: fiorucci/nginx-instance-counter:1.2
+        image: fiorucci/nginx-instance-counter:1.3
         ports:
         - containerPort: 5000
         env:
@@ -39,7 +39,7 @@ spec:
           #- name: NGINX_CONTROLLER_TYPE
           #  value: NGINX_INSTANCE_MANAGER
           #- name: NGINX_CONTROLLER_FQDN
-          #  value: "https://nim.ff.lan:11000"
+          #  value: "http://nim.ff.lan:11000"
           #- name: NGINX_CONTROLLER_USERNAME
           #  value: "username@domain"
           #- name: NGINX_CONTROLLER_PASSWORD
@@ -47,11 +47,15 @@ spec:
 
           ### Push mode - push interval in seconds
           - name: STATS_PUSH_ENABLE
-            value: "false"
-          #- name: STATS_PUSH_URL
-          #  value: "http://192.168.1.18/callHome"
-          #- name: STATS_PUSH_INTERVAL
-          #  value: 10
+            value: "true"
+          - name: STATS_PUSH_MODE
+            #value: CUSTOM
+            value: NGINX_PUSH
+          - name: STATS_PUSH_URL
+            #value: "http://192.168.1.18/callHome"
+            value: "http://pushgateway.nginx.ff.lan"
+          - name: STATS_PUSH_INTERVAL
+            value: "10"
 
           # Optional parameters for Basic Auth
           #- name: STATS_PUSH_USERNAME
