@@ -11,11 +11,14 @@ data:
       scrape_timeout: 8s
     rule_files:
     scrape_configs:
+      # Configuration for pull mode
       #- job_name: 'nginx-instance-counter'
       #  scrape_interval: 10s
       #  scrape_timeout: 8s
       #  static_configs:
       #  - targets: ['counter.nginx.ff.lan']
+
+      # Configuration for push mode
       - job_name: 'pushgateway'
         scrape_interval: 10s
         scrape_timeout: 8s

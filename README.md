@@ -96,6 +96,8 @@ kubectl apply -f 3.grafana.yaml
 kubectl apply -f 4.pushgateway.yaml
 ```
 
+By default 4.pushgateway.yaml is configured for push mode, it must be edited decommenting the relevant section for pull mode
+
 To setup visualization:
 
 - Grafana shall be configured with a Prometheus datasource using by default http://prometheus.nginx.ff.lan
