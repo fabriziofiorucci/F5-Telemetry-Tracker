@@ -36,7 +36,9 @@ Push mode: Instance Counter pushes stats to a remote data collection and visuali
 - Private registry to push the NGINX Instance Counter image
 - NGINX Controller 3.18 or NGINX Instance Manager 1.0.1
 
-## How to build
+# How to build
+
+## For Kubernetes/Openshift
 
 The NGINX Instance Counter image is available on Docker Hub as:
 
@@ -56,7 +58,20 @@ docker build --no-cache -t PRIVATE_REGISTRY:PORT/nginx-instance-counter:1.3 .
 docker push PRIVATE_REGISTRY:PORT/nginx-instance-counter:1.3
 ```
 
-## How to deploy
+## As a native python application
+
+NGINX Instance Counter requires:
+
+- Any Linux distribution
+- Python 3 (tested on 3.9+)
+- [Flask framework](https://flask.palletsprojects.com/en/2.0.x/)
+- [Requests](https://docs.python-requests.org/en/master/)
+
+nginx-instance-counter/nicstart.sh is a sample script to run NGINX Instance Counter from bash
+
+# How to deploy
+
+## For Kubernetes/Openshift
 
 ```
 cd NGINX-InstanceCounter/manifests
@@ -110,7 +125,13 @@ Service names created by default as Ingress resources are:
 - prometheus.nginx.ff.lan - Prometheus web GUI
 - grafana.nginx.ff.lan - Grafana visualization web GUI
 
-## Usage - REST API mode
+## As a native python application
+
+Edit nginx-instance-counter/nicstart.sh and run it
+
+# Usage
+
+## REST API mode
 
 To get instance statistics in JSON format:
 
@@ -190,7 +211,7 @@ nginx_plus_online_instances{subscription="NGX-Subscription-1-TRL-046027",instanc
 nginx_plus_offline_instances{subscription="NGX-Subscription-1-TRL-046027",instanceType="NGINX Controller",instanceVersion="3.18.0",location="unspecified"} 283
 ```
 
-## Usage - Push mode to custom URL
+## Push mode to custom URL
 
 Sample unauthenticated POST payload:
 
@@ -224,7 +245,7 @@ Authorization: Basic YWE6YmI=
 ```
 
 
-## Visualization
+# Visualization
 
 <img src="./images/grafana.1.jpg"/>
 
