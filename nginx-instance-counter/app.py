@@ -288,7 +288,19 @@ def nimInstances(mode):
 
   if mode == 'JSON':
     output = '{ "subscription": {"id": "'+subscriptionId+'","type":"'+instanceType+'","version":"'+instanceVersion+'"},' + \
-             '"instances": [ {"nginx_plus_online": '+plusManaged+', "nginx_oss_online": '+str(int(totalManaged)-int(plusManaged))+'}]}'
+             '"instances": [ {"nginx_plus_online": '+plusManaged+', "nginx_oss_online": '+str(int(totalManaged)-int(plusManaged)) + \
+             '}],"details": ['
+
+    for i in instances['list']:
+      output = output + '{ \
+        "instance_id": "'+i['instance_id'] + '", \
+        "uname": "'+i['uname'] + '", \
+        "containerized": "'+str(i['containerized']) + '", \
+        "type": "'+i['nginx']['type'] + '", \
+        "version": "'+i['nginx']['version'] + \
+      '"}'
+
+    output = output + ']}'
   elif mode == 'PROMETHEUS' or mode == 'PUSHGATEWAY':
     if mode == 'PROMETHEUS':
       output = '# HELP nginx_oss_online_instances Online NGINX OSS instances\n'
@@ -362,3 +374,4 @@ if __name__ == '__main__':
     # REST API / prometheus metrics server
     print('Running REST API/Prometheus metrics server')
     app.run(host='0.0.0.0')
+

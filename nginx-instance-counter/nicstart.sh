@@ -10,7 +10,7 @@
 ### Section to use when polling NGINX Instance Manager
 
 #export NGINX_CONTROLLER_TYPE=NGINX_INSTANCE_MANAGER
-#export NGINX_CONTROLLER_FQDN="https://nim.ff.lan:11000"
+#export NGINX_CONTROLLER_FQDN="http://nim.ff.lan:11000"
 #export NGINX_CONTROLLER_USERNAME="username@domain"
 #export NGINX_CONTROLLER_PASSWORD="thepassword"
 
@@ -23,7 +23,7 @@
 #export STATS_PUSH_USERNAME="authusername"
 #export STATS_PUSH_PASSWORD="authpassword"
 
-### Section to use when using push in custom mode (basic auth username/password are optional)
+### Section to use when using push in custom mode (basic auth username/password are optional) - STATS_PUSH_ENABLE is mandatory
 
 #export STATS_PUSH_ENABLE="true"
 #export STATS_PUSH_MODE=CUSTOM

@@ -148,7 +148,16 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
   "instances": [
     {
       "nginx_plus_online": 0,
-      "nginx_oss_online": 2
+      "nginx_oss_online": 1
+    }
+  ],
+  "details": [
+    {
+      "instance_id": "f821413d-9664-4fb9-b8b9-595490912bb7",
+      "uname": "Linux testserver 5.7.6 #1 SMP PREEMPT Fri Jun 26 17:39:22 CEST 2020 x86_64 QEMU Virtual CPU version 2.5+ AuthenticAMD GNU/Linux",
+      "containerized": "False",
+      "type": "oss",
+      "version": "1.20.1"
     }
   ]
 }
