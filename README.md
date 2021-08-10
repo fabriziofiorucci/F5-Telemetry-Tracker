@@ -2,7 +2,7 @@
 
 ## Description
 
-This microservice helps tracking NGINX Plus instances managed by NGINX Controller and NGINX Instance Manager
+This tool helps tracking NGINX Plus instances managed by NGINX Controller and NGINX Instance Manager
 
 It has been tested against:
 
