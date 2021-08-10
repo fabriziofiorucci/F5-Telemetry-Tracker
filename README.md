@@ -6,7 +6,7 @@ This tool helps tracking NGINX Plus instances managed by NGINX Controller and NG
 
 It has been tested against:
 
-- NGINX Controller 3.18
+- NGINX Controller 3.18, 3.18.2
 - NGINX Instance Manager 1.0.1
 
 Communication to NGINX Controller / NGINX Instance Manager is based on REST API, current features are:
@@ -34,7 +34,7 @@ Push mode: Instance Counter pushes stats to a remote data collection and visuali
 
 - Kubernetes or Openshift cluster
 - Private registry to push the NGINX Instance Counter image
-- NGINX Controller 3.18 or NGINX Instance Manager 1.0.1
+- NGINX Controller 3.18, 3.18.2 or NGINX Instance Manager 1.0.1
 
 # How to build
 
@@ -171,7 +171,7 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
   "subscription": {
     "id": "NGX-Subscription-1-TRL-XXXXXX",
     "type": "NGINX Controller",
-    "version": "3.18.0"
+    "version": "3.18.2"
   },
   "instances": [
     {
@@ -208,16 +208,16 @@ Pulling from NGINX Controller
 $ curl -s http://counter.nginx.ff.lan/metrics
 # HELP nginx_plus_online_instances Online NGINX Plus instances
 # TYPE nginx_plus_online_instances gauge
-nginx_plus_online_instances{subscription="NGX-Subscription-1-TRL-046027",instanceType="NGINX Controller",instanceVersion="3.18.0",location="test"} 0
+nginx_plus_online_instances{subscription="NGX-Subscription-1-TRL-046027",instanceType="NGINX Controller",instanceVersion="3.18.2",location="test"} 0
 # HELP nginx_plus_offline_instances Offline NGINX Plus instances
 # TYPE nginx_plus_offline_instances gauge
-nginx_plus_offline_instances{subscription="NGX-Subscription-1-TRL-046027",instanceType="NGINX Controller",instanceVersion="3.18.0",location="test"} 0
+nginx_plus_offline_instances{subscription="NGX-Subscription-1-TRL-046027",instanceType="NGINX Controller",instanceVersion="3.18.2",location="test"} 0
 # HELP nginx_plus_online_instances Online NGINX Plus instances
 # TYPE nginx_plus_online_instances gauge
-nginx_plus_online_instances{subscription="NGX-Subscription-1-TRL-046027",instanceType="NGINX Controller",instanceVersion="3.18.0",location="unspecified"} 2
+nginx_plus_online_instances{subscription="NGX-Subscription-1-TRL-046027",instanceType="NGINX Controller",instanceVersion="3.18.2",location="unspecified"} 2
 # HELP nginx_plus_offline_instances Offline NGINX Plus instances
 # TYPE nginx_plus_offline_instances gauge
-nginx_plus_offline_instances{subscription="NGX-Subscription-1-TRL-046027",instanceType="NGINX Controller",instanceVersion="3.18.0",location="unspecified"} 283
+nginx_plus_offline_instances{subscription="NGX-Subscription-1-TRL-046027",instanceType="NGINX Controller",instanceVersion="3.18.2",location="unspecified"} 283
 ```
 
 ## Push mode to custom URL
