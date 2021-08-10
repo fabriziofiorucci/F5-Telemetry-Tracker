@@ -234,7 +234,28 @@ Connection: keep-alive
 Content-Type: application/json
 Content-Length: 267
 
-{ "subscription": {"id": "NGX-Subscription-1-TRL-XXXXXX","type":"NGINX Controller","version":"3.18.0"},"instances": [{"location": "test", "nginx_plus_online": 0, "nginx_plus_offline": 0},{"location": "unspecified", "nginx_plus_online": 3, "nginx_plus_offline": 283}]}
+{
+  "subscription": {
+    "id": "NGX-Subscription-1-TRL-XXXXXX",
+    "type": "INSTANCE_MANAGER",
+    "version": "2"
+  },
+  "instances": [
+    {
+      "nginx_plus_online": 0,
+      "nginx_oss_online": 1
+    }
+  ],
+  "details": [
+    {
+      "instance_id": "f821413d-9664-4fb9-b8b9-595490912bb7",
+      "uname": "Linux vm-gw 5.7.6 #1 SMP PREEMPT Fri Jun 26 17:39:22 CEST 2020 x86_64 QEMU Virtual CPU version 2.5+ AuthenticAMD GNU/Linux",
+      "containerized": "False",
+      "type": "oss",
+      "version": "1.20.1"
+    }
+  ]
+}
 ```
 
 Sample POST payload with Basic Authentication
@@ -250,7 +271,28 @@ Content-Type: application/json
 Content-Length: 267
 Authorization: Basic YWE6YmI=
 
-{ "subscription": {"id": "NGX-Subscription-1-TRL-XXXXXX","type":"NGINX Controller","version":"3.18.0"},"instances": [{"location": "test", "nginx_plus_online": 0, "nginx_plus_offline": 0},{"location": "unspecified", "nginx_plus_online": 3, "nginx_plus_offline": 283}]}
+{
+  "subscription": {
+    "id": "NGX-Subscription-1-TRL-XXXXXX",
+    "type": "INSTANCE_MANAGER",
+    "version": "2"
+  },
+  "instances": [
+    {
+      "nginx_plus_online": 0,
+      "nginx_oss_online": 1
+    }
+  ],
+  "details": [
+    {
+      "instance_id": "f821413d-9664-4fb9-b8b9-595490912bb7",
+      "uname": "Linux vm-gw 5.7.6 #1 SMP PREEMPT Fri Jun 26 17:39:22 CEST 2020 x86_64 QEMU Virtual CPU version 2.5+ AuthenticAMD GNU/Linux",
+      "containerized": "False",
+      "type": "oss",
+      "version": "1.20.1"
+    }
+  ]
+}
 ```
 
 
