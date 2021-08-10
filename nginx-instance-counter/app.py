@@ -291,7 +291,15 @@ def nimInstances(mode):
              '"instances": [ {"nginx_plus_online": '+plusManaged+', "nginx_oss_online": '+str(int(totalManaged)-int(plusManaged)) + \
              '}],"details": ['
 
+    firstLoop=True
+
     for i in instances['list']:
+
+      if firstLoop == True :
+        firstLoop=False
+      else:
+        output+=','
+
       output = output + '{ \
         "instance_id": "'+i['instance_id'] + '", \
         "uname": "'+i['uname'] + '", \
