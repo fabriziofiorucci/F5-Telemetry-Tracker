@@ -59,7 +59,7 @@ docker push PRIVATE_REGISTRY:PORT/nginx-instance-counter:1.3
 ## How to deploy
 
 ```
-cd NGINX-InstanceCounter
+cd NGINX-InstanceCounter/manifests
 ```
 
 Edit 1.instancecounter.yaml to customize:
