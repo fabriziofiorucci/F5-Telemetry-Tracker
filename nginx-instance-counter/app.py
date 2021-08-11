@@ -31,37 +31,41 @@ def scheduledPush(url,username,password,interval,pushmode):
   pushgatewayUrl=url+"/metrics/job/nginx-instance-counter"
 
   while (counter>=0):
-    if nc_mode == 'NGINX_CONTROLLER':
-      if pushmode == 'CUSTOM':
-        payload=ncInstances(mode='JSON')
-      elif pushmode == 'NGINX_PUSH':
-        payload=ncInstances(mode='PUSHGATEWAY')
-    elif nc_mode == 'NGINX_INSTANCE_MANAGER':
-      if pushmode == 'CUSTOM':
-        payload=nimInstances(mode='JSON')
-      elif pushmode == 'NGINX_PUSH':
-        payload=nimInstances(mode='PUSHGATEWAY')
-
     try:
-      if username == '' or password == '':
+      if nc_mode == 'NGINX_CONTROLLER':
         if pushmode == 'CUSTOM':
-          # Push json to custom URL
-          r = requests.post(url, data=payload, headers={'Content-Type': 'application/json'}, timeout=10)
+          payload=ncInstances(mode='JSON')
         elif pushmode == 'NGINX_PUSH':
-          # Push to pushgateway
-          r = requests.post(pushgatewayUrl, data=payload, timeout=10)
+          payload=ncInstances(mode='PUSHGATEWAY')
+      elif nc_mode == 'NGINX_INSTANCE_MANAGER':
+        if pushmode == 'CUSTOM':
+          payload=nimInstances(mode='JSON')
+        elif pushmode == 'NGINX_PUSH':
+          payload=nimInstances(mode='PUSHGATEWAY')
+
+      try:
+        if username == '' or password == '':
+          if pushmode == 'CUSTOM':
+            # Push json to custom URL
+            r = requests.post(url, data=payload, headers={'Content-Type': 'application/json'}, timeout=10)
+          elif pushmode == 'NGINX_PUSH':
+            # Push to pushgateway
+            r = requests.post(pushgatewayUrl, data=payload, timeout=10)
+        else:
+          if pushmode == 'CUSTOM':
+            # Push json to custom URL with basic auth
+            r = requests.post(url, auth=(username,password), data=payload, headers={'Content-Type': 'application/json'}, timeout=10)
+          elif pushmode == 'NGINX_PUSH':
+            # Push to pushgateway
+            r = requests.post(pushgatewayUrl, auth=(username,password), data=payload, timeout=10)
+      except:
+        e = sys.exc_info()[0]
+        print(datetime.datetime.now(),counter,'Pushing stats to',url,'failed:',e)
       else:
-        if pushmode == 'CUSTOM':
-          # Push json to custom URL with basic auth
-          r = requests.post(url, auth=(username,password), data=payload, headers={'Content-Type': 'application/json'}, timeout=10)
-        elif pushmode == 'NGINX_PUSH':
-          # Push to pushgateway
-          r = requests.post(pushgatewayUrl, auth=(username,password), data=payload, timeout=10)
+        print(datetime.datetime.now(),counter,'Pushing stats to',url,'returncode',r.status_code)
+
     except:
-      e = sys.exc_info()[0]
-      print(datetime.datetime.now(),counter,'Pushing stats to',url,'failed:',e)
-    else:
-      print(datetime.datetime.now(),counter,'Pushing stats to',url,'returncode',r.status_code)
+      print('Exception caught during push')
 
     counter = counter + 1
 
