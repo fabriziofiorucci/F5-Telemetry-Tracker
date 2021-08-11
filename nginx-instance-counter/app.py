@@ -255,6 +255,28 @@ def ncInstances(mode):
 
       output = output + 'nginx_plus_offline_instances{subscription="'+subscriptionId+'",instanceType="'+instanceType+'",instanceVersion="'+instanceVersion+'",location="'+locName+'"} '+str(offline)+'\n'
 
+  if mode == 'JSON':
+    output = output + '], "details": ['
+
+    firstLoop = True
+
+    for i in instances['items']:
+      if firstLoop == True :
+        firstLoop = False
+      else:
+        output+=','
+
+      lsm = i['currentStatus']['legacySystemMetadata']
+      uname = lsm['os-type']+' '+lsm['release']['name']+ ' '+lsm['release']['version']+' '+lsm['processor']['architecture']+' '+lsm['processor']['model']
+
+      output = output + '{' + \
+        '"instance_id":"' + i['metadata']['uid'] + '",' + \
+        '"uname":"' + uname + '",' + \
+        '"containerized":"' + '' + '",' + \
+        '"type":"' + 'plus' + '",' + \
+        '"version":"' + i['currentStatus']['version'] + '"' + \
+        '}'
+
   nginxControllerLogout(nc_fqdn,sessionCookie)
 
   if mode == 'JSON':

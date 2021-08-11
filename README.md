@@ -175,14 +175,25 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
   },
   "instances": [
     {
-      "location": "test",
-      "nginx_plus_online": 0,
-      "nginx_plus_offline": 0
-    },
-    {
       "location": "unspecified",
       "nginx_plus_online": 2,
-      "nginx_plus_offline": 283
+      "nginx_plus_offline": 0
+    }
+  ],
+  "details": [
+    {
+      "instance_id": "3b074010-df8d-498c-af41-d54c4ffb1021",
+      "uname": "linux Ubuntu 18.04.5 LTS (Bionic Beaver) x86_64 QEMU Virtual CPU version 2.5+",
+      "containerized": "",
+      "type": "plus",
+      "version": "1.19.10"
+    },
+    {
+      "instance_id": "c891eebe-4def-459e-bb29-eb715e7846a8",
+      "uname": "linux Ubuntu 18.04.5 LTS (Bionic Beaver) x86_64 QEMU Virtual CPU version 2.5+",
+      "containerized": "",
+      "type": "plus",
+      "version": "1.19.10"
     }
   ]
 }
