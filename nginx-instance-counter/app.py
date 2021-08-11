@@ -217,6 +217,8 @@ def ncInstances(mode):
   else:
     output = ''
 
+  instanceDetails = ''
+
   # Iterates locations
   for l in locations['items']:
     if mode == 'JSON':
@@ -232,6 +234,7 @@ def ncInstances(mode):
     if status != 200:
       return make_response(jsonify({'error': 'instances fetch error'}), 404)
 
+    firstILoop = True
     online = 0
     offline = 0
     for i in instances['items']:
@@ -239,6 +242,24 @@ def ncInstances(mode):
         online+=1
       else:
         offline+=1
+
+      if mode == 'JSON':
+        if firstILoop == True :
+          firstILoop = False
+        else:
+          instanceDetails = instanceDetails + ','
+
+        # Retrieves instance details
+        lsm = i['currentStatus']['legacySystemMetadata']
+        uname = lsm['os-type']+' '+lsm['release']['name']+ ' '+lsm['release']['version']+' '+lsm['processor']['architecture']+' '+lsm['processor']['model']
+
+        instanceDetails = instanceDetails + '{' + \
+          '"instance_id":"' + i['metadata']['uid'] + '",' + \
+          '"uname":"' + uname + '",' + \
+          '"containerized":"' + '' + '",' + \
+          '"type":"' + 'plus' + '",' + \
+          '"version":"' + i['currentStatus']['version'] + '"' + \
+          '}'
 
     if mode == 'JSON':
       output = output + '{"location": "'+locName+'", "nginx_plus_online": '+str(online)+', "nginx_plus_offline": '+str(offline)+'}'
@@ -256,31 +277,9 @@ def ncInstances(mode):
       output = output + 'nginx_plus_offline_instances{subscription="'+subscriptionId+'",instanceType="'+instanceType+'",instanceVersion="'+instanceVersion+'",location="'+locName+'"} '+str(offline)+'\n'
 
   if mode == 'JSON':
-    output = output + '], "details": ['
-
-    firstLoop = True
-
-    for i in instances['items']:
-      if firstLoop == True :
-        firstLoop = False
-      else:
-        output+=','
-
-      lsm = i['currentStatus']['legacySystemMetadata']
-      uname = lsm['os-type']+' '+lsm['release']['name']+ ' '+lsm['release']['version']+' '+lsm['processor']['architecture']+' '+lsm['processor']['model']
-
-      output = output + '{' + \
-        '"instance_id":"' + i['metadata']['uid'] + '",' + \
-        '"uname":"' + uname + '",' + \
-        '"containerized":"' + '' + '",' + \
-        '"type":"' + 'plus' + '",' + \
-        '"version":"' + i['currentStatus']['version'] + '"' + \
-        '}'
+    output = output + '], "details": [' + instanceDetails + ']}'
 
   nginxControllerLogout(nc_fqdn,sessionCookie)
-
-  if mode == 'JSON':
-    output = output + ']}'
 
   return output
 
