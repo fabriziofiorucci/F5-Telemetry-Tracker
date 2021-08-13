@@ -192,6 +192,20 @@ def nginxInstanceManagerInstances(fqdn):
   return res.status_code,data
 
 
+### BIG-IQ REST API
+
+# Returns NGINX OSS/Plus instances managed by NIM
+def bigIQInstances(fqdn):
+  res = requests.request("GET", fqdn+"/mgmt/shared/resolver/device-groups/cm-bigip-allBigIpDevices/devices", auth=(nc_user,nc_pass), verify=False)
+
+  if res.status_code == 200:
+    data = res.json()
+  else:
+    data = {}
+
+  return res.status_code,data
+
+
 ### NGINX Controller query functions
 
 # Returns NGINX Plus instances managed by NGINX Controller in JSON format
@@ -350,6 +364,43 @@ def nimInstances(mode):
   return output
 
 
+### BIG-IQ query functions
+
+# Returns NGINX OSS/Plus instances managed by NIM in JSON format
+def bigIqInventory(mode):
+
+  status,details = bigIQInstances(nc_fqdn)
+  if status != 200:
+    return make_response(jsonify({'error': 'authentication failed'}), 401)
+
+  output=''
+
+  if mode == 'JSON':
+    output = '{ "instances": [{ "bigip":"'+str(len(details['items']))+'"}], "details": ['
+    firstLoop = True
+
+    for item in details['items']:
+      if mode == 'JSON':
+        if firstLoop == True :
+          firstLoop=False
+        else:
+          output+=','
+
+        output += '{"product":"'+item['product']+'","version":"'+item['version']+'","edition":"'+ \
+          item['edition']+'","build":"'+item['build']+'","isVirtual":"'+str(item['isVirtual'])+'","isClustered":"'+str(item['isClustered'])+ \
+          '","platformMarketingName":"'+item['platformMarketingName']+'","restFrameworkVersion":"'+ \
+          item['restFrameworkVersion']+'"}'
+
+    output = output + ']}'
+  elif mode == 'PROMETHEUS' or mode == 'PUSHGATEWAY':
+    if mode == 'PROMETHEUS':
+      output = '# HELP bigip_online_instances Online BIG-IP instances\n'
+      output = output + '# TYPE bigip_online_instances gauge\n'
+
+    output = output + 'bigip_online_instances{bigiq_url="'+nc_fqdn+'"} '+str(len(details['items']))+'\n'
+
+  return output
+
 
 # Returns stats in json format
 @app.route('/instances', methods=['GET'])
@@ -358,6 +409,8 @@ def getInstances():
     return ncInstances(mode='JSON')
   elif nc_mode == 'NGINX_INSTANCE_MANAGER':
     return nimInstances(mode='JSON')
+  elif nc_mode == 'BIG_IQ':
+    return bigIqInventory(mode='JSON')
 
 
 # Returns stats in prometheus format
@@ -367,6 +420,8 @@ def getMetrics():
     return ncInstances(mode='PROMETHEUS')
   elif nc_mode == 'NGINX_INSTANCE_MANAGER':
     return nimInstances(mode='PROMETHEUS')
+  elif nc_mode == 'BIG_IQ':
+    return bigIqInventory(mode='PROMETHEUS')
 
 
 @app.errorhandler(404)
@@ -375,7 +430,7 @@ def not_found(error):
 
 if __name__ == '__main__':
 
-  if nc_mode != 'NGINX_CONTROLLER' and nc_mode != 'NGINX_INSTANCE_MANAGER':
+  if nc_mode != 'NGINX_CONTROLLER' and nc_mode != 'NGINX_INSTANCE_MANAGER' and nc_mode != 'BIG_IQ' :
     print('Invalid NGINX_CONTROLLER_TYPE')
   else:
     # Push thread

@@ -2,14 +2,15 @@
 
 ## Description
 
-This tool helps tracking NGINX Plus instances managed by NGINX Controller and NGINX Instance Manager
+This tool helps tracking NGINX Plus instances managed by NGINX Controller and NGINX Instance Manager, and BIG-IP instances managed by BIG-IQ
 
 It has been tested against:
 
 - NGINX Controller 3.18, 3.18.2
 - NGINX Instance Manager 1.0.1, 1.0.2
+- BIG-IQ 8.1.0
 
-Communication to NGINX Controller / NGINX Instance Manager is based on REST API, current features are:
+Communication to NGINX Controller / NGINX Instance Manager / BIG-IQ is based on REST API, current features are:
 
 - REST API mode
   - /instances - returns JSON output
@@ -34,7 +35,7 @@ Push mode: Instance Counter pushes stats to a remote data collection and visuali
 
 - Kubernetes or Openshift cluster
 - Private registry to push the NGINX Instance Counter image
-- NGINX Controller 3.18, 3.18.2 or NGINX Instance Manager 1.0.1, 1.0.2
+- NGINX Controller 3.18, 3.18.2 or NGINX Instance Manager 1.0.1, 1.0.2 or BIG-IP 8.1.0
 
 # How to build
 
@@ -43,7 +44,7 @@ Push mode: Instance Counter pushes stats to a remote data collection and visuali
 The NGINX Instance Counter image is available on Docker Hub as:
 
 ```
-fiorucci/nginx-instance-counter:1.7
+fiorucci/nginx-instance-counter:1.8
 ```
 
 The 1.instancecounter.yaml file references that by default.
@@ -54,8 +55,8 @@ If you need to build and push NGINX your own image to a private registry:
 git clone fabriziofiorucci/NGINX-InstanceCounter
 cd NGINX-InstanceCounter/nginx-instance-counter
 
-docker build --no-cache -t PRIVATE_REGISTRY:PORT/nginx-instance-counter:1.7 .
-docker push PRIVATE_REGISTRY:PORT/nginx-instance-counter:1.7
+docker build --no-cache -t PRIVATE_REGISTRY:PORT/nginx-instance-counter:1.8 .
+docker push PRIVATE_REGISTRY:PORT/nginx-instance-counter:1.8
 ```
 
 ## As a native python application
@@ -82,10 +83,10 @@ Edit 1.instancecounter.yaml to customize:
 - image name:
   - To be set to your private registry image (only if not using the image available on Docker Hub)
 - environment variables:
-  - NGINX_CONTROLLER_TYPE - either NGINX_CONTROLLER or NGINX_INSTANCE_MANAGER
-  - NGINX_CONTROLLER_FQDN - the FQDN of your NGINX Controller / NGINX Instance Manager instance - format must be http[s]://FQDN:port
-  - NGINX_CONTROLLER_USERNAME - the username for NGINX Controller authentication
-  - NGINX_CONTROLLER_PASSWORD - the password for NGINX Controller authentication
+  - NGINX_CONTROLLER_TYPE - can be NGINX_CONTROLLER, NGINX_INSTANCE_MANAGER or BIG_IQ
+  - NGINX_CONTROLLER_FQDN - the FQDN of your NGINX Controller / NGINX Instance Manager / BIG-IQ instance - format must be http[s]://FQDN:port
+  - NGINX_CONTROLLER_USERNAME - the username for authentication
+  - NGINX_CONTROLLER_PASSWORD - the password for authentication
 
   - STATS_PUSH_ENABLE - if set to "true" push mode is enabled, disabled it set to "false"
   - STATS_PUSH_MODE - either CUSTOM or NGINX_PUSH, to push (HTTP POST) JSON to custom URL and to push metrics to pushgateway, respectively
@@ -199,6 +200,41 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
 }
 ```
 
+BIG-IQ
+
+```
+$ curl -s http://counter.nginx.ff.lan/instances | jq
+{
+  "instances": [
+    {
+      "bigip": "2"
+    }
+  ],
+  "details": [
+    {
+      "product": "BIG-IP",
+      "version": "16.1.0",
+      "edition": "Final",
+      "build": "0.0.19",
+      "isVirtual": "True",
+      "isClustered": "False",
+      "platformMarketingName": "BIG-IP Virtual Edition",
+      "restFrameworkVersion": "16.1.0-0.0.19"
+    },
+    {
+      "product": "BIG-IP",
+      "version": "16.1.0",
+      "edition": "Final",
+      "build": "0.0.19",
+      "isVirtual": "True",
+      "isClustered": "False",
+      "platformMarketingName": "BIG-IP Virtual Edition",
+      "restFrameworkVersion": "16.1.0-0.0.19"
+    }
+  ]
+}
+```
+
 Prometheus endpoint:
 
 Pulling from NGINX Instance Manager
@@ -229,6 +265,15 @@ nginx_plus_online_instances{subscription="NGX-Subscription-1-TRL-046027",instanc
 # HELP nginx_plus_offline_instances Offline NGINX Plus instances
 # TYPE nginx_plus_offline_instances gauge
 nginx_plus_offline_instances{subscription="NGX-Subscription-1-TRL-046027",instanceType="NGINX Controller",instanceVersion="3.18.2",location="unspecified"} 283
+```
+
+Pulling from BIG-IQ
+
+```
+$ curl -s https://counter.nginx.ff.lan/metrics
+# HELP bigip_online_instances Online BIG-IP instances
+# TYPE bigip_online_instances gauge
+bigip_online_instances{bigiq_url="https://10.155.153.208:443"} 2
 ```
 
 ## Push mode to custom URL

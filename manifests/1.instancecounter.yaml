@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: nginx-instance-counter
-        image: fiorucci/nginx-instance-counter:1.7
+        image: fiorucci/nginx-instance-counter:1.8
         ports:
         - containerPort: 5000
         env:
@@ -44,6 +44,17 @@ spec:
           #  value: "username@domain"
           #- name: NGINX_CONTROLLER_PASSWORD
           #  value: "thepassword"
+
+          # Example for BIG-IQ
+
+          #- name: NGINX_CONTROLLER_TYPE
+          #  value: BIG_IQ
+          #- name: NGINX_CONTROLLER_FQDN
+          #  value: "https://bigiq"
+          #- name: NGINX_CONTROLLER_USERNAME
+          #  value: "admin"
+          #- name: NGINX_CONTROLLER_PASSWORD
+          #  value: "admin"
 
           ### Push mode - push interval in seconds
           - name: STATS_PUSH_ENABLE
