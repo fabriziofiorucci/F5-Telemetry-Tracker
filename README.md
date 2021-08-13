@@ -44,7 +44,7 @@ Push mode: Instance Counter pushes stats to a remote data collection and visuali
 The NGINX Instance Counter image is available on Docker Hub as:
 
 ```
-fiorucci/nginx-instance-counter:1.9
+fiorucci/nginx-instance-counter:2.0
 ```
 
 The 1.instancecounter.yaml file references that by default.
@@ -55,8 +55,8 @@ If you need to build and push NGINX your own image to a private registry:
 git clone fabriziofiorucci/NGINX-InstanceCounter
 cd NGINX-InstanceCounter/nginx-instance-counter
 
-docker build --no-cache -t PRIVATE_REGISTRY:PORT/nginx-instance-counter:1.9 .
-docker push PRIVATE_REGISTRY:PORT/nginx-instance-counter:1.9
+docker build --no-cache -t PRIVATE_REGISTRY:PORT/nginx-instance-counter:2.0 .
+docker push PRIVATE_REGISTRY:PORT/nginx-instance-counter:2.0
 ```
 
 ## As a native python application
@@ -273,7 +273,7 @@ Pulling from BIG-IQ
 $ curl -s https://counter.nginx.ff.lan/metrics
 # HELP bigip_online_instances Online BIG-IP instances
 # TYPE bigip_online_instances gauge
-bigip_online_instances{bigiq_url="https://10.155.153.208:443"} 2
+bigip_online_instances{instanceType="BIG-IQ",bigiq_url="https://10.155.153.208:443"} 2
 ```
 
 ## Push mode to custom URL

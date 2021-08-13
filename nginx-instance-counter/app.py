@@ -402,7 +402,7 @@ def bigIqInventory(mode):
       output = '# HELP bigip_online_instances Online BIG-IP instances\n'
       output = output + '# TYPE bigip_online_instances gauge\n'
 
-    output = output + 'bigip_online_instances{instanceType="'+BIG-IQ+'",bigiq_url="'+nc_fqdn+'"} '+str(len(details['items']))+'\n'
+    output = output + 'bigip_online_instances{instanceType="BIG-IQ",bigiq_url="'+nc_fqdn+'"} '+str(len(details['items']))+'\n'
 
   return output
 
