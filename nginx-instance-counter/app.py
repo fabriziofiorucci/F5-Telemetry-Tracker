@@ -42,6 +42,11 @@ def scheduledPush(url,username,password,interval,pushmode):
           payload=nimInstances(mode='JSON')
         elif pushmode == 'NGINX_PUSH':
           payload=nimInstances(mode='PUSHGATEWAY')
+      elif nc_mode == 'BIG_IQ':
+        if pushmode == 'CUSTOM':
+          payload=bigIqInventory(mode='JSON')
+        elif pushmode == 'NGINX_PUSH':
+          payload=bigIqInventory(mode='PUSHGATEWAY')
 
       try:
         if username == '' or password == '':
@@ -397,7 +402,7 @@ def bigIqInventory(mode):
       output = '# HELP bigip_online_instances Online BIG-IP instances\n'
       output = output + '# TYPE bigip_online_instances gauge\n'
 
-    output = output + 'bigip_online_instances{bigiq_url="'+nc_fqdn+'"} '+str(len(details['items']))+'\n'
+    output = output + 'bigip_online_instances{instanceType="'+BIG-IQ+'",bigiq_url="'+nc_fqdn+'"} '+str(len(details['items']))+'\n'
 
   return output
 
