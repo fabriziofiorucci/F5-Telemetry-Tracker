@@ -295,7 +295,8 @@ Content-Length: 267
   "subscription": {
     "id": "NGX-Subscription-1-TRL-XXXXXX",
     "type": "INSTANCE_MANAGER",
-    "version": "2"
+    "version": "1.0.2",
+    "serial": "6232847160738694"
   },
   "instances": [
     {
@@ -332,7 +333,8 @@ Authorization: Basic YWE6YmI=
   "subscription": {
     "id": "NGX-Subscription-1-TRL-XXXXXX",
     "type": "INSTANCE_MANAGER",
-    "version": "2"
+    "version": "1.0.2",
+    "serial": "6232847160738694"
   },
   "instances": [
     {
