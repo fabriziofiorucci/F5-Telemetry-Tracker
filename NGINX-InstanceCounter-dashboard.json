@@ -64,7 +64,7 @@
   "gnetId": null,
   "graphTooltip": 0,
   "id": null,
-  "iteration": 1629194631214,
+  "iteration": 1629195029917,
   "links": [],
   "panels": [
     {
@@ -86,7 +86,7 @@
       "description": "",
       "gridPos": {
         "h": 3,
-        "w": 7,
+        "w": 6,
         "x": 0,
         "y": 1
       },
@@ -104,8 +104,8 @@
       "description": "",
       "gridPos": {
         "h": 3,
-        "w": 5,
-        "x": 7,
+        "w": 4,
+        "x": 6,
         "y": 1
       },
       "id": 9,
@@ -123,7 +123,7 @@
       "gridPos": {
         "h": 3,
         "w": 3,
-        "x": 12,
+        "x": 10,
         "y": 1
       },
       "id": 12,
@@ -140,8 +140,8 @@
       "description": "",
       "gridPos": {
         "h": 3,
-        "w": 9,
-        "x": 15,
+        "w": 6,
+        "x": 13,
         "y": 1
       },
       "id": 13,
@@ -151,6 +151,24 @@
       },
       "pluginVersion": "8.1.1",
       "title": "Location",
+      "type": "text"
+    },
+    {
+      "datasource": null,
+      "description": "",
+      "gridPos": {
+        "h": 3,
+        "w": 5,
+        "x": 19,
+        "y": 1
+      },
+      "id": 17,
+      "options": {
+        "content": "$instanceSerial\n=",
+        "mode": "markdown"
+      },
+      "pluginVersion": "8.1.1",
+      "title": "Serial",
       "type": "text"
     },
     {
@@ -392,7 +410,7 @@
       "type": "stat"
     }
   ],
-  "refresh": false,
+  "refresh": "",
   "schemaVersion": 30,
   "style": "dark",
   "tags": [],
@@ -523,5 +541,5 @@
   "timezone": "",
   "title": "NGINX Instances",
   "uid": "ypDUGrZnk",
-  "version": 74
+  "version": 77
 }
