@@ -44,7 +44,7 @@ Push mode: Instance Counter pushes stats to a remote data collection and visuali
 The NGINX Instance Counter image is available on Docker Hub as:
 
 ```
-fiorucci/nginx-instance-counter:2.0
+fiorucci/nginx-instance-counter:2.1
 ```
 
 The 1.instancecounter.yaml file references that by default.
@@ -55,8 +55,8 @@ If you need to build and push NGINX your own image to a private registry:
 git clone fabriziofiorucci/NGINX-InstanceCounter
 cd NGINX-InstanceCounter/nginx-instance-counter
 
-docker build --no-cache -t PRIVATE_REGISTRY:PORT/nginx-instance-counter:2.0 .
-docker push PRIVATE_REGISTRY:PORT/nginx-instance-counter:2.0
+docker build --no-cache -t PRIVATE_REGISTRY:PORT/nginx-instance-counter:2.1 .
+docker push PRIVATE_REGISTRY:PORT/nginx-instance-counter:2.1
 ```
 
 ## As a native python application
@@ -144,7 +144,8 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
   "subscription": {
     "id": "NGX-Subscription-1-TRL-XXXXXX",
     "type": "INSTANCE_MANAGER",
-    "version": "2"
+    "version": "1.0.2",
+    "serial": "6232847160738694"
   },
   "instances": [
     {
@@ -243,10 +244,10 @@ Pulling from NGINX Instance Manager
 $ curl -s http://counter.nginx.ff.lan/metrics
 # HELP nginx_oss_online_instances Online NGINX OSS instances
 # TYPE nginx_oss_online_instances gauge
-nginx_oss_online_instances{subscription="NGX-Subscription-1-TRL-064788",instanceType="INSTANCE_MANAGER",instanceVersion="2"} 2
+nginx_oss_online_instances{subscription="NGX-Subscription-1-TRL-064788",instanceType="INSTANCE_MANAGER",instanceVersion="1.0.2",instanceSerial="6232847160738694"} 1
 # HELP nginx_plus_online_instances Online NGINX Plus instances
 # TYPE nginx_plus_online_instances gauge
-nginx_plus_online_instances{subscription="NGX-Subscription-1-TRL-064788",instanceType="INSTANCE_MANAGER",instanceVersion="2"} 0
+nginx_plus_online_instances{subscription="NGX-Subscription-1-TRL-064788",instanceType="INSTANCE_MANAGER",instanceVersion="1.0.2",instanceSerial="6232847160738694"} 0
 ```
 
 Pulling from NGINX Controller

@@ -180,6 +180,21 @@ def nginxInstanceManagerLicense(fqdn):
 
   return res.status_code,data
 
+# Returns NIM Controller system information
+def nginxInstanceManagerSystem(fqdn):
+  s = Session()
+  req = Request('GET',fqdn+"/api/v0/about/system")
+
+  p = s.prepare_request(req)
+  res = s.send(p,verify=False)
+
+  if res.status_code == 200:
+    data = res.json()
+  else:
+    data = {}
+
+  return res.status_code,data
+
 
 # Returns NGINX OSS/Plus instances managed by NIM
 def nginxInstanceManagerInstances(fqdn):
@@ -316,9 +331,15 @@ def nimInstances(mode):
   if status != 200:
     return make_response(jsonify({'error': 'authentication failed'}), 401)
 
+  # Fetching NIM system information
+  status,system = nginxInstanceManagerSystem(nc_fqdn)
+  if status != 200:
+    return make_response(jsonify({'error': 'authentication failed'}), 401)
+
   subscriptionId=license['attributes']['subscription']
   instanceType=license['licenses'][0]['product_code']
-  instanceVersion=license['licenses'][0]['version']
+  instanceVersion=system['version']
+  instanceSerial=license['licenses'][0]['serial']
   plusManaged=license['plus_instances_managed']
   totalManaged=license['total_instances_managed']
 
@@ -331,7 +352,7 @@ def nimInstances(mode):
   output=''
 
   if mode == 'JSON':
-    output = '{ "subscription": {"id": "'+subscriptionId+'","type":"'+instanceType+'","version":"'+instanceVersion+'"},' + \
+    output = '{ "subscription": {"id": "'+subscriptionId+'","type":"'+instanceType+'","version":"'+instanceVersion+'","serial":"'+instanceSerial+'"},' + \
              '"instances": [ {"nginx_plus_online": '+plusManaged+', "nginx_oss_online": '+str(int(totalManaged)-int(plusManaged)) + \
              '}],"details": ['
 
@@ -358,13 +379,13 @@ def nimInstances(mode):
       output = '# HELP nginx_oss_online_instances Online NGINX OSS instances\n'
       output = output + '# TYPE nginx_oss_online_instances gauge\n'
 
-    output = output + 'nginx_oss_online_instances{subscription="'+subscriptionId+'",instanceType="'+instanceType+'",instanceVersion="'+instanceVersion+'"} '+str(int(totalManaged)-int(plusManaged))+'\n'
+    output = output + 'nginx_oss_online_instances{subscription="'+subscriptionId+'",instanceType="'+instanceType+'",instanceVersion="'+instanceVersion+'",instanceSerial="'+instanceSerial+'"} '+str(int(totalManaged)-int(plusManaged))+'\n'
 
     if mode == 'PROMETHEUS':
       output = output + '# HELP nginx_plus_online_instances Online NGINX Plus instances\n'
       output = output + '# TYPE nginx_plus_online_instances gauge\n'
 
-    output = output + 'nginx_plus_online_instances{subscription="'+subscriptionId+'",instanceType="'+instanceType+'",instanceVersion="'+instanceVersion+'"} '+plusManaged+'\n'
+    output = output + 'nginx_plus_online_instances{subscription="'+subscriptionId+'",instanceType="'+instanceType+'",instanceVersion="'+instanceVersion+'",instanceSerial="'+instanceSerial+'"} '+plusManaged+'\n'
 
   return output
 
