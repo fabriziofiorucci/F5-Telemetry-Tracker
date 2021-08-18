@@ -7,6 +7,7 @@ RUN pip3 install --upgrade virtualenv
 
 RUN mkdir deployment
 RUN virtualenv /deployment/env/
+RUN /deployment/env/bin/python -m pip install --upgrade pip
 RUN /deployment/env/bin/pip3 install flask
 RUN /deployment/env/bin/pip3 install requests
 WORKDIR /deployment

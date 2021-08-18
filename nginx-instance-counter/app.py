@@ -291,12 +291,18 @@ def ncInstances(mode):
         lsm = i['currentStatus']['legacySystemMetadata']
         uname = lsm['os-type']+' '+lsm['release']['name']+ ' '+lsm['release']['version']+' '+lsm['processor']['architecture']+' '+lsm['processor']['model']
 
+        if lsm['processor']['hypervisor'] == 'container':
+          containerized = "True"
+        else:
+          containerized = "False"
+
         instanceDetails = instanceDetails + '{' + \
           '"instance_id":"' + i['metadata']['uid'] + '",' + \
           '"uname":"' + uname + '",' + \
-          '"containerized":"' + '' + '",' + \
+          '"containerized":"' + containerized + '",' + \
           '"type":"' + 'plus' + '",' + \
-          '"version":"' + i['currentStatus']['version'] + '"' + \
+          '"version":"' + i['currentStatus']['version'] + '",' + \
+          '"last_seen":"' + i['currentStatus']['legacyNginxMetadata']['last_seen'] + '"' + \
           '}'
 
     if mode == 'JSON':
@@ -370,8 +376,8 @@ def nimInstances(mode):
         "uname": "'+i['uname'] + '", \
         "containerized": "'+str(i['containerized']) + '", \
         "type": "'+i['nginx']['type'] + '", \
-        "version": "'+i['nginx']['version'] + \
-      '"}'
+        "version": "'+i['nginx']['version'] + '", \
+        "last_seen": "'+i['lastseen']+'"}'
 
     output = output + ']}'
   elif mode == 'PROMETHEUS' or mode == 'PUSHGATEWAY':
