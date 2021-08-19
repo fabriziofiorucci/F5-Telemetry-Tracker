@@ -255,6 +255,7 @@ def ncInstances(mode):
   else:
     output = ''
 
+  firstILoop = True
   instanceDetails = ''
 
   # Iterates locations
@@ -272,7 +273,6 @@ def ncInstances(mode):
     if status != 200:
       return make_response(jsonify({'error': 'instances fetch error'}), 404)
 
-    firstILoop = True
     online = 0
     offline = 0
     for i in instances['items']:
