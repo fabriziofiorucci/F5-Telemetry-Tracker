@@ -238,7 +238,7 @@ def ncInstances(mode):
   # Fetches controller license
   status,license = nginxControllerLicense(nc_fqdn,sessionCookie)
   if status != 200:
-    return make_response(jsonify({'error': 'authentication failed'}), 401)
+    return make_response(jsonify({'error': 'fetching license failed'}), 401)
 
   subscriptionId=license['currentStatus']['subscription']['id']
   instanceType=license['currentStatus']['state']['currentInstance']['type']
@@ -335,12 +335,12 @@ def nimInstances(mode):
   # Fetching NIM license
   status,license = nginxInstanceManagerLicense(nc_fqdn)
   if status != 200:
-    return make_response(jsonify({'error': 'authentication failed'}), 401)
+    return make_response(jsonify({'error': 'fetching license failed'}), 401)
 
   # Fetching NIM system information
   status,system = nginxInstanceManagerSystem(nc_fqdn)
   if status != 200:
-    return make_response(jsonify({'error': 'authentication failed'}), 401)
+    return make_response(jsonify({'error': 'fetching system information failed'}), 401)
 
   subscriptionId=license['attributes']['subscription']
   instanceType=license['licenses'][0]['product_code']
@@ -398,12 +398,12 @@ def nimInstances(mode):
 
 ### BIG-IQ query functions
 
-# Returns NGINX OSS/Plus instances managed by NIM in JSON format
+# Returns NGINX OSS/Plus instances managed by BIG-IQ in JSON format
 def bigIqInventory(mode):
 
   status,details = bigIQInstances(nc_fqdn)
   if status != 200:
-    return make_response(jsonify({'error': 'authentication failed'}), 401)
+    return make_response(jsonify({'error': 'fetching instances failed'}), 401)
 
   output=''
 
