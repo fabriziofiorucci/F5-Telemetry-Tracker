@@ -7,7 +7,7 @@ This tool helps tracking NGINX Plus instances managed by NGINX Controller and NG
 It has been tested against:
 
 - NGINX Controller 3.18, 3.18.2
-- NGINX Instance Manager 1.0.1, 1.0.2
+- NGINX Instance Manager 1.0.1, 1.0.2, 1.0.3
 - BIG-IQ 8.1.0
 
 Communication to NGINX Controller / NGINX Instance Manager / BIG-IQ is based on REST API, current features are:
