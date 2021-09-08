@@ -130,6 +130,10 @@ Service names created by default as Ingress resources are:
 
 Edit nginx-instance-counter/nicstart.sh and run it
 
+## Using F5 Support solution
+
+See F5 Support solution at https://support.f5.com/csp/article/K83394355
+
 # Usage
 
 ## REST API mode
