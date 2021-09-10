@@ -9,10 +9,10 @@
 
 ### Section to use when polling NGINX Instance Manager
 
-#export NGINX_CONTROLLER_TYPE=NGINX_INSTANCE_MANAGER
-#export NGINX_CONTROLLER_FQDN="http://nim.ff.lan:11000"
-#export NGINX_CONTROLLER_USERNAME="username@domain"
-#export NGINX_CONTROLLER_PASSWORD="thepassword"
+export NGINX_CONTROLLER_TYPE=NGINX_INSTANCE_MANAGER
+export NGINX_CONTROLLER_FQDN="http://127.0.0.1:11000"
+export NGINX_CONTROLLER_USERNAME="username@domain"
+export NGINX_CONTROLLER_PASSWORD="thepassword"
 
 ### Section to use when polling BIG-IQ
 
