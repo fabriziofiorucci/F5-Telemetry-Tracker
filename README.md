@@ -35,7 +35,7 @@ Push mode: Instance Counter pushes stats to a remote data collection and visuali
 
 - Kubernetes or Openshift cluster
 - Private registry to push the NGINX Instance Counter image
-- NGINX Controller 3.18, 3.18.2 or NGINX Instance Manager 1.0.1, 1.0.2 or BIG-IP 8.1.0
+- NGINX Controller 3.18, 3.18.2 or NGINX Instance Manager 1.0.1, 1.0.2, 1.0.3 or BIG-IP 8.1.0
 
 # How to build
 
