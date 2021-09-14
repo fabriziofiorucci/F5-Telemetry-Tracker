@@ -4,8 +4,8 @@
 
 #export NGINX_CONTROLLER_TYPE=NGINX_CONTROLLER
 #export NGINX_CONTROLLER_FQDN="https://nginx-controller.ff.lan:443"
-#export NGINX_CONTROLLER_USERNAME="f.fiorucci@f5.com"
-#export NGINX_CONTROLLER_PASSWORD="n0vp1c14"
+#export NGINX_CONTROLLER_USERNAME="username@domain"
+#export NGINX_CONTROLLER_PASSWORD="thepassword"
 
 ### Section to use when polling NGINX Instance Manager
 

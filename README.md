@@ -132,7 +132,10 @@ Edit nginx-instance-counter/nicstart.sh and run it
 
 ## Using F5 Support solution
 
-See F5 Support solution at https://support.f5.com/csp/article/K83394355
+See F5 Support solutions:
+
+- K83394355: How to count the number of NGINX instances with NGINX Instance Manager - https://support.f5.com/csp/article/K83394355
+- K45028541: How to count the number of NGINX instances with NGINX Controller - https://support.f5.com/csp/article/K45028541
 
 # Usage
 
