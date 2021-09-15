@@ -302,7 +302,10 @@ def ncInstances(mode):
           '"containerized":"' + containerized + '",' + \
           '"type":"' + 'plus' + '",' + \
           '"version":"' + i['currentStatus']['version'] + '",' + \
-          '"last_seen":"' + i['currentStatus']['legacyNginxMetadata']['last_seen'] + '"' + \
+          '"last_seen":"' + i['currentStatus']['legacyNginxMetadata']['last_seen'] + '",' + \
+          '"createtime":"' + i['metadata']['createTime'] + '",' + \
+          '"networkConfig":' + str(i['currentStatus']['networkConfig']).replace('\'','"') + ',' + \
+          '"hostname":"' + i['currentStatus']['hostname'] + '"' + \
           '}'
 
     if mode == 'JSON':
@@ -377,7 +380,11 @@ def nimInstances(mode):
         "containerized": "'+str(i['containerized']) + '", \
         "type": "'+i['nginx']['type'] + '", \
         "version": "'+i['nginx']['version'] + '", \
-        "last_seen": "'+i['lastseen']+'"}'
+        "last_seen": "'+i['lastseen']+'", \
+        "createtime": "'+i['added']+'", \
+        "networkconfig": { "host_ips": '+str(i['host_ips']).replace('\'','"')+'}, \
+        "hostname": "'+i['hostname']+'" \
+      }'
 
     output = output + ']}'
   elif mode == 'PROMETHEUS' or mode == 'PUSHGATEWAY':

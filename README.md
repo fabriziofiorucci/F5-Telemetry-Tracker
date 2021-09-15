@@ -162,12 +162,24 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
   ],
   "details": [
     {
-      "instance_id": "ee3f2f76-aa22-4182-b643-ba298cc0f758",
-      "uname": "Linux ubuntu 5.4.0-80-generic #90-Ubuntu SMP Fri Jul 9 22:49:44 UTC 2021 x86_64 x86_64 x86_64 GNU/Linux",
+      "instance_id": "c613e90d-3051-4090-b9cd-a32cb725b785",
+      "uname": "Linux vm-gw 5.7.6 #1 SMP PREEMPT Fri Jun 26 17:39:22 CEST 2020 x86_64 QEMU Virtual CPU version 2.5+ AuthenticAMD GNU/Linux",
       "containerized": "False",
       "type": "oss",
-      "version": "1.18.0",
-      "last_seen": "2021-08-18T07:57:11.670746604Z"
+      "version": "1.20.1",
+      "last_seen": "2021-08-31T11:37:04.587986759Z",
+      "createtime": "2021-08-18T22:02:49.717530751Z",
+      "networkconfig": {
+        "host_ips": [
+          "192.168.1.5",
+          "192.168.1.27",
+          "192.168.10.5",
+          "192.168.11.5",
+          "192.168.2.5",
+          "10.200.200.10"
+        ]
+      },
+      "hostname": "vm-gw"
     }
   ]
 }
@@ -179,15 +191,15 @@ NGINX Controller
 $ curl -s http://ubuntu:5000/instances | jq 
 {
   "subscription": {
-    "id": "T0XXXXXX",
+    "id": "XYZ",
     "type": "NGINX Controller",
     "version": "3.18.2"
   },
   "instances": [
     {
       "location": "devops",
-      "nginx_plus_online": 0,
-      "nginx_plus_offline": 0
+      "nginx_plus_online": 2,
+      "nginx_plus_offline": 3
     },
     {
       "location": "production",
@@ -196,34 +208,171 @@ $ curl -s http://ubuntu:5000/instances | jq
     },
     {
       "location": "unspecified",
-      "nginx_plus_online": 2,
-      "nginx_plus_offline": 1
+      "nginx_plus_online": 0,
+      "nginx_plus_offline": 2
     }
   ],
   "details": [
     {
-      "instance_id": "f6f6dff5-2a3b-477e-98ae-1fb1da0339cc",
+      "instance_id": "2933d801-02f6-4a1e-bd76-213e6a723235",
       "uname": "linux Ubuntu 18.04.5 LTS (Bionic Beaver) x86_64 QEMU Virtual CPU version 2.5+",
       "containerized": "True",
       "type": "plus",
       "version": "1.19.10",
-      "last_seen": "2021-08-18T07:57:55.96608Z"
+      "last_seen": "2021-08-22T08:32:52.058499Z",
+      "createtime": "2021-08-20T15:22:52.069915Z",
+      "networkConfig": {
+        "networkInterfaces": [
+          {
+            "name": "lo",
+            "privateIP": "127.0.0.1"
+          },
+          {
+            "name": "eth0",
+            "privateIP": "10.244.2.31"
+          }
+        ]
+      },
+      "hostname": "nginx-76cd77586b-76g8k"
     },
     {
-      "instance_id": "0b086763-3eef-457b-85c3-72497e2194fa",
+      "instance_id": "61b945d0-6e4d-4225-a91f-52ae36b290cc",
       "uname": "linux Ubuntu 18.04.5 LTS (Bionic Beaver) x86_64 QEMU Virtual CPU version 2.5+",
       "containerized": "True",
       "type": "plus",
       "version": "1.19.10",
-      "last_seen": "2021-08-18T07:57:57.842124Z"
+      "last_seen": "2021-09-15T16:37:48.566275Z",
+      "createtime": "2021-08-23T10:11:48.527776Z",
+      "networkConfig": {
+        "networkInterfaces": [
+          {
+            "name": "lo",
+            "privateIP": "127.0.0.1"
+          },
+          {
+            "name": "eth0",
+            "privateIP": "10.244.1.41"
+          }
+        ]
+      },
+      "hostname": "nginx-76cd77586b-xs5mm"
     },
     {
-      "instance_id": "c891eebe-4def-459e-bb29-eb715e7846a8",
+      "instance_id": "e56260de-691f-4585-a4f5-9f6a93095f73",
       "uname": "linux Ubuntu 18.04.5 LTS (Bionic Beaver) x86_64 QEMU Virtual CPU version 2.5+",
+      "containerized": "True",
+      "type": "plus",
+      "version": "1.19.10",
+      "last_seen": "2021-08-22T08:33:31.006875Z",
+      "createtime": "2021-08-20T15:22:30.439847Z",
+      "networkConfig": {
+        "networkInterfaces": [
+          {
+            "name": "lo",
+            "privateIP": "127.0.0.1"
+          },
+          {
+            "name": "eth0",
+            "privateIP": "10.244.2.30"
+          }
+        ]
+      },
+      "hostname": "nginx-76cd77586b-srb4c"
+    },
+    {
+      "instance_id": "fb67428e-40f6-43a8-bcda-0621ee0d4331",
+      "uname": "linux Ubuntu 18.04.5 LTS (Bionic Beaver) x86_64 QEMU Virtual CPU version 2.5+",
+      "containerized": "True",
+      "type": "plus",
+      "version": "1.19.10",
+      "last_seen": "2021-09-15T16:37:46.244602Z",
+      "createtime": "2021-08-23T10:11:46.561424Z",
+      "networkConfig": {
+        "networkInterfaces": [
+          {
+            "name": "lo",
+            "privateIP": "127.0.0.1"
+          },
+          {
+            "name": "eth0",
+            "privateIP": "10.244.2.41"
+          }
+        ]
+      },
+      "hostname": "nginx-76cd77586b-n8f2k"
+    },
+    {
+      "instance_id": "d78c7b6c-bde3-458c-933d-847d023bb2d5",
+      "uname": "linux Ubuntu 20.04.3 LTS (Focal Fossa) x86_64 QEMU Virtual CPU version 2.5+",
       "containerized": "False",
       "type": "plus",
       "version": "1.19.10",
-      "last_seen": "2021-08-12T10:32:12.572133Z"
+      "last_seen": "2021-09-13T22:01:05.598863Z",
+      "createtime": "2021-08-23T10:48:05.403247Z",
+      "networkConfig": {
+        "networkInterfaces": [
+          {
+            "name": "lo",
+            "privateIP": "127.0.0.1",
+            "privateIPv6": "::1"
+          },
+          {
+            "name": "ens3",
+            "privateIP": "192.168.1.26",
+            "privateIPv6": "fe80::dcad:beff:feef:4413"
+          },
+          {
+            "name": "docker0",
+            "privateIP": "172.17.0.1",
+            "privateIPv6": "fe80::42:1aff:fe50:e757"
+          }
+        ]
+      },
+      "hostname": "ubuntu"
+    },
+    {
+      "instance_id": "ada757cf-df90-4125-b966-8db891431835",
+      "uname": "linux Ubuntu 18.04.5 LTS (Bionic Beaver) x86_64 QEMU Virtual CPU version 2.5+",
+      "containerized": "True",
+      "type": "plus",
+      "version": "1.19.10",
+      "last_seen": "2021-08-19T09:57:52.472761Z",
+      "createtime": "2021-08-19T09:57:52.003188Z",
+      "networkConfig": {
+        "networkInterfaces": [
+          {
+            "name": "lo",
+            "privateIP": "127.0.0.1"
+          },
+          {
+            "name": "eth0",
+            "privateIP": "10.244.1.29"
+          }
+        ]
+      },
+      "hostname": "nginx-646545df5d-h2p7f"
+    },
+    {
+      "instance_id": "c9409b38-17d8-4345-9f31-b37f816195a8",
+      "uname": "linux Ubuntu 18.04.5 LTS (Bionic Beaver) x86_64 QEMU Virtual CPU version 2.5+",
+      "containerized": "True",
+      "type": "plus",
+      "version": "1.19.10",
+      "last_seen": "2021-08-19T09:57:53.956519Z",
+      "createtime": "2021-08-19T09:57:53.478961Z",
+      "networkConfig": {
+        "networkInterfaces": [
+          {
+            "name": "lo",
+            "privateIP": "127.0.0.1"
+          },
+          {
+            "name": "eth0",
+            "privateIP": "10.244.1.30"
+          }
+        ]
+      },
+      "hostname": "nginx-646545df5d-5wkqv"
     }
   ]
 }
