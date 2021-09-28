@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 
-## #!flask/bin/python
 from flask import Flask, jsonify, abort, make_response, request
 import os
 import sys
@@ -10,8 +9,10 @@ import sched,time,datetime
 import requests
 import time
 import threading
+import smtplib
 from requests import Request, Session
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
+from email.message import EmailMessage
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
@@ -75,6 +76,50 @@ def scheduledPush(url,username,password,interval,pushmode):
     counter = counter + 1
 
     time.sleep(interval)
+
+
+# Scheduler for automated email reporting
+def scheduledEmail(email_server,email_server_port,email_server_type,email_auth_user,email_auth_pass,email_sender,email_recipient,email_interval):
+  while True:
+    try:
+      if nc_mode == 'NGINX_CONTROLLER':
+        payload=ncInstances(mode='JSON')
+      elif nc_mode == 'NGINX_INSTANCE_MANAGER':
+        payload=nimInstances(mode='JSON')
+      elif nc_mode == 'BIG_IQ':
+        payload=bigIqInventory(mode='JSON')
+
+      jsonPayload=json.loads(payload)
+      subscriptionId=jsonPayload['subscription']['id']
+      dateNow=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+      message = EmailMessage()
+      message['Subject'] = '['+subscriptionId+'] ['+dateNow+'] NGINX Usage Reporting'
+      message['From'] = email_sender
+      message['To'] = email_recipient
+      message.set_content('This is the NGINX usage report for '+subscriptionId+' on '+dateNow)
+      message.add_attachment(payload,filename='nginx_report.json')
+
+      if email_server_type == 'ssl':
+        context = ssl._create_unverified_context()
+        smtpObj = smtplib.SMTP_SSL(email_server,email_server_port,context=context)
+      else:
+        smtpObj = smtplib.SMTP(email_server,email_server_port)
+
+        if email_server_type == 'starttls':
+          smtpObj.starttls()
+
+      if email_auth_user != '' and email_auth_pass != '':
+        smtpObj.login(email_auth_user,email_auth_pass)
+
+      smtpObj.sendmail(email_sender, email_recipient, message.as_string())
+      print(datetime.datetime.now(),'Reporting email successfully sent to',email_recipient)
+
+    except:
+      e = sys.exc_info()[0]
+      print(datetime.datetime.now(),'Sending email stats to',url,'failed:',e)
+
+    time.sleep(email_interval)
 
 
 ### NGINX Controller REST API
@@ -498,7 +543,26 @@ if __name__ == '__main__':
         pushThread = threading.Thread(target=scheduledPush,args=(stats_push_url,stats_push_username,stats_push_password,stats_push_interval,stats_push_mode))
         pushThread.start()
 
+    if os.environ['EMAIL_ENABLED'] == 'true':
+      email_interval=int(os.environ['EMAIL_INTERVAL'])
+      email_sender=os.environ['EMAIL_SENDER']
+      email_recipient=os.environ['EMAIL_RECIPIENT']
+      email_server=os.environ['EMAIL_SERVER']
+      email_server_port=os.environ['EMAIL_SERVER_PORT']
+      email_server_type=os.environ['EMAIL_SERVER_TYPE']
+      if "EMAIL_AUTH_USER" in os.environ and "EMAIL_AUTH_PASS" in os.environ:
+        email_auth_user=os.environ['EMAIL_AUTH_USER']
+        email_auth_pass=os.environ['EMAIL_AUTH_PASS']
+      else:
+        email_auth_user=''
+        email_auth_pass=''
+
+      print('Email reporting to',email_recipient,'every',email_interval,'days')
+      print(email_auth_user,'***',email_auth_pass)
+      print('Running push thread')
+      emailThread = threading.Thread(target=scheduledEmail,args=(email_server,email_server_port,email_server_type,email_auth_user,email_auth_pass,email_sender,email_recipient,email_interval*60))
+      emailThread.start()
+
     # REST API / prometheus metrics server
     print('Running REST API/Prometheus metrics server')
     app.run(host='0.0.0.0')
-

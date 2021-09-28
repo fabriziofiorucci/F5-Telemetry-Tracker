@@ -19,7 +19,11 @@ Communication to NGINX Controller / NGINX Instance Manager / BIG-IQ is based on 
   - POSTs instance statistics to a user-defined HTTP(S) URL (STATS_PUSH_MODE: CUSTOM)
   - Pushes instance statistics to pushgateway (STATS_PUSH_MODE: NGINX_PUSH)
   - Basic authentication support
-  - User-defined push interval (in seconds)
+  - Configurable push interval (in seconds)
+- Automated e-mail reporting
+  - Sends an email containing the report JSON file as an attachment
+  - Support for plaintext SMTP, STARTTLS, SMTP over TLS, SMTP authentication, custom SMTP port
+  - Configurable push interval (in days)
 
 ## Deployment modes
 
@@ -36,6 +40,7 @@ Push mode: Instance Counter pushes stats to a remote data collection and visuali
 - Kubernetes or Openshift cluster
 - Private registry to push the NGINX Instance Counter image
 - NGINX Controller 3.18, 3.18.2 or NGINX Instance Manager 1.0.1, 1.0.2, 1.0.3 or BIG-IP 8.1.0
+- SMTP server if automated email reporting is used
 
 # How to build
 
@@ -44,7 +49,7 @@ Push mode: Instance Counter pushes stats to a remote data collection and visuali
 The NGINX Instance Counter image is available on Docker Hub as:
 
 ```
-fiorucci/nginx-instance-counter:2.5
+fiorucci/nginx-instance-counter:2.6
 ```
 
 The 1.instancecounter.yaml file references that by default.
@@ -55,8 +60,8 @@ If you need to build and push NGINX your own image to a private registry:
 git clone fabriziofiorucci/NGINX-InstanceCounter
 cd NGINX-InstanceCounter/nginx-instance-counter
 
-docker build --no-cache -t PRIVATE_REGISTRY:PORT/nginx-instance-counter:2.5 .
-docker push PRIVATE_REGISTRY:PORT/nginx-instance-counter:2.5
+docker build --no-cache -t PRIVATE_REGISTRY:PORT/nginx-instance-counter:2.6 .
+docker push PRIVATE_REGISTRY:PORT/nginx-instance-counter:2.6
 ```
 
 ## As a native python application
@@ -88,12 +93,22 @@ Edit 1.instancecounter.yaml to customize:
   - NGINX_CONTROLLER_USERNAME - the username for authentication
   - NGINX_CONTROLLER_PASSWORD - the password for authentication
 
-  - STATS_PUSH_ENABLE - if set to "true" push mode is enabled, disabled it set to "false"
+  - STATS_PUSH_ENABLE - if set to "true" push mode is enabled, disabled if set to "false". This parameter is mandatory
   - STATS_PUSH_MODE - either CUSTOM or NGINX_PUSH, to push (HTTP POST) JSON to custom URL and to push metrics to pushgateway, respectively
   - STATS_PUSH_URL - the URL where to push statistics
   - STATS_PUSH_INTERVAL - the interval in seconds between two consecutive push
   - STATS_PUSH_USERNAME - (optional) the username for POST Basic Authentication
   - STATS_PUSH_PASSWORD - (optional) the password for POST Basic Authentication
+
+  - EMAIL_ENABLED - if set to "true" automated email reporting is enabled, disabled if set to "false". This parameter is mandatory
+  - EMAIL_INTERVAL - the interval in days between two consecutive email reports
+  - EMAIL_SERVER - the FQDN of the SMTP server to use
+  - EMAIL_SERVER_PORT - the SMTP server port
+  - EMAIL_SERVER_TYPE - either "plaintext", "starttls" or "ssl"
+  - EMAIL_AUTH_USER - optional, the username for SMTP authentication
+  - EMAIL_AUTH_PASS - optional, the password for SMTP authentication
+  - EMAIL_SENDER - the sender email address
+  - EMAIL_RECIPIENT - the recipient email address
 - Ingress host:
   - By default it is set to counter.nginx.ff.lan
 
@@ -130,7 +145,7 @@ Service names created by default as Ingress resources are:
 
 Edit nginx-instance-counter/nicstart.sh and run it
 
-## Using F5 Support solution
+## Using F5 Support solutions
 
 See F5 Support solutions:
 
