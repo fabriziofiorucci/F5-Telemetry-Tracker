@@ -84,21 +84,30 @@ def scheduledEmail(email_server,email_server_port,email_server_type,email_auth_u
     try:
       if nc_mode == 'NGINX_CONTROLLER':
         payload=ncInstances(mode='JSON')
+        jsonPayload=json.loads(payload)
+        subscriptionId='['+jsonPayload['subscription']['id']+'] '
+        subjectPostfix='NGINX Usage Reporting'
+        attachname='nginx_report.json'
       elif nc_mode == 'NGINX_INSTANCE_MANAGER':
         payload=nimInstances(mode='JSON')
+        jsonPayload=json.loads(payload)
+        subscriptionId='['+jsonPayload['subscription']['id']+'] '
+        subjectPostfix='NGINX Usage Reporting'
+        attachname='nginx_report.json'
       elif nc_mode == 'BIG_IQ':
         payload=bigIqInventory(mode='JSON')
+        subscriptionId=''
+        subjectPostfix='BIG-IP Usage Reporting'
+        attachname='bigip_report.json'
 
-      jsonPayload=json.loads(payload)
-      subscriptionId=jsonPayload['subscription']['id']
       dateNow=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
       message = EmailMessage()
-      message['Subject'] = '['+subscriptionId+'] ['+dateNow+'] NGINX Usage Reporting'
+      message['Subject'] = subscriptionId+'['+dateNow+'] '+subjectPostfix
       message['From'] = email_sender
       message['To'] = email_recipient
-      message.set_content('This is the NGINX usage report for '+subscriptionId+' on '+dateNow)
-      message.add_attachment(payload,filename='nginx_report.json')
+      message.set_content('This is the '+subjectPostfix+' for '+dateNow)
+      message.add_attachment(payload,filename=attachname)
 
       if email_server_type == 'ssl':
         context = ssl._create_unverified_context()
@@ -259,9 +268,21 @@ def nginxInstanceManagerInstances(fqdn):
 
 ### BIG-IQ REST API
 
-# Returns NGINX OSS/Plus instances managed by NIM
+# Returns BIG-IP devices managed by BIG-IQ
 def bigIQInstances(fqdn):
   res = requests.request("GET", fqdn+"/mgmt/shared/resolver/device-groups/cm-bigip-allBigIpDevices/devices", auth=(nc_user,nc_pass), verify=False)
+
+  if res.status_code == 200:
+    data = res.json()
+  else:
+    data = {}
+
+  return res.status_code,data
+
+
+# Returns details for a given BIG-IP device
+def bigIQInstanceDetails(fqdn,instanceUUID):
+  res = requests.request("GET", fqdn+"/mgmt/cm/system/machineid-resolver/"+instanceUUID, auth=(nc_user,nc_pass), verify=False)
 
   if res.status_code == 200:
     data = res.json()
@@ -470,10 +491,15 @@ def bigIqInventory(mode):
         else:
           output+=','
 
-        output += '{"product":"'+item['product']+'","version":"'+item['version']+'","edition":"'+ \
+        # Gets TMOS module details for the current BIG-IP device
+        retcode,instanceDetails = bigIQInstanceDetails(nc_fqdn,item['uuid'])
+
+        activeModules = instanceDetails['properties']['cm:gui:module']
+
+        output += '{"hostname":"'+item['hostname']+'","address":"'+item['address']+'","product":"'+item['product']+'","version":"'+item['version']+'","edition":"'+ \
           item['edition']+'","build":"'+item['build']+'","isVirtual":"'+str(item['isVirtual'])+'","isClustered":"'+str(item['isClustered'])+ \
           '","platformMarketingName":"'+item['platformMarketingName']+'","restFrameworkVersion":"'+ \
-          item['restFrameworkVersion']+'"}'
+          item['restFrameworkVersion']+'","modules":'+str(activeModules).replace('\'','"')+'}'
 
     output = output + ']}'
   elif mode == 'PROMETHEUS' or mode == 'PUSHGATEWAY':

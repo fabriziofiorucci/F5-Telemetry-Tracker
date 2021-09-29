@@ -21,7 +21,7 @@ Communication to NGINX Controller / NGINX Instance Manager / BIG-IQ is based on 
   - Basic authentication support
   - Configurable push interval (in seconds)
 - Automated e-mail reporting
-  - Sends an email containing the report JSON file as an attachment
+  - Sends an email containing the report JSON file as an attachment named nginx_report.json for NGINX Instance Manager and NGINX Controller, and bigip_report.json for BIG-IQ
   - Support for plaintext SMTP, STARTTLS, SMTP over TLS, SMTP authentication, custom SMTP port
   - Configurable push interval (in days)
 
@@ -60,8 +60,8 @@ If you need to build and push NGINX your own image to a private registry:
 git clone fabriziofiorucci/NGINX-InstanceCounter
 cd NGINX-InstanceCounter/nginx-instance-counter
 
-docker build --no-cache -t PRIVATE_REGISTRY:PORT/nginx-instance-counter:2.6 .
-docker push PRIVATE_REGISTRY:PORT/nginx-instance-counter:2.6
+docker build --no-cache -t PRIVATE_REGISTRY:PORT/nginx-instance-counter:2.7 .
+docker push PRIVATE_REGISTRY:PORT/nginx-instance-counter:2.7
 ```
 
 ## As a native python application
@@ -405,6 +405,8 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
   ],
   "details": [
     {
+      "hostname": "bigip1.lab.local",
+      "address": "10.155.153.207",
       "product": "BIG-IP",
       "version": "16.1.0",
       "edition": "Final",
@@ -412,9 +414,15 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
       "isVirtual": "True",
       "isClustered": "False",
       "platformMarketingName": "BIG-IP Virtual Edition",
-      "restFrameworkVersion": "16.1.0-0.0.19"
+      "restFrameworkVersion": "16.1.0-0.0.19",
+      "modules": [
+        "adc",
+        "BigIPDevice"
+      ]
     },
     {
+      "hostname": "bigip2.lab.local",
+      "address": "10.155.153.208",
       "product": "BIG-IP",
       "version": "16.1.0",
       "edition": "Final",
@@ -422,7 +430,15 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
       "isVirtual": "True",
       "isClustered": "False",
       "platformMarketingName": "BIG-IP Virtual Edition",
-      "restFrameworkVersion": "16.1.0-0.0.19"
+      "restFrameworkVersion": "16.1.0-0.0.19",
+      "modules": [
+        "asmsecurity",
+        "adc",
+        "Access",
+        "BigIPDevice",
+        "networksecurity",
+        "sharedsecurity"
+      ]
     }
   ]
 }
