@@ -49,7 +49,7 @@ Push mode: Instance Counter pushes stats to a remote data collection and visuali
 The NGINX Instance Counter image is available on Docker Hub as:
 
 ```
-fiorucci/nginx-instance-counter:2.6
+fiorucci/nginx-instance-counter:2.7
 ```
 
 The 1.instancecounter.yaml file references that by default.
