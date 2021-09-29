@@ -554,3 +554,8 @@ Authorization: Basic YWE6YmI=
 <img src="./images/grafana.1.jpg"/>
 
 <img src="./images/grafana.2.jpg"/>
+
+
+# Sample report e-mail
+
+<img src="./images/reporting-mail.png"/>
