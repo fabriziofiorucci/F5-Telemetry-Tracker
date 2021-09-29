@@ -203,7 +203,7 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
 NGINX Controller
 
 ```
-$ curl -s http://ubuntu:5000/instances | jq 
+$ curl -s http://counter.nginx.ff.lan/instances | jq 
 {
   "subscription": {
     "id": "XYZ",
