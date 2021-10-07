@@ -292,6 +292,18 @@ def bigIQInstanceDetails(fqdn,instanceUUID):
   return res.status_code,data
 
 
+# Returns modules provisioning status details for BIG-IP devices managed by BIG-IQ
+def bigIQInstanceProvisioning(fqdn):
+  res = requests.request("GET", fqdn+"/mgmt/cm/shared/current-config/sys/provision", auth=(nc_user,nc_pass), verify=False)
+
+  if res.status_code == 200:
+    data = res.json()
+  else:
+    data = {}
+
+  return res.status_code,data
+
+
 ### NGINX Controller query functions
 
 # Returns NGINX Plus instances managed by NGINX Controller in JSON format
@@ -484,22 +496,37 @@ def bigIqInventory(mode):
     output = '{ "instances": [{ "bigip":"'+str(len(details['items']))+'"}], "details": ['
     firstLoop = True
 
+    # Gets TMOS modules provisioning state for all devices
+    rcode,provisioningDetails = bigIQInstanceProvisioning(nc_fqdn)
+
     for item in details['items']:
       if mode == 'JSON':
         if firstLoop == True :
-          firstLoop=False
+          firstLoop = False
         else:
           output+=','
 
-        # Gets TMOS module details for the current BIG-IP device
+        # Gets TMOS modules provisioning for the current BIG-IP device
+        provModules = ''
+        pFirstLoop = True
+        for prov in provisioningDetails['items']:
+          if prov['deviceReference']['machineId'] == item['uuid']:
+            if pFirstLoop == True:
+              pFirstLoop = False
+            else:
+              provModules+=','
+
+            provModules += '{"module":"'+prov['name']+'","level":"'+prov['level']+'"}'
+
+        # Gets TMOS licensed modules for the current BIG-IP device
         retcode,instanceDetails = bigIQInstanceDetails(nc_fqdn,item['uuid'])
 
-        activeModules = instanceDetails['properties']['cm:gui:module']
+        licensedModules = instanceDetails['properties']['cm:gui:module']
 
         output += '{"hostname":"'+item['hostname']+'","address":"'+item['address']+'","product":"'+item['product']+'","version":"'+item['version']+'","edition":"'+ \
           item['edition']+'","build":"'+item['build']+'","isVirtual":"'+str(item['isVirtual'])+'","isClustered":"'+str(item['isClustered'])+ \
           '","platformMarketingName":"'+item['platformMarketingName']+'","restFrameworkVersion":"'+ \
-          item['restFrameworkVersion']+'","modules":'+str(activeModules).replace('\'','"')+'}'
+          item['restFrameworkVersion']+'","licensedModules":'+str(licensedModules).replace('\'','"')+',"provisionedModules":['+provModules+']}'
 
     output = output + ']}'
   elif mode == 'PROMETHEUS' or mode == 'PUSHGATEWAY':
