@@ -270,31 +270,29 @@ def nginxInstanceManagerInstances(fqdn):
 
 # Returns BIG-IP devices managed by BIG-IQ
 def bigIQInstances(fqdn):
-  res = requests.request("GET", fqdn+"/mgmt/shared/resolver/device-groups/cm-bigip-allBigIpDevices/devices", auth=(nc_user,nc_pass), verify=False)
-
-  if res.status_code == 200:
-    data = res.json()
-  else:
-    data = {}
-
-  return res.status_code,data
+  return bigIQcallRESTURI(fqdn,"GET","/mgmt/shared/resolver/device-groups/cm-bigip-allBigIpDevices/devices")
 
 
 # Returns details for a given BIG-IP device
 def bigIQInstanceDetails(fqdn,instanceUUID):
-  res = requests.request("GET", fqdn+"/mgmt/cm/system/machineid-resolver/"+instanceUUID, auth=(nc_user,nc_pass), verify=False)
-
-  if res.status_code == 200:
-    data = res.json()
-  else:
-    data = {}
-
-  return res.status_code,data
+  return bigIQcallRESTURI(fqdn,"GET","/mgmt/cm/system/machineid-resolver/"+instanceUUID)
 
 
 # Returns modules provisioning status details for BIG-IP devices managed by BIG-IQ
 def bigIQInstanceProvisioning(fqdn):
-  res = requests.request("GET", fqdn+"/mgmt/cm/shared/current-config/sys/provision", auth=(nc_user,nc_pass), verify=False)
+  return bigIQcallRESTURI(fqdn,"GET","/mgmt/cm/shared/current-config/sys/provision")
+
+
+# Invokes the given BIG-IQ REST API
+# The uri must start with '/'
+def bigIQcallRESTURI(fqdn,method,uri):
+  authRes = requests.request("POST", fqdn+"/mgmt/shared/authn/login", json = {'username': nc_user, 'password': nc_pass}, verify=False)
+  if authRes.status_code != 200:
+    return authRes.status_code,"{'error':'authentication failed'}"
+
+  # Get authorization token
+  authToken = authRes.json()['token']['token']
+  res = requests.request(method, fqdn+uri, headers = { 'X-F5-Auth-Token': authToken }, verify=False)
 
   if res.status_code == 200:
     data = res.json()
@@ -302,6 +300,7 @@ def bigIQInstanceProvisioning(fqdn):
     data = {}
 
   return res.status_code,data
+
 
 
 ### NGINX Controller query functions
