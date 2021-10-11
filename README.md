@@ -49,7 +49,7 @@ Push mode: Instance Counter pushes stats to a remote data collection and visuali
 The NGINX Instance Counter image is available on Docker Hub as:
 
 ```
-fiorucci/nginx-instance-counter:2.9
+fiorucci/nginx-instance-counter:3.0
 ```
 
 The 1.instancecounter.yaml file references that by default.
@@ -60,8 +60,8 @@ If you need to build and push NGINX your own image to a private registry:
 git clone fabriziofiorucci/NGINX-InstanceCounter
 cd NGINX-InstanceCounter/nginx-instance-counter
 
-docker build --no-cache -t PRIVATE_REGISTRY:PORT/nginx-instance-counter:2.9 .
-docker push PRIVATE_REGISTRY:PORT/nginx-instance-counter:2.9
+docker build --no-cache -t PRIVATE_REGISTRY:PORT/nginx-instance-counter:3.0 .
+docker push PRIVATE_REGISTRY:PORT/nginx-instance-counter:3.0
 ```
 
 ## As a native python application
@@ -400,13 +400,13 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
 {
   "instances": [
     {
-      "bigip": "2"
+      "bigip": "1"
     }
   ],
   "details": [
     {
-      "hostname": "bigip1.lab.local",
-      "address": "10.155.153.207",
+      "hostname": "bigip.f5.ff.lan",
+      "address": "192.168.1.70",
       "product": "BIG-IP",
       "version": "16.1.0",
       "edition": "Final",
@@ -415,31 +415,14 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
       "isClustered": "False",
       "platformMarketingName": "BIG-IP Virtual Edition",
       "restFrameworkVersion": "16.1.0-0.0.19",
-      "licensedModules": [
-        "adc",
-        "BigIPDevice"
-      ],
-      "provisionedModules": [
-        {
-          "module": "ltm",
-          "level": "nominal"
-        },
-      ]
-    },
-    {
-      "hostname": "bigip2.lab.local",
-      "address": "10.155.153.208",
-      "product": "BIG-IP",
-      "version": "16.1.0",
-      "edition": "Final",
-      "build": "0.0.19",
-      "isVirtual": "True",
-      "isClustered": "False",
-      "platformMarketingName": "BIG-IP Virtual Edition",
-      "restFrameworkVersion": "16.1.0-0.0.19",
+      "platform": "Z100",
+      "registrationKey": "XXXXX-YYYYY-ZZZZZ-TTTTT-QQQQQQQ",
+      "licenseEndDateTime": "2021-11-26T00:00:00+01:00",
+      "chassisSerialNumber": "00000000-0000-0000-000000000000",
       "licensedModules": [
         "asmsecurity",
         "adc",
+        "dns",
         "Access",
         "BigIPDevice",
         "networksecurity",
@@ -447,7 +430,27 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
       ],
       "provisionedModules": [
         {
+          "module": "afm",
+          "level": "nominal"
+        },
+        {
+          "module": "sslo",
+          "level": "none"
+        },
+        {
           "module": "ltm",
+          "level": "nominal"
+        },
+        {
+          "module": "urldb",
+          "level": "none"
+        },
+        {
+          "module": "cgnat",
+          "level": "none"
+        },
+        {
+          "module": "gtm",
           "level": "nominal"
         },
         {
@@ -455,9 +458,37 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
           "level": "none"
         },
         {
+          "module": "pem",
+          "level": "none"
+        },
+        {
+          "module": "swg",
+          "level": "none"
+        },
+        {
+          "module": "avr",
+          "level": "nominal"
+        },
+        {
           "module": "asm",
           "level": "nominal"
         },
+        {
+          "module": "lc",
+          "level": "none"
+        },
+        {
+          "module": "dos",
+          "level": "none"
+        },
+        {
+          "module": "fps",
+          "level": "none"
+        },
+        {
+          "module": "apm",
+          "level": "none"
+        }
       ]
     }
   ]

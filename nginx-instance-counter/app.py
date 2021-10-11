@@ -270,31 +270,67 @@ def nginxInstanceManagerInstances(fqdn):
 
 # Returns BIG-IP devices managed by BIG-IQ
 def bigIQInstances(fqdn):
-  return bigIQcallRESTURI(fqdn,"GET","/mgmt/shared/resolver/device-groups/cm-bigip-allBigIpDevices/devices")
+  return bigIQcallRESTURI(fqdn = fqdn,method = "GET",uri = "/mgmt/shared/resolver/device-groups/cm-bigip-allBigIpDevices/devices",body = "")
 
 
 # Returns details for a given BIG-IP device
 def bigIQInstanceDetails(fqdn,instanceUUID):
-  return bigIQcallRESTURI(fqdn,"GET","/mgmt/cm/system/machineid-resolver/"+instanceUUID)
+  return bigIQcallRESTURI(fqdn = fqdn,method = "GET",uri = "/mgmt/cm/system/machineid-resolver/"+instanceUUID, body = "")
 
 
 # Returns modules provisioning status details for BIG-IP devices managed by BIG-IQ
 def bigIQInstanceProvisioning(fqdn):
-  return bigIQcallRESTURI(fqdn,"GET","/mgmt/cm/shared/current-config/sys/provision")
+  return bigIQcallRESTURI(fqdn = fqdn,method = "GET",uri = "/mgmt/cm/shared/current-config/sys/provision", body ="")
 
 
-# Invokes the given BIG-IQ REST API
+# Returns the inventory for BIG-IP devices managed by BIG-IQ
+# The "resultsReference" field contains the URL to fetch license/serial number information
+def bigIQgetInventory(fqdn):
+  # https://clouddocs.f5.com/products/big-iq/mgmt-api/v8.1.0/HowToSamples/bigiq_public_api_wf/t_export_device_inventory.html?highlight=inventory
+  res,body = bigIQcallRESTURI(fqdn = fqdn, method = "POST", uri = "/mgmt/cm/device/tasks/device-inventory", body = {'devicesQueryUri': 'https://localhost/mgmt/shared/resolver/device-groups/cm-bigip-allBigIpDevices/devices'} )
+  if res != 202:
+    return res,body
+
+  inventoryID = body['id']
+  inventoryStatus = body['status']
+  inventoryPending = True
+
+  while inventoryPending == True:
+    time.sleep(1)
+
+    res,body = bigIQcallRESTURI(fqdn = fqdn, method = "GET", uri = "/mgmt/cm/device/tasks/device-inventory/"+inventoryID, body = "" )
+    if res != 200:
+      return res,body
+    else:
+      inventoryStatus = body['status']
+      if inventoryStatus == "FINISHED":
+        inventoryPending=False
+
+  # "resultsReference": {
+  #   "link": "https://localhost/mgmt/cm/device/reports/device-inventory/8982ed9f-1870-4483-96c2-9fb024a2a5b6/results",
+  #   "isSubcollection": true
+  # }
+  resultsReferenceID = body['resultsReference']['link'].split('/')[8]
+
+  res,body = bigIQcallRESTURI(fqdn = fqdn, method = "GET", uri = "/mgmt/cm/device/reports/device-inventory/"+resultsReferenceID+"/results", body = "" )
+
+  return res,body
+
+
+# Invokes the given BIG-IQ REST API method
 # The uri must start with '/'
-def bigIQcallRESTURI(fqdn,method,uri):
+def bigIQcallRESTURI(fqdn,method,uri,body):
+  # Get authorization token
   authRes = requests.request("POST", fqdn+"/mgmt/shared/authn/login", json = {'username': nc_user, 'password': nc_pass}, verify=False)
+
   if authRes.status_code != 200:
     return authRes.status_code,"{'error':'authentication failed'}"
-
-  # Get authorization token
   authToken = authRes.json()['token']['token']
-  res = requests.request(method, fqdn+uri, headers = { 'X-F5-Auth-Token': authToken }, verify=False)
 
-  if res.status_code == 200:
+  # Invokes the BIG-IQ REST API method
+  res = requests.request(method, fqdn+uri, headers = { 'X-F5-Auth-Token': authToken }, json = body, verify=False)
+
+  if res.status_code == 200 or res.status_code == 202:
     data = res.json()
   else:
     data = {}
@@ -497,6 +533,7 @@ def bigIqInventory(mode):
 
     # Gets TMOS modules provisioning state for all devices
     rcode,provisioningDetails = bigIQInstanceProvisioning(nc_fqdn)
+    rcode2,inventoryDetails = bigIQgetInventory(nc_fqdn)
 
     for item in details['items']:
       if mode == 'JSON':
@@ -517,6 +554,15 @@ def bigIqInventory(mode):
 
             provModules += '{"module":"'+prov['name']+'","level":"'+prov['level']+'"}'
 
+        # Gets TMOS registration key and serial number for the current BIG-IP device
+        inventoryData = ''
+        for invDevice in inventoryDetails['items']:
+          if invDevice['infoState']['machineId'] == item['machineId']:
+            inventoryData = '"platform":"'+invDevice['infoState']['platform']+ \
+              '","registrationKey":"'+invDevice['infoState']['license']['registrationKey']+ \
+              '","licenseEndDateTime":"'+invDevice['infoState']['license']['licenseEndDateTime']+ \
+              '","chassisSerialNumber":"'+invDevice['infoState']['chassisSerialNumber']+'"'
+
         # Gets TMOS licensed modules for the current BIG-IP device
         retcode,instanceDetails = bigIQInstanceDetails(nc_fqdn,item['uuid'])
 
@@ -525,7 +571,7 @@ def bigIqInventory(mode):
         output += '{"hostname":"'+item['hostname']+'","address":"'+item['address']+'","product":"'+item['product']+'","version":"'+item['version']+'","edition":"'+ \
           item['edition']+'","build":"'+item['build']+'","isVirtual":"'+str(item['isVirtual'])+'","isClustered":"'+str(item['isClustered'])+ \
           '","platformMarketingName":"'+item['platformMarketingName']+'","restFrameworkVersion":"'+ \
-          item['restFrameworkVersion']+'","licensedModules":'+str(licensedModules).replace('\'','"')+',"provisionedModules":['+provModules+']}'
+          item['restFrameworkVersion']+'",'+inventoryData+',"licensedModules":'+str(licensedModules).replace('\'','"')+',"provisionedModules":['+provModules+']}'
 
     output = output + ']}'
   elif mode == 'PROMETHEUS' or mode == 'PUSHGATEWAY':
