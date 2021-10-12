@@ -8,7 +8,7 @@ It has been tested against:
 
 - NGINX Controller 3.18, 3.18.2
 - NGINX Instance Manager 1.0.1, 1.0.2, 1.0.3
-- BIG-IQ 8.1.0
+- BIG-IQ 8.1.0, 8.1.0.2
 
 Communication to NGINX Controller / NGINX Instance Manager / BIG-IQ is based on REST API, current features are:
 
@@ -39,7 +39,7 @@ Push mode: Instance Counter pushes stats to a remote data collection and visuali
 
 - Kubernetes or Openshift cluster
 - Private registry to push the NGINX Instance Counter image
-- NGINX Controller 3.18, 3.18.2 or NGINX Instance Manager 1.0.1, 1.0.2, 1.0.3 or BIG-IP 8.1.0
+- NGINX Controller 3.18, 3.18.2 or NGINX Instance Manager 1.0.1, 1.0.2, 1.0.3 or BIG-IP 8.1.0, 8.1.0.2
 - SMTP server if automated email reporting is used
 
 # How to build
