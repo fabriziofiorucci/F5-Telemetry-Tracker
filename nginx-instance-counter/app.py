@@ -295,6 +295,7 @@ def bigIQgetInventory(fqdn):
   inventoryStatus = body['status']
   inventoryPending = True
 
+  timeoutCounter = 0
   while inventoryPending == True:
     time.sleep(1)
 
@@ -305,6 +306,10 @@ def bigIQgetInventory(fqdn):
       inventoryStatus = body['status']
       if inventoryStatus == "FINISHED":
         inventoryPending=False
+
+    timeoutCounter = timeoutCounter + 1
+    if timeoutCounter == 5:
+      return 204,''
 
   # "resultsReference": {
   #   "link": "https://localhost/mgmt/cm/device/reports/device-inventory/8982ed9f-1870-4483-96c2-9fb024a2a5b6/results",
@@ -555,13 +560,15 @@ def bigIqInventory(mode):
             provModules += '{"module":"'+prov['name']+'","level":"'+prov['level']+'"}'
 
         # Gets TMOS registration key and serial number for the current BIG-IP device
-        inventoryData = ''
-        for invDevice in inventoryDetails['items']:
-          if invDevice['infoState']['machineId'] == item['machineId']:
-            inventoryData = '"platform":"'+invDevice['infoState']['platform']+ \
-              '","registrationKey":"'+invDevice['infoState']['license']['registrationKey']+ \
-              '","licenseEndDateTime":"'+invDevice['infoState']['license']['licenseEndDateTime']+ \
-              '","chassisSerialNumber":"'+invDevice['infoState']['chassisSerialNumber']+'"'
+        if rcode2 == 204:
+          inventoryData = ''
+        else:
+          for invDevice in inventoryDetails['items']:
+            if invDevice['infoState']['machineId'] == item['machineId']:
+              inventoryData = '"platform":"'+invDevice['infoState']['platform']+ \
+                '","registrationKey":"'+invDevice['infoState']['license']['registrationKey']+ \
+                '","licenseEndDateTime":"'+invDevice['infoState']['license']['licenseEndDateTime']+ \
+                '","chassisSerialNumber":"'+invDevice['infoState']['chassisSerialNumber']+'",'
 
         # Gets TMOS licensed modules for the current BIG-IP device
         retcode,instanceDetails = bigIQInstanceDetails(nc_fqdn,item['uuid'])
@@ -571,7 +578,7 @@ def bigIqInventory(mode):
         output += '{"hostname":"'+item['hostname']+'","address":"'+item['address']+'","product":"'+item['product']+'","version":"'+item['version']+'","edition":"'+ \
           item['edition']+'","build":"'+item['build']+'","isVirtual":"'+str(item['isVirtual'])+'","isClustered":"'+str(item['isClustered'])+ \
           '","platformMarketingName":"'+item['platformMarketingName']+'","restFrameworkVersion":"'+ \
-          item['restFrameworkVersion']+'",'+inventoryData+',"licensedModules":'+str(licensedModules).replace('\'','"')+',"provisionedModules":['+provModules+']}'
+          item['restFrameworkVersion']+'",'+inventoryData+'"licensedModules":'+str(licensedModules).replace('\'','"')+',"provisionedModules":['+provModules+']}'
 
     output = output + ']}'
   elif mode == 'PROMETHEUS' or mode == 'PUSHGATEWAY':
