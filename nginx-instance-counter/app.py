@@ -131,6 +131,16 @@ def scheduledEmail(email_server,email_server_port,email_server_type,email_auth_u
     time.sleep(email_interval)
 
 
+# Thread for scheduled inventory generation
+def scheduledInventory(fqdn,username,password):
+  while True:
+    # Starts inventory generation task
+    # https://clouddocs.f5.com/products/big-iq/mgmt-api/v8.1.0/HowToSamples/bigiq_public_api_wf/t_export_device_inventory.html?highlight=inventory
+    print(datetime.datetime.now(),"Requesting BIG-IQ inventory refresh")
+    res,body = bigIQcallRESTURI(fqdn = fqdn, username = username, password = password, method = "POST", uri = "/mgmt/cm/device/tasks/device-inventory", body = {'devicesQueryUri': 'https://localhost/mgmt/shared/resolver/device-groups/cm-bigip-allBigIpDevices/devices'} )
+
+    time.sleep(86400)
+
 ### NGINX Controller REST API
 
 # NGINX Controller - login
@@ -269,64 +279,52 @@ def nginxInstanceManagerInstances(fqdn):
 ### BIG-IQ REST API
 
 # Returns BIG-IP devices managed by BIG-IQ
-def bigIQInstances(fqdn):
-  return bigIQcallRESTURI(fqdn = fqdn,method = "GET",uri = "/mgmt/shared/resolver/device-groups/cm-bigip-allBigIpDevices/devices",body = "")
+def bigIQInstances(fqdn,username,password):
+  return bigIQcallRESTURI(fqdn = fqdn,username = username,password = password,method = "GET",uri = "/mgmt/shared/resolver/device-groups/cm-bigip-allBigIpDevices/devices",body = "")
 
 
 # Returns details for a given BIG-IP device
-def bigIQInstanceDetails(fqdn,instanceUUID):
-  return bigIQcallRESTURI(fqdn = fqdn,method = "GET",uri = "/mgmt/cm/system/machineid-resolver/"+instanceUUID, body = "")
+def bigIQInstanceDetails(fqdn,username,password,instanceUUID):
+  return bigIQcallRESTURI(fqdn = fqdn,username = username,password = password,method = "GET",uri = "/mgmt/cm/system/machineid-resolver/"+instanceUUID, body = "")
 
 
 # Returns modules provisioning status details for BIG-IP devices managed by BIG-IQ
-def bigIQInstanceProvisioning(fqdn):
-  return bigIQcallRESTURI(fqdn = fqdn,method = "GET",uri = "/mgmt/cm/shared/current-config/sys/provision", body ="")
+def bigIQInstanceProvisioning(fqdn,username,password):
+  return bigIQcallRESTURI(fqdn = fqdn,username = username,password = password,method = "GET",uri = "/mgmt/cm/shared/current-config/sys/provision", body ="")
 
 
-# Returns the inventory for BIG-IP devices managed by BIG-IQ
-# The "resultsReference" field contains the URL to fetch license/serial number information
-def bigIQgetInventory(fqdn):
-  # https://clouddocs.f5.com/products/big-iq/mgmt-api/v8.1.0/HowToSamples/bigiq_public_api_wf/t_export_device_inventory.html?highlight=inventory
-  res,body = bigIQcallRESTURI(fqdn = fqdn, method = "POST", uri = "/mgmt/cm/device/tasks/device-inventory", body = {'devicesQueryUri': 'https://localhost/mgmt/shared/resolver/device-groups/cm-bigip-allBigIpDevices/devices'} )
-  if res != 202:
+# Returns the most recent inventory for BIG-IP devices managed by BIG-IQ
+def bigIQgetInventory(fqdn,username,password):
+  # Gets the latest available inventory
+  # The "resultsReference" field contains the URL to fetch license/serial number information
+  res,body = bigIQcallRESTURI(fqdn = fqdn, username = username,password = password,method = "GET", uri = "/mgmt/cm/device/tasks/device-inventory", body = "" )
+  if res != 200:
     return res,body
+  else:
+    latestUpdate=0
+    latestResultsReference=''
+    for item in body['items']:
+      if item['lastUpdateMicros'] > latestUpdate:
+        # "resultsReference": {
+        #   "link": "https://localhost/mgmt/cm/device/reports/device-inventory/8982ed9f-1870-4483-96c2-9fb024a2a5b6/results",
+        #   "isSubcollection": true
+        # }
+        latestResultsReference = item['resultsReference']['link'].split('/')[8]
+        latestUpdate = item['lastUpdateMicros']
 
-  inventoryID = body['id']
-  inventoryStatus = body['status']
-  inventoryPending = True
+    if latestUpdate == 0:
+       return 204,'{}'
 
-  timeoutCounter = 0
-  while inventoryPending == True:
-    time.sleep(1)
+    res,body = bigIQcallRESTURI(fqdn = fqdn,username = username,password = password,method = "GET", uri = "/mgmt/cm/device/reports/device-inventory/"+latestResultsReference+"/results", body = "" )
 
-    res,body = bigIQcallRESTURI(fqdn = fqdn, method = "GET", uri = "/mgmt/cm/device/tasks/device-inventory/"+inventoryID, body = "" )
-    if res != 200:
-      return res,body
-    else:
-      inventoryStatus = body['status']
-      if inventoryStatus == "FINISHED":
-        inventoryPending=False
-
-    timeoutCounter = timeoutCounter + 1
-    if timeoutCounter == 5:
-      return 204,''
-
-  # "resultsReference": {
-  #   "link": "https://localhost/mgmt/cm/device/reports/device-inventory/8982ed9f-1870-4483-96c2-9fb024a2a5b6/results",
-  #   "isSubcollection": true
-  # }
-  resultsReferenceID = body['resultsReference']['link'].split('/')[8]
-
-  res,body = bigIQcallRESTURI(fqdn = fqdn, method = "GET", uri = "/mgmt/cm/device/reports/device-inventory/"+resultsReferenceID+"/results", body = "" )
-
-  return res,body
+    return res,body
 
 
 # Invokes the given BIG-IQ REST API method
 # The uri must start with '/'
-def bigIQcallRESTURI(fqdn,method,uri,body):
+def bigIQcallRESTURI(fqdn,username,password,method,uri,body):
   # Get authorization token
-  authRes = requests.request("POST", fqdn+"/mgmt/shared/authn/login", json = {'username': nc_user, 'password': nc_pass}, verify=False)
+  authRes = requests.request("POST", fqdn+"/mgmt/shared/authn/login", json = {'username': username, 'password': password}, verify=False)
 
   if authRes.status_code != 200:
     return authRes.status_code,"{'error':'authentication failed'}"
@@ -362,7 +360,7 @@ def ncInstances(mode):
   instanceType=license['currentStatus']['state']['currentInstance']['type']
   instanceVersion=license['currentStatus']['state']['currentInstance']['version']
 
-  # Fetches locations
+  # Fetches ocations
   status,locations = nginxControllerLocations(nc_fqdn,sessionCookie)
   if status != 200:
     return make_response(jsonify({'error': 'locations fetch error'}), 404)
@@ -526,7 +524,7 @@ def nimInstances(mode):
 # Returns NGINX OSS/Plus instances managed by BIG-IQ in JSON format
 def bigIqInventory(mode):
 
-  status,details = bigIQInstances(nc_fqdn)
+  status,details = bigIQInstances(nc_fqdn,nc_user,nc_pass)
   if status != 200:
     return make_response(jsonify({'error': 'fetching instances failed'}), 401)
 
@@ -537,8 +535,8 @@ def bigIqInventory(mode):
     firstLoop = True
 
     # Gets TMOS modules provisioning state for all devices
-    rcode,provisioningDetails = bigIQInstanceProvisioning(nc_fqdn)
-    rcode2,inventoryDetails = bigIQgetInventory(nc_fqdn)
+    rcode,provisioningDetails = bigIQInstanceProvisioning(nc_fqdn,nc_user,nc_pass)
+    rcode2,inventoryDetails = bigIQgetInventory(nc_fqdn,nc_user,nc_pass)
 
     for item in details['items']:
       if mode == 'JSON':
@@ -560,9 +558,8 @@ def bigIqInventory(mode):
             provModules += '{"module":"'+prov['name']+'","level":"'+prov['level']+'"}'
 
         # Gets TMOS registration key and serial number for the current BIG-IP device
-        if rcode2 == 204:
-          inventoryData = ''
-        else:
+        inventoryData = ''
+        if rcode2 != 204:
           for invDevice in inventoryDetails['items']:
             if invDevice['infoState']['machineId'] == item['machineId']:
               inventoryData = '"platform":"'+invDevice['infoState']['platform']+ \
@@ -571,7 +568,7 @@ def bigIqInventory(mode):
                 '","chassisSerialNumber":"'+invDevice['infoState']['chassisSerialNumber']+'",'
 
         # Gets TMOS licensed modules for the current BIG-IP device
-        retcode,instanceDetails = bigIQInstanceDetails(nc_fqdn,item['uuid'])
+        retcode,instanceDetails = bigIQInstanceDetails(nc_fqdn,nc_user,nc_pass,item['uuid'])
 
         licensedModules = instanceDetails['properties']['cm:gui:module']
 
@@ -623,6 +620,11 @@ if __name__ == '__main__':
     print('Invalid NGINX_CONTROLLER_TYPE')
   else:
     # Push thread
+    if nc_mode == 'BIG_IQ':
+      print('Running BIG-IQ inventory refresh thread')
+      inventoryThread = threading.Thread(target=scheduledInventory,args=(nc_fqdn,nc_user,nc_pass))
+      inventoryThread.start()
+
     if os.environ['STATS_PUSH_ENABLE'] == 'true':
       stats_push_mode=os.environ['STATS_PUSH_MODE']
 
