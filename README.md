@@ -498,7 +498,7 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
       "inventoryTimestamp": "1634121930315",
       "inventoryStatus": "full",
       "platform": "Z100",
-      "registrationKey": "VXAUI-AIYCG-CTTXA-ORTFI-WYOOTFU",
+      "registrationKey": "XXXXX-XXXXX-XXXXX-XXXXX-XXXXXXX",
       "licenseEndDateTime": "2021-11-26T00:00:00+01:00",
       "chassisSerialNumber": "00000000-0000-0000-000000000000",
       "licensedModules": [
