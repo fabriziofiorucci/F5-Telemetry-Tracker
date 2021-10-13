@@ -10,6 +10,7 @@ import requests
 import time
 import threading
 import smtplib
+import urllib3.exceptions
 from requests import Request, Session
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from email.message import EmailMessage

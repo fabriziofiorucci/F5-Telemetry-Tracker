@@ -75,6 +75,11 @@ NGINX Instance Counter requires:
 
 nginx-instance-counter/nicstart.sh is a sample script to run NGINX Instance Counter from bash
 
+## As a portable application
+
+- [AppImage for Linux](/portable/Linux)
+
+
 # How to deploy
 
 ## For Kubernetes/Openshift
