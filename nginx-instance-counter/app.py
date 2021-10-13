@@ -558,14 +558,20 @@ def bigIqInventory(mode):
             provModules += '{"module":"'+prov['name']+'","level":"'+prov['level']+'"}'
 
         # Gets TMOS registration key and serial number for the current BIG-IP device
-        inventoryData = ''
-        if rcode2 != 204:
+        inventoryData = '"inventoryTimestamp":"'+str(inventoryDetails['lastUpdateMicros']//1000)+'",'
+        if rcode2 == 204:
+          inventoryData = inventoryData + '"inventoryStatus":"partial",'
+        else:
           for invDevice in inventoryDetails['items']:
             if invDevice['infoState']['machineId'] == item['machineId']:
-              inventoryData = '"platform":"'+invDevice['infoState']['platform']+ \
-                '","registrationKey":"'+invDevice['infoState']['license']['registrationKey']+ \
-                '","licenseEndDateTime":"'+invDevice['infoState']['license']['licenseEndDateTime']+ \
-                '","chassisSerialNumber":"'+invDevice['infoState']['chassisSerialNumber']+'",'
+              if "errors" in invDevice['infoState']:
+                # BIG-IP unreachable, inventory incomplete
+                inventoryData = inventoryData + '"inventoryStatus":"partial",'
+              else:
+                inventoryData = inventoryData + '"inventoryStatus":"full","platform":"'+invDevice['infoState']['platform']+ \
+                  '","registrationKey":"'+invDevice['infoState']['license']['registrationKey']+ \
+                  '","licenseEndDateTime":"'+invDevice['infoState']['license']['licenseEndDateTime']+ \
+                  '","chassisSerialNumber":"'+invDevice['infoState']['chassisSerialNumber']+'",'
 
         # Gets TMOS licensed modules for the current BIG-IP device
         retcode,instanceDetails = bigIQInstanceDetails(nc_fqdn,nc_user,nc_pass,item['uuid'])

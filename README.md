@@ -49,7 +49,7 @@ Push mode: Instance Counter pushes stats to a remote data collection and visuali
 The NGINX Instance Counter image is available on Docker Hub as:
 
 ```
-fiorucci/nginx-instance-counter:3.2
+fiorucci/nginx-instance-counter:3.3
 ```
 
 The 1.instancecounter.yaml file references that by default.
@@ -60,8 +60,8 @@ If you need to build and push NGINX your own image to a private registry:
 git clone fabriziofiorucci/NGINX-InstanceCounter
 cd NGINX-InstanceCounter/nginx-instance-counter
 
-docker build --no-cache -t PRIVATE_REGISTRY:PORT/nginx-instance-counter:3.2 .
-docker push PRIVATE_REGISTRY:PORT/nginx-instance-counter:3.2
+docker build --no-cache -t PRIVATE_REGISTRY:PORT/nginx-instance-counter:3.3 .
+docker push PRIVATE_REGISTRY:PORT/nginx-instance-counter:3.3
 ```
 
 ## As a native python application
@@ -400,10 +400,90 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
 {
   "instances": [
     {
-      "bigip": "1"
+      "bigip": "2"
     }
   ],
   "details": [
+    {
+      "hostname": "bigip1.f5.ff.lan",
+      "address": "192.168.1.69",
+      "product": "BIG-IP",
+      "version": "16.1.0",
+      "edition": "Final",
+      "build": "0.0.19",
+      "isVirtual": "True",
+      "isClustered": "False",
+      "platformMarketingName": "BIG-IP Virtual Edition",
+      "restFrameworkVersion": "16.1.0-0.0.19",
+      "inventoryTimestamp": "1634121930315",
+      "inventoryStatus": "partial",
+      "licensedModules": [
+        "adc",
+        "BigIPDevice"
+      ],
+      "provisionedModules": [
+        {
+          "module": "ltm",
+          "level": "nominal"
+        },
+        {
+          "module": "avr",
+          "level": "none"
+        },
+        {
+          "module": "asm",
+          "level": "none"
+        },
+        {
+          "module": "sslo",
+          "level": "none"
+        },
+        {
+          "module": "lc",
+          "level": "none"
+        },
+        {
+          "module": "dos",
+          "level": "none"
+        },
+        {
+          "module": "ilx",
+          "level": "none"
+        },
+        {
+          "module": "afm",
+          "level": "none"
+        },
+        {
+          "module": "apm",
+          "level": "none"
+        },
+        {
+          "module": "cgnat",
+          "level": "none"
+        },
+        {
+          "module": "gtm",
+          "level": "none"
+        },
+        {
+          "module": "swg",
+          "level": "none"
+        },
+        {
+          "module": "pem",
+          "level": "none"
+        },
+        {
+          "module": "fps",
+          "level": "none"
+        },
+        {
+          "module": "urldb",
+          "level": "none"
+        }
+      ]
+    },
     {
       "hostname": "bigip.f5.ff.lan",
       "address": "192.168.1.70",
@@ -415,8 +495,10 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
       "isClustered": "False",
       "platformMarketingName": "BIG-IP Virtual Edition",
       "restFrameworkVersion": "16.1.0-0.0.19",
+      "inventoryTimestamp": "1634121930315",
+      "inventoryStatus": "full",
       "platform": "Z100",
-      "registrationKey": "XXXXX-YYYYY-ZZZZZ-TTTTT-QQQQQQQ",
+      "registrationKey": "VXAUI-AIYCG-CTTXA-ORTFI-WYOOTFU",
       "licenseEndDateTime": "2021-11-26T00:00:00+01:00",
       "chassisSerialNumber": "00000000-0000-0000-000000000000",
       "licensedModules": [
