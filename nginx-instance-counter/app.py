@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+import flask
 from flask import Flask, jsonify, abort, make_response, request
 import os
 import sys

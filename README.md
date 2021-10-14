@@ -79,6 +79,7 @@ nginx-instance-counter/nicstart.sh is a sample script to run NGINX Instance Coun
 
 - [All portable images](/portable)
 - [AppImage for Linux](/portable/Linux)
+- [AppImage for Windows 10](/portable/Windows)
 
 
 # How to deploy
