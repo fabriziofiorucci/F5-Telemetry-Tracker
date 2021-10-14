@@ -42,7 +42,7 @@ Push mode: Instance Counter pushes stats to a remote data collection and visuali
 - NGINX Controller 3.18, 3.18.2 or NGINX Instance Manager 1.0.1, 1.0.2, 1.0.3 or BIG-IP 8.1.0, 8.1.0.2
 - SMTP server if automated email reporting is used
 
-# How to build
+# How to build and run
 
 ## For Kubernetes/Openshift
 
