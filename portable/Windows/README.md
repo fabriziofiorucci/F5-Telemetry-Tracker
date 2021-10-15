@@ -22,8 +22,8 @@ python -m nuitka --follow-imports --onefile --mingw64 app.py
 
 - Upon startup Windows will ask to allow traffic from the image to BIG-IQ: all traffic is sent to BIG-IQ management IP address and port TCP/443 (configurabile from nicstart.bat)
 
-<img src="./images/portable-windows.1.jpg"/>
+<img src="/images/portable-windows.1.jpg"/>
 
 - When the NGINX Instance Counter has started, it can be queries sending a GET request to http://127.0.0.1:5000/instances
 
-<img src="./images/portable-windows.2.jpg"/>
+<img src="/images/portable-windows.2.jpg"/>
