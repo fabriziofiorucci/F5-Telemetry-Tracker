@@ -42,18 +42,18 @@ set STATS_PUSH_USERNAME=authusername
 set STATS_PUSH_PASSWORD=authpassword
 
 rem ### Section to use when using e-mail based push - EMAIL_ENABLED is mandatory
-set EMAIL_ENABLED="false"
-set EMAIL_SERVER="smtp.mydomain.tld"
+set EMAIL_ENABLED=false
+set EMAIL_SERVER=smtp.mydomain.tld
 rem ### Port 25 for SMTP, 465 for SMTP over TLS
 set EMAIL_SERVER_PORT=25
 rem ### EMAIL_SERVER_TYPE can be: starttls, ssl, plaintext
-set EMAIL_SERVER_TYPE="starttls"
-set EMAIL_SENDER="sender@domain.tld"
-set EMAIL_RECIPIENT="recipient@domain.tld"
+set EMAIL_SERVER_TYPE=starttls
+set EMAIL_SENDER=sender@domain.tld
+set EMAIL_RECIPIENT=recipient@domain.tld
 rem ### EMAIL_INTERVAL in minutes
 set EMAIL_INTERVAL=15
 rem ### Optional for SMTP authentication
-set EMAIL_AUTH_USER="username@domain"
-set EMAIL_AUTH_PASS="thepassword"
+set EMAIL_AUTH_USER=username@domain
+set EMAIL_AUTH_PASS=thepassword
 
 NGINX-InstanceCounter.exe
