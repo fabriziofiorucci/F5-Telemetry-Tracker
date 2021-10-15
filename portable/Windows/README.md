@@ -20,7 +20,7 @@ python -m nuitka --follow-imports --onefile --mingw64 app.py
 
 - Edit and use the provided nicstart.bat script to run the generated image
 
-- Upon startup Windows will ask to allow traffic from the image to BIG-IQ: all traffic is sent to BIG-IQ management IP address and port TCP/443 (configurabile from nicstart.bat)
+- Upon startup Windows will ask to allow traffic from the image to NGINX Instance Manager, NGINX Controller or BIG-IQ: all traffic is sent to NIM/NC/BIG-IQ management IP address and port (configurabile from nicstart.bat)
 
 <img src="/images/portable-windows.1.jpg"/>
 
