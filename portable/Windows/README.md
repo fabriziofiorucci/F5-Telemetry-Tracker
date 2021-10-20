@@ -24,6 +24,6 @@ python -m nuitka --follow-imports --onefile --mingw64 app.py
 
 <img src="/images/portable-windows.1.jpg"/>
 
-- When the NGINX Instance Counter has started, it can be queried sending a GET request to http://127.0.0.1:5000/instances
+- When the NGINX Instance Counter has started, it can be queried sending a GET request to http://127.0.0.1:5000/instances or http://127.0.0.1:5000/counter/instances for JSON reporting. Prometheus metrics can be polled using http://127.0.0.1:5000/metrics or http://127.0.0.1:5000/counter/metrics
 
 <img src="/images/portable-windows.2.jpg"/>
