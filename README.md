@@ -49,7 +49,7 @@ Push mode: Instance Counter pushes stats to a remote data collection and visuali
 The NGINX Instance Counter image is available on Docker Hub as:
 
 ```
-fiorucci/nginx-instance-counter:3.4
+fiorucci/nginx-instance-counter:3.5
 ```
 
 The 1.instancecounter.yaml file references that by default.
@@ -60,8 +60,8 @@ If you need to build and push NGINX your own image to a private registry:
 git clone fabriziofiorucci/NGINX-InstanceCounter
 cd NGINX-InstanceCounter/nginx-instance-counter
 
-docker build --no-cache -t PRIVATE_REGISTRY:PORT/nginx-instance-counter:3.4 .
-docker push PRIVATE_REGISTRY:PORT/nginx-instance-counter:3.4
+docker build --no-cache -t PRIVATE_REGISTRY:PORT/nginx-instance-counter:3.5 .
+docker push PRIVATE_REGISTRY:PORT/nginx-instance-counter:3.5
 ```
 
 ## As a native python application
@@ -100,14 +100,14 @@ Edit 1.instancecounter.yaml to customize:
   - NGINX_CONTROLLER_USERNAME - the username for authentication
   - NGINX_CONTROLLER_PASSWORD - the password for authentication
 
-  - STATS_PUSH_ENABLE - if set to "true" push mode is enabled, disabled if set to "false". This parameter is mandatory
+  - STATS_PUSH_ENABLE - if set to "true" push mode is enabled, disabled if set to "false"
   - STATS_PUSH_MODE - either CUSTOM or NGINX_PUSH, to push (HTTP POST) JSON to custom URL and to push metrics to pushgateway, respectively
   - STATS_PUSH_URL - the URL where to push statistics
   - STATS_PUSH_INTERVAL - the interval in seconds between two consecutive push
   - STATS_PUSH_USERNAME - (optional) the username for POST Basic Authentication
   - STATS_PUSH_PASSWORD - (optional) the password for POST Basic Authentication
 
-  - EMAIL_ENABLED - if set to "true" automated email reporting is enabled, disabled if set to "false". This parameter is mandatory
+  - EMAIL_ENABLED - if set to "true" automated email reporting is enabled, disabled if set to "false"
   - EMAIL_INTERVAL - the interval in days between two consecutive email reports
   - EMAIL_SERVER - the FQDN of the SMTP server to use
   - EMAIL_SERVER_PORT - the SMTP server port

@@ -660,13 +660,14 @@ if __name__ == '__main__':
         pushThread = threading.Thread(target=scheduledPush,args=(stats_push_url,stats_push_username,stats_push_password,stats_push_interval,stats_push_mode))
         pushThread.start()
 
-    if os.environ['EMAIL_ENABLED'] == 'true':
-      email_interval=int(os.environ['EMAIL_INTERVAL'])
-      email_sender=os.environ['EMAIL_SENDER']
-      email_recipient=os.environ['EMAIL_RECIPIENT']
-      email_server=os.environ['EMAIL_SERVER']
-      email_server_port=os.environ['EMAIL_SERVER_PORT']
-      email_server_type=os.environ['EMAIL_SERVER_TYPE']
+    if "EMAIL_ENABLED" in os.environ:
+      if os.environ['EMAIL_ENABLED'] == 'true':
+        email_interval=int(os.environ['EMAIL_INTERVAL'])
+        email_sender=os.environ['EMAIL_SENDER']
+        email_recipient=os.environ['EMAIL_RECIPIENT']
+        email_server=os.environ['EMAIL_SERVER']
+        email_server_port=os.environ['EMAIL_SERVER_PORT']
+        email_server_type=os.environ['EMAIL_SERVER_TYPE']
       if "EMAIL_AUTH_USER" in os.environ and "EMAIL_AUTH_PASS" in os.environ:
         email_auth_user=os.environ['EMAIL_AUTH_USER']
         email_auth_pass=os.environ['EMAIL_AUTH_PASS']
@@ -674,11 +675,11 @@ if __name__ == '__main__':
         email_auth_user=''
         email_auth_pass=''
 
-      print('Email reporting to',email_recipient,'every',email_interval,'days')
-      print(email_auth_user,'***',email_auth_pass)
-      print('Running push thread')
-      emailThread = threading.Thread(target=scheduledEmail,args=(email_server,email_server_port,email_server_type,email_auth_user,email_auth_pass,email_sender,email_recipient,email_interval*60))
-      emailThread.start()
+        print('Email reporting to',email_recipient,'every',email_interval,'days')
+        print(email_auth_user,'***',email_auth_pass)
+        print('Running push thread')
+        emailThread = threading.Thread(target=scheduledEmail,args=(email_server,email_server_port,email_server_type,email_auth_user,email_auth_pass,email_sender,email_recipient,email_interval*60))
+        emailThread.start()
 
     # REST API / prometheus metrics server
     print('Running REST API/Prometheus metrics server')
