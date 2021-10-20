@@ -13,8 +13,8 @@ It has been tested against:
 Communication to NGINX Controller / NGINX Instance Manager / BIG-IQ is based on REST API, current features are:
 
 - REST API mode
-  - /instances - returns JSON output
-  - /metrics - returns Prometheus compliant output
+  - /instances and /counter/instances - return JSON output
+  - /metrics and /counter/metrics - return Prometheus compliant output
 - Push mode
   - POSTs instance statistics to a user-defined HTTP(S) URL (STATS_PUSH_MODE: CUSTOM)
   - Pushes instance statistics to pushgateway (STATS_PUSH_MODE: NGINX_PUSH)
@@ -49,7 +49,7 @@ Push mode: Instance Counter pushes stats to a remote data collection and visuali
 The NGINX Instance Counter image is available on Docker Hub as:
 
 ```
-fiorucci/nginx-instance-counter:3.3
+fiorucci/nginx-instance-counter:3.4
 ```
 
 The 1.instancecounter.yaml file references that by default.
@@ -60,8 +60,8 @@ If you need to build and push NGINX your own image to a private registry:
 git clone fabriziofiorucci/NGINX-InstanceCounter
 cd NGINX-InstanceCounter/nginx-instance-counter
 
-docker build --no-cache -t PRIVATE_REGISTRY:PORT/nginx-instance-counter:3.3 .
-docker push PRIVATE_REGISTRY:PORT/nginx-instance-counter:3.3
+docker build --no-cache -t PRIVATE_REGISTRY:PORT/nginx-instance-counter:3.4 .
+docker push PRIVATE_REGISTRY:PORT/nginx-instance-counter:3.4
 ```
 
 ## As a native python application

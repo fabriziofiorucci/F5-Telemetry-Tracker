@@ -598,6 +598,7 @@ def bigIqInventory(mode):
 
 # Returns stats in json format
 @app.route('/instances', methods=['GET'])
+@app.route('/counter/instances', methods=['GET'])
 def getInstances():
   if nc_mode == 'NGINX_CONTROLLER':
     return ncInstances(mode='JSON')
@@ -609,6 +610,7 @@ def getInstances():
 
 # Returns stats in prometheus format
 @app.route('/metrics', methods=['GET'])
+@app.route('/counter/metrics', methods=['GET'])
 def getMetrics():
   if nc_mode == 'NGINX_CONTROLLER':
     return ncInstances(mode='PROMETHEUS')
