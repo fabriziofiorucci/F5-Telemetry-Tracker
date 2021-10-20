@@ -15,7 +15,7 @@ pip install requests
 - Package the app.py script
 
 ```
-python -m nuitka --follow-imports --onefile --mingw64 app.py
+python -m nuitka --onefile --mingw64 app.py
 ```
 
 - Edit and use the provided nicstart.bat script to run the generated image

@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: nginx-instance-counter
-        image: fiorucci/nginx-instance-counter:3.5
+        image: fiorucci/nginx-instance-counter:3.6
         ports:
         - containerPort: 5000
         env:
@@ -63,17 +63,15 @@ spec:
           #  value: "admin"
 
           ### Push mode - push interval in seconds
-            # STATS_PUSH_ENABLE is mandatory
-          - name: STATS_PUSH_ENABLE
-            value: "true"
-          - name: STATS_PUSH_MODE
-            #value: CUSTOM
-            value: NGINX_PUSH
-          - name: STATS_PUSH_URL
-            #value: "http://192.168.1.18/callHome"
-            value: "http://pushgateway.nginx.ff.lan"
-          - name: STATS_PUSH_INTERVAL
-            value: "10"
+          #- name: STATS_PUSH_ENABLE
+          #  value: "true"
+          #- name: STATS_PUSH_MODE
+          #  value: CUSTOM
+          #  value: NGINX_PUSH
+          #- name: STATS_PUSH_URL
+          #  value: "http://pushgateway.nginx.ff.lan"
+          #- name: STATS_PUSH_INTERVAL
+          #  value: "10"
 
           # Optional parameters for Basic Auth
           #- name: STATS_PUSH_USERNAME
@@ -83,31 +81,31 @@ spec:
 
           ### Automated e-mail reporting
             # EMAIL_ENABLED is mandatory
-          - name: EMAIL_ENABLED
-            value: "false"
-          - name: EMAIL_INTERVAL
+          #- name: EMAIL_ENABLED
+          #  value: "false"
+          #- name: EMAIL_INTERVAL
             # EMAIL_INTERVAL specified in days
-            value: "5"
+          #  value: "5"
 
-          - name: EMAIL_SERVER
-            value: "smtp.mydomain.tld"
-          - name: EMAIL_SERVER_PORT
-            value: "25"
-          - name: EMAIL_SERVER_TYPE
+          #- name: EMAIL_SERVER
+          #  value: "smtp.mydomain.tld"
+          #- name: EMAIL_SERVER_PORT
+          #  value: "25"
+          #- name: EMAIL_SERVER_TYPE
             # Value can be starttls, ssl, plaintext
-            value: "starttls"
+          #  value: "starttls"
 
             # Optional username/password for SMTP authentication
-          - name: EMAIL_AUTH_USER
-            value: "username@domain.tld"
-          - name: EMAIL_AUTH_PASS
-            value: "thepassword"
+          #- name: EMAIL_AUTH_USER
+          #  value: "username@domain.tld"
+          #- name: EMAIL_AUTH_PASS
+          #  value: "thepassword"
 
             # Reporting email sender and recipient
-          - name: EMAIL_SENDER
-            value: "sender@domain.tld"
-          - name: EMAIL_RECIPIENT
-            value: "recipient@domain.tld"
+          #- name: EMAIL_SENDER
+          #  value: "sender@domain.tld"
+          #- name: EMAIL_RECIPIENT
+          #  value: "recipient@domain.tld"
 
 ---
 apiVersion: v1

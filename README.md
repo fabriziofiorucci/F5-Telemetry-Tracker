@@ -50,7 +50,7 @@ Push mode: Instance Counter pushes stats to a remote data collection and visuali
 The NGINX Instance Counter image is available on Docker Hub as:
 
 ```
-fiorucci/nginx-instance-counter:3.5
+fiorucci/nginx-instance-counter:3.7
 ```
 
 The 1.instancecounter.yaml file references that by default.
@@ -61,8 +61,8 @@ If you need to build and push NGINX your own image to a private registry:
 git clone fabriziofiorucci/NGINX-InstanceCounter
 cd NGINX-InstanceCounter/nginx-instance-counter
 
-docker build --no-cache -t PRIVATE_REGISTRY:PORT/nginx-instance-counter:3.5 .
-docker push PRIVATE_REGISTRY:PORT/nginx-instance-counter:3.5
+docker build --no-cache -t PRIVATE_REGISTRY:PORT/nginx-instance-counter:3.6 .
+docker push PRIVATE_REGISTRY:PORT/nginx-instance-counter:3.6
 ```
 
 ## As a native python application
@@ -650,22 +650,7 @@ Content-Length: 267
     "version": "1.0.2",
     "serial": "6232847160738694"
   },
-  "instances": [
-    {
-      "nginx_plus_online": 0,
-      "nginx_oss_online": 1
-    }
-  ],
-  "details": [
-    {
-      "instance_id": "ee3f2f76-aa22-4182-b643-ba298cc0f758",
-      "uname": "Linux ubuntu 5.4.0-80-generic #90-Ubuntu SMP Fri Jul 9 22:49:44 UTC 2021 x86_64 x86_64 x86_64 GNU/Linux",
-      "containerized": "False",
-      "type": "oss",
-      "version": "1.18.0",
-      "last_seen": "2021-08-18T07:57:11.670746604Z"
-    }
-  ]
+  ...
 }
 ```
 
@@ -689,22 +674,7 @@ Authorization: Basic YWE6YmI=
     "version": "1.0.2",
     "serial": "6232847160738694"
   },
-  "instances": [
-    {
-      "nginx_plus_online": 0,
-      "nginx_oss_online": 1
-    }
-  ],
-  "details": [
-    {
-      "instance_id": "ee3f2f76-aa22-4182-b643-ba298cc0f758",
-      "uname": "Linux ubuntu 5.4.0-80-generic #90-Ubuntu SMP Fri Jul 9 22:49:44 UTC 2021 x86_64 x86_64 x86_64 GNU/Linux",
-      "containerized": "False",
-      "type": "oss",
-      "version": "1.18.0",
-      "last_seen": "2021-08-18T07:57:11.670746604Z"
-    }
-  ]
+  ...
 }
 ```
 

@@ -660,30 +660,31 @@ if __name__ == '__main__':
       inventoryThread = threading.Thread(target=scheduledInventory,args=(nc_fqdn,nc_user,nc_pass))
       inventoryThread.start()
 
-    if os.environ['STATS_PUSH_ENABLE'] == 'true':
-      stats_push_mode=os.environ['STATS_PUSH_MODE']
+    if "STATS_PUSH_ENABLE" in os.environ:
+      if os.environ['STATS_PUSH_ENABLE'] == 'true':
+        stats_push_mode=os.environ['STATS_PUSH_MODE']
 
-      if stats_push_mode != 'NGINX_PUSH' and stats_push_mode != 'CUSTOM':
-        print('Invalid STATS_PUSH_MODE')
-      else:
-        stats_push_url=os.environ['STATS_PUSH_URL']
-        if "STATS_PUSH_USERNAME" in os.environ:
-          stats_push_username=os.environ['STATS_PUSH_USERNAME']
+        if stats_push_mode != 'NGINX_PUSH' and stats_push_mode != 'CUSTOM':
+          print('Invalid STATS_PUSH_MODE')
         else:
-          stats_push_username=''
+          stats_push_url=os.environ['STATS_PUSH_URL']
+          if "STATS_PUSH_USERNAME" in os.environ:
+            stats_push_username=os.environ['STATS_PUSH_USERNAME']
+          else:
+            stats_push_username=''
 
-        if "STATS_PUSH_PASSWORD" in os.environ:
-          stats_push_password=os.environ['STATS_PUSH_PASSWORD']
-        else:
-          stats_push_password=''
+          if "STATS_PUSH_PASSWORD" in os.environ:
+            stats_push_password=os.environ['STATS_PUSH_PASSWORD']
+          else:
+            stats_push_password=''
 
-        stats_push_interval=int(os.environ['STATS_PUSH_INTERVAL'])
+          stats_push_interval=int(os.environ['STATS_PUSH_INTERVAL'])
 
-        print('Pushing stats to',stats_push_url,'every',stats_push_interval,'seconds')
+          print('Pushing stats to',stats_push_url,'every',stats_push_interval,'seconds')
 
-        print('Running push thread')
-        pushThread = threading.Thread(target=scheduledPush,args=(stats_push_url,stats_push_username,stats_push_password,stats_push_interval,stats_push_mode))
-        pushThread.start()
+          print('Running push thread')
+          pushThread = threading.Thread(target=scheduledPush,args=(stats_push_url,stats_push_username,stats_push_password,stats_push_interval,stats_push_mode))
+          pushThread.start()
 
     if "EMAIL_ENABLED" in os.environ:
       if os.environ['EMAIL_ENABLED'] == 'true':
@@ -693,12 +694,13 @@ if __name__ == '__main__':
         email_server=os.environ['EMAIL_SERVER']
         email_server_port=os.environ['EMAIL_SERVER_PORT']
         email_server_type=os.environ['EMAIL_SERVER_TYPE']
-      if "EMAIL_AUTH_USER" in os.environ and "EMAIL_AUTH_PASS" in os.environ:
-        email_auth_user=os.environ['EMAIL_AUTH_USER']
-        email_auth_pass=os.environ['EMAIL_AUTH_PASS']
-      else:
-        email_auth_user=''
-        email_auth_pass=''
+
+        if "EMAIL_AUTH_USER" in os.environ and "EMAIL_AUTH_PASS" in os.environ:
+          email_auth_user=os.environ['EMAIL_AUTH_USER']
+          email_auth_pass=os.environ['EMAIL_AUTH_PASS']
+        else:
+          email_auth_user=''
+          email_auth_pass=''
 
         print('Email reporting to',email_recipient,'every',email_interval,'days')
         print(email_auth_user,'***',email_auth_pass)

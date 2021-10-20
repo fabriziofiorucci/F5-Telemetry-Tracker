@@ -15,7 +15,7 @@ pip install requests
 - Package the app.py script
 
 ```
-python3 -m nuitka --follow-imports --onefile app.py
+python3 -m nuitka --onefile app.py
 ```
 
 - Edit and use the provided nicstart.sh script to run the generated image

@@ -35,29 +35,29 @@ rem set STATS_PUSH_INTERVAL=10
 rem set STATS_PUSH_USERNAME=authusername
 rem set STATS_PUSH_PASSWORD=authpassword
 
-rem ### Section to use when using push in custom mode (basic auth username/password are optional) - STATS_PUSH_ENABLE is mandatory
+rem ### Section to use when using push in custom mode (basic auth username/password are optional)
 
-set STATS_PUSH_ENABLE=false
-set STATS_PUSH_MODE=CUSTOM
-set STATS_PUSH_URL=http://192.168.1.18/callHome
+rem set STATS_PUSH_ENABLE=false
+rem set STATS_PUSH_MODE=CUSTOM
+rem set STATS_PUSH_URL=http://192.168.1.18/callHome
 rem ### STATS_PUSH_INTERVAL in seconds
-set STATS_PUSH_INTERVAL=10
-set STATS_PUSH_USERNAME=authusername
-set STATS_PUSH_PASSWORD=authpassword
+rem set STATS_PUSH_INTERVAL=10
+rem set STATS_PUSH_USERNAME=authusername
+rem set STATS_PUSH_PASSWORD=authpassword
 
-rem ### Section to use when using e-mail based push - EMAIL_ENABLED is mandatory
-set EMAIL_ENABLED=false
-set EMAIL_SERVER=smtp.mydomain.tld
+rem ### Section to use when using e-mail based push
+rem set EMAIL_ENABLED=false
+rem set EMAIL_SERVER=smtp.mydomain.tld
 rem ### Port 25 for SMTP, 465 for SMTP over TLS
-set EMAIL_SERVER_PORT=25
+rem set EMAIL_SERVER_PORT=25
 rem ### EMAIL_SERVER_TYPE can be: starttls, ssl, plaintext
-set EMAIL_SERVER_TYPE=starttls
-set EMAIL_SENDER=sender@domain.tld
-set EMAIL_RECIPIENT=recipient@domain.tld
+rem set EMAIL_SERVER_TYPE=starttls
+rem set EMAIL_SENDER=sender@domain.tld
+rem set EMAIL_RECIPIENT=recipient@domain.tld
 rem ### EMAIL_INTERVAL in minutes
-set EMAIL_INTERVAL=15
+rem set EMAIL_INTERVAL=15
 rem ### Optional for SMTP authentication
-set EMAIL_AUTH_USER=username@domain
-set EMAIL_AUTH_PASS=thepassword
+rem set EMAIL_AUTH_USER=username@domain
+rem set EMAIL_AUTH_PASS=thepassword
 
 NGINX-InstanceCounter.exe
