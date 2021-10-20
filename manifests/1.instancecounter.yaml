@@ -21,6 +21,12 @@ spec:
         ports:
         - containerPort: 5000
         env:
+          ### Optional HTTP(S) Proxy
+          #- name: HTTP_PROXY
+          #  value: "http(s)://username:password@proxy_ip:port"
+          #- name: HTTPS_PROXY
+          #  value: "http(s)://username:password@proxy_ip:port"
+
           ### REST API mode
 
           # Example for NGINX Controller

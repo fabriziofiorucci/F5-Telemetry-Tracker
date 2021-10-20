@@ -1,5 +1,9 @@
 @echo off
 
+rem ### Optional HTTP(S) proxy
+rem set HTTP_PROXY=http(s)://username:password@proxy_ip:port
+rem set HTTPS_PROXY=http(s)://username:password@proxy_ip:port
+
 rem ### Section to use when polling NGINX Controller
 
 rem set NGINX_CONTROLLER_TYPE=NGINX_CONTROLLER

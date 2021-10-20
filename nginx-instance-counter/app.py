@@ -55,17 +55,17 @@ def scheduledPush(url,username,password,interval,pushmode):
         if username == '' or password == '':
           if pushmode == 'CUSTOM':
             # Push json to custom URL
-            r = requests.post(url, data=payload, headers={'Content-Type': 'application/json'}, timeout=10)
+            r = requests.post(url, data=payload, headers={'Content-Type': 'application/json'}, timeout=10, proxies=proxyDict)
           elif pushmode == 'NGINX_PUSH':
             # Push to pushgateway
-            r = requests.post(pushgatewayUrl, data=payload, timeout=10)
+            r = requests.post(pushgatewayUrl, data=payload, timeout=10, proxies=proxyDict)
         else:
           if pushmode == 'CUSTOM':
             # Push json to custom URL with basic auth
-            r = requests.post(url, auth=(username,password), data=payload, headers={'Content-Type': 'application/json'}, timeout=10)
+            r = requests.post(url, auth=(username,password), data=payload, headers={'Content-Type': 'application/json'}, timeout=10, proxies=proxyDict)
           elif pushmode == 'NGINX_PUSH':
             # Push to pushgateway
-            r = requests.post(pushgatewayUrl, auth=(username,password), data=payload, timeout=10)
+            r = requests.post(pushgatewayUrl, auth=(username,password), data=payload, timeout=10, proxies=proxyDict)
       except:
         e = sys.exc_info()[0]
         print(datetime.datetime.now(),counter,'Pushing stats to',url,'failed:',e)
@@ -155,6 +155,7 @@ def nginxControllerLogin(fqdn,username,password):
   req = Request('POST',fqdn+"/api/v1/platform/login",data=data,headers=headers)
 
   p = s.prepare_request(req)
+  s.proxies = proxyDict
   res = s.send(p,verify=False)
 
   if res.status_code == 204:
@@ -172,6 +173,7 @@ def nginxControllerLogout(fqdn,cookie):
   req = Request('POST',fqdn+"/api/v1/platform/logout")
 
   p = s.prepare_request(req)
+  s.proxies = proxyDict
   p.headers['Cookie']=cookie
   res = s.send(p,verify=False)
 
@@ -184,6 +186,7 @@ def nginxControllerLicense(fqdn,cookie):
   req = Request('GET',fqdn+"/api/v1/platform/license")
 
   p = s.prepare_request(req)
+  s.proxies = proxyDict
   p.headers['Cookie']=cookie
   res = s.send(p,verify=False)
 
@@ -201,6 +204,7 @@ def nginxControllerLocations(fqdn,cookie):
   req = Request('GET',fqdn+"/api/v1/infrastructure/locations")
 
   p = s.prepare_request(req)
+  s.proxies = proxyDict
   p.headers['Cookie']=cookie
   res = s.send(p,verify=False)
 
@@ -219,6 +223,7 @@ def nginxControllerInstances(fqdn,cookie,location):
 
   p = s.prepare_request(req)
   p.headers['Cookie']=cookie
+  s.proxies = proxyDict
   res = s.send(p,verify=False)
 
   if res.status_code == 200:
@@ -237,6 +242,7 @@ def nginxInstanceManagerLicense(fqdn):
   req = Request('GET',fqdn+"/api/v0/about/license")
 
   p = s.prepare_request(req)
+  s.proxies = proxyDict
   res = s.send(p,verify=False)
 
   if res.status_code == 200:
@@ -252,6 +258,7 @@ def nginxInstanceManagerSystem(fqdn):
   req = Request('GET',fqdn+"/api/v0/about/system")
 
   p = s.prepare_request(req)
+  s.proxies = proxyDict
   res = s.send(p,verify=False)
 
   if res.status_code == 200:
@@ -268,6 +275,7 @@ def nginxInstanceManagerInstances(fqdn):
   req = Request('GET',fqdn+"/api/v0/instances")
 
   p = s.prepare_request(req)
+  s.proxies = proxyDict
   res = s.send(p,verify=False)
 
   if res.status_code == 200:
@@ -326,14 +334,14 @@ def bigIQgetInventory(fqdn,username,password):
 # The uri must start with '/'
 def bigIQcallRESTURI(fqdn,username,password,method,uri,body):
   # Get authorization token
-  authRes = requests.request("POST", fqdn+"/mgmt/shared/authn/login", json = {'username': username, 'password': password}, verify=False)
+  authRes = requests.request("POST", fqdn+"/mgmt/shared/authn/login", json = {'username': username, 'password': password}, verify=False, proxies=proxyDict)
 
   if authRes.status_code != 200:
     return authRes.status_code,"{'error':'authentication failed'}"
   authToken = authRes.json()['token']['token']
 
   # Invokes the BIG-IQ REST API method
-  res = requests.request(method, fqdn+uri, headers = { 'X-F5-Auth-Token': authToken }, json = body, verify=False)
+  res = requests.request(method, fqdn+uri, headers = { 'X-F5-Auth-Token': authToken }, json = body, verify=False, proxies=proxyDict)
 
   if res.status_code == 200 or res.status_code == 202:
     data = res.json()
@@ -629,6 +637,23 @@ if __name__ == '__main__':
   if nc_mode != 'NGINX_CONTROLLER' and nc_mode != 'NGINX_INSTANCE_MANAGER' and nc_mode != 'BIG_IQ' :
     print('Invalid NGINX_CONTROLLER_TYPE')
   else:
+    # optional HTTP(S) proxy
+    if "HTTP_PROXY" in os.environ:
+      http_proxy=os.environ['HTTP_PROXY']
+      print('Using HTTP Proxy',http_proxy)
+    else:
+      http_proxy=''
+    if "HTTPS_PROXY" in os.environ:
+      https_proxy=os.environ['HTTPS_PROXY']
+      print('Using HTTPS Proxy',https_proxy)
+    else:
+      https_proxy=''
+
+    proxyDict = {
+      "http": http_proxy,
+      "https": https_proxy
+    }
+
     # Push thread
     if nc_mode == 'BIG_IQ':
       print('Running BIG-IQ inventory refresh thread')

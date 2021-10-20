@@ -24,6 +24,7 @@ Communication to NGINX Controller / NGINX Instance Manager / BIG-IQ is based on 
   - Sends an email containing the report JSON file as an attachment named nginx_report.json for NGINX Instance Manager and NGINX Controller, and bigip_report.json for BIG-IQ
   - Support for plaintext SMTP, STARTTLS, SMTP over TLS, SMTP authentication, custom SMTP port
   - Configurable push interval (in days)
+- HTTP(S) proxy support
 
 ## Deployment modes
 
@@ -95,6 +96,9 @@ Edit 1.instancecounter.yaml to customize:
 - image name:
   - To be set to your private registry image (only if not using the image available on Docker Hub)
 - environment variables:
+  - HTTP_PROXY - to be set if HTTP proxy must be used to connect to NGINX Controller, NGINX Instance Manager or BIG-IQ
+  - HTTPS_PROXY - to be set if HTTPS proxy must be used to connect to NGINX Controller, NGINX Instance Manager or BIG-IQ
+
   - NGINX_CONTROLLER_TYPE - can be NGINX_CONTROLLER, NGINX_INSTANCE_MANAGER or BIG_IQ
   - NGINX_CONTROLLER_FQDN - the FQDN of your NGINX Controller / NGINX Instance Manager / BIG-IQ instance - format must be http[s]://FQDN:port
   - NGINX_CONTROLLER_USERNAME - the username for authentication

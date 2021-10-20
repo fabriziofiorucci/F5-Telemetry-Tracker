@@ -1,5 +1,9 @@
 #!/bin/bash
 
+### Optional HTTP(S) proxy
+#export HTTP_PROXY="http(s)://username:password@proxy_ip:port"
+#export HTTPS_PROXY="http(s)://username:password@proxy_ip:port"
+
 ### Section to use when polling NGINX Controller
 
 #export NGINX_CONTROLLER_TYPE=NGINX_CONTROLLER
