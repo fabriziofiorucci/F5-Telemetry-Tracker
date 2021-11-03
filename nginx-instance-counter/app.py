@@ -431,7 +431,8 @@ def ncInstances(mode):
           '"last_seen":"' + i['currentStatus']['legacyNginxMetadata']['last_seen'] + '",' + \
           '"createtime":"' + i['metadata']['createTime'] + '",' + \
           '"networkConfig":' + str(i['currentStatus']['networkConfig']).replace('\'','"') + ',' + \
-          '"hostname":"' + i['currentStatus']['hostname'] + '"' + \
+          '"hostname":"' + i['currentStatus']['hostname'] + '",' + \
+          '"name":"' + i['metadata']['name'] + '"' + \
           '}'
 
     if mode == 'JSON':

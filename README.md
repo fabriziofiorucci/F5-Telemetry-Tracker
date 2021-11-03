@@ -61,8 +61,8 @@ If you need to build and push NGINX your own image to a private registry:
 git clone fabriziofiorucci/NGINX-InstanceCounter
 cd NGINX-InstanceCounter/nginx-instance-counter
 
-docker build --no-cache -t PRIVATE_REGISTRY:PORT/nginx-instance-counter:3.6 .
-docker push PRIVATE_REGISTRY:PORT/nginx-instance-counter:3.6
+docker build --no-cache -t PRIVATE_REGISTRY:PORT/nginx-instance-counter:3.7 .
+docker push PRIVATE_REGISTRY:PORT/nginx-instance-counter:3.7
 ```
 
 ## As a native python application
@@ -259,7 +259,8 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
           }
         ]
       },
-      "hostname": "nginx-76cd77586b-76g8k"
+      "hostname": "nginx-76cd77586b-76g8k",
+      "name": "nginx-devportal"
     },
     {
       "instance_id": "61b945d0-6e4d-4225-a91f-52ae36b290cc",
@@ -281,7 +282,8 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
           }
         ]
       },
-      "hostname": "nginx-76cd77586b-xs5mm"
+      "hostname": "nginx-76cd77586b-xs5mm",
+      "name": "nginx-76cd77586b-xs5mm"
     },
     {
       "instance_id": "e56260de-691f-4585-a4f5-9f6a93095f73",
@@ -303,7 +305,8 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
           }
         ]
       },
-      "hostname": "nginx-76cd77586b-srb4c"
+      "hostname": "nginx-76cd77586b-srb4c",
+      "name": "nginx-76cd77586b-srb4c"
     },
     {
       "instance_id": "fb67428e-40f6-43a8-bcda-0621ee0d4331",
@@ -325,7 +328,8 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
           }
         ]
       },
-      "hostname": "nginx-76cd77586b-n8f2k"
+      "hostname": "nginx-76cd77586b-n8f2k",
+      "name": "nginx-api"
     },
     {
       "instance_id": "d78c7b6c-bde3-458c-933d-847d023bb2d5",
@@ -354,7 +358,8 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
           }
         ]
       },
-      "hostname": "ubuntu"
+      "hostname": "ubuntu",
+      "name": "ubuntu"
     },
     {
       "instance_id": "ada757cf-df90-4125-b966-8db891431835",
@@ -376,7 +381,8 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
           }
         ]
       },
-      "hostname": "nginx-646545df5d-h2p7f"
+      "hostname": "nginx-646545df5d-h2p7f",
+      "name": "nginx-646545df5d-h2p7f"
     },
     {
       "instance_id": "c9409b38-17d8-4345-9f31-b37f816195a8",
@@ -398,7 +404,8 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
           }
         ]
       },
-      "hostname": "nginx-646545df5d-5wkqv"
+      "hostname": "nginx-646545df5d-5wkqv",
+      "name": "nginx-646545df5d-5wkqv"
     }
   ]
 }
