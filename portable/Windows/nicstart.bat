@@ -1,5 +1,9 @@
 @echo off
 
+rem ### Optional listen address and port
+rem set NIC_ADDRESS=0.0.0.0
+rem set NIC_PORT=5000
+
 rem ### Optional HTTP(S) proxy
 rem set HTTP_PROXY=http(s)://username:password@proxy_ip:port
 rem set HTTPS_PROXY=http(s)://username:password@proxy_ip:port

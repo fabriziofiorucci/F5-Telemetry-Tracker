@@ -711,4 +711,12 @@ if __name__ == '__main__':
 
     # REST API / prometheus metrics server
     print('Running REST API/Prometheus metrics server')
-    app.run(host='0.0.0.0')
+
+    nicPort=5000
+    nicAddress="0.0.0.0"
+    if "NIC_PORT" in os.environ:
+      nicPort=os.environ['NIC_PORT']
+    if "NIC_ADDRESS" in os.environ:
+      nicAddress=os.environ['NIC_ADDRESS']
+
+    app.run(host=nicAddress,port=nicPort)

@@ -1,5 +1,9 @@
 #!/bin/bash
 
+### Optional listen address and port
+#export NIC_ADDRESS=0.0.0.0
+#export NIC_PORT=5000
+
 ### Optional HTTP(S) proxy
 #export HTTP_PROXY="http(s)://username:password@proxy_ip:port"
 #export HTTPS_PROXY="http(s)://username:password@proxy_ip:port"

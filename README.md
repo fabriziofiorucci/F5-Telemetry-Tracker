@@ -96,6 +96,9 @@ Edit 1.instancecounter.yaml to customize:
 - image name:
   - To be set to your private registry image (only if not using the image available on Docker Hub)
 - environment variables:
+  - NIC_ADDRESS - optional IP address NGINX Instance Counter should listen on. Default is 0.0.0.0
+  - NIC_PORT - optional TCP port NGINX Instance Counter should listen on. Default is 5000
+
   - HTTP_PROXY - to be set if HTTP proxy must be used to connect to NGINX Controller, NGINX Instance Manager or BIG-IQ
   - HTTPS_PROXY - to be set if HTTPS proxy must be used to connect to NGINX Controller, NGINX Instance Manager or BIG-IQ
 
