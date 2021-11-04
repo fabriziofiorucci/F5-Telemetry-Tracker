@@ -17,10 +17,16 @@ spec:
     spec:
       containers:
       - name: nginx-instance-counter
-        image: fiorucci/nginx-instance-counter:3.7
+        image: fiorucci/nginx-instance-counter:3.8
         ports:
         - containerPort: 5000
         env:
+          ### Optional listen address and port
+          #- name: NIC_ADDRESS
+          #  value: 0.0.0.0
+          #- name: NIC_PORT
+          #  value: 5000
+
           ### Optional HTTP(S) Proxy
           #- name: HTTP_PROXY
           #  value: "http(s)://username:password@proxy_ip:port"
