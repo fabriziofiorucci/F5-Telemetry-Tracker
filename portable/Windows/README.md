@@ -26,4 +26,6 @@ python -m nuitka --onefile --mingw64 app.py
 
 - When the NGINX Instance Counter has started, it can be queried sending a GET request to http://127.0.0.1:5000/instances or http://127.0.0.1:5000/counter/instances for JSON reporting. Prometheus metrics can be polled using http://127.0.0.1:5000/metrics or http://127.0.0.1:5000/counter/metrics
 
+- Port 5000 is used by default, it can be customized setting NIC_PORT in nicstart.sh
+
 <img src="/images/portable-windows.2.jpg"/>
