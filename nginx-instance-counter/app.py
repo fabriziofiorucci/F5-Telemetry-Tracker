@@ -26,6 +26,54 @@ nc_fqdn=os.environ['NGINX_CONTROLLER_FQDN']
 nc_user=os.environ['NGINX_CONTROLLER_USERNAME']
 nc_pass=os.environ['NGINX_CONTROLLER_PASSWORD']
 
+# Hardware platform types, names and SKU mappings
+# https://support.f5.com/csp/article/K4309
+# platformcode: platformType|SKU|first letter of the SW reporting SKU
+hwPlatforms = {
+  "D116": "I15800|F5-BIG-I15800",
+  "C124": "I11800|F5-BIG-I11800-DS",
+  "C123": "I11800|F5-BIG-I11800",
+  "    ": "I10800|F5-BIG-I10800-D",
+  "C116": "I10800|F5-BIG-I10800",
+  "C126": "I7800|F5-BIG-I7820-DF",
+  "    ": "I7800|F5-BIG-I7800-D",
+  "C118": "I7800|F5-BIG-I7800",
+  "C125": "I5800|F5-BIG-I5820-DF",
+  "C119": "I5800|F5-BIG-I5800",
+  "C115": "I4800|F5-BIG-I4800",
+  "C117": "I2800|F5-BIG-I2800",
+  "    ": "C4800|F5-VPR-C4800-DCN",
+  "A109": "B2100|F5-VPR-B2100",
+  "A113": "B2150|F5-VPR-B2150",
+  "A112": "B2250|F5-VPR-B2250",
+  "A114": "B4450|F5-VPR-B4450N",
+  "F100": "C2400|F5-VPR-C2400-AC",
+  "F101": "C2400|F5-VPR-C2400-AC",
+  "    ": "C2400|F5-VPR-C2400-ACT",
+  "J102": "C4480|F5-VPR-C4480-AC",
+  "    ": "C4480|F5-VPR-C4480-DCN",
+  "S100": "C4800|F5-VPR-C4800-AC",
+  "S101": "C4800|F5-VPR-C4800-AC"
+}
+
+# SKUs are H-[H|B][platformType]-[swModule]
+swModules = {
+  "gtm": "DNS",
+  "sslo": "SSLO",
+  "apm": "APM",
+  "cgnat": "CGNAT",
+  "ltm": "LTM",
+  "avr": "",
+  "fps": "",
+  "dos": "",
+  "lc": "",
+  "pem": "PEM",
+  "urldb": "",
+  "swg": "",
+  "asm": "AWF",
+  "afm": "AFM",
+  "ilx": ""
+}
 
 # Scheduler for automated statistics push / call home
 def scheduledPush(url,username,password,interval,pushmode):
@@ -337,7 +385,8 @@ def bigIQcallRESTURI(fqdn,username,password,method,uri,body):
   authRes = requests.request("POST", fqdn+"/mgmt/shared/authn/login", json = {'username': username, 'password': password}, verify=False, proxies=proxyDict)
 
   if authRes.status_code != 200:
-    return authRes.status_code,"{'error':'authentication failed'}"
+    return authRes.status_code,authRes.json()
+    #return authRes.status_code,{'error':'authentication failed'}
   authToken = authRes.json()['token']['token']
 
   # Invokes the BIG-IQ REST API method
@@ -537,7 +586,8 @@ def bigIqInventory(mode):
 
   status,details = bigIQInstances(nc_fqdn,nc_user,nc_pass)
   if status != 200:
-    return make_response(jsonify({'error': 'fetching instances failed'}), 401)
+    return make_response(jsonify(details), status)
+    #return make_response(jsonify({'error': 'fetching instances failed'}), 401)
 
   output=''
 
@@ -556,7 +606,42 @@ def bigIqInventory(mode):
         else:
           output+=','
 
+        # Gets TMOS registration key and serial number for the current BIG-IP device
+        inventoryData = '"inventoryTimestamp":"'+str(inventoryDetails['lastUpdateMicros']//1000)+'",'
+
+        platformType=''
+
+        if rcode2 == 204:
+          inventoryData = inventoryData + '"inventoryStatus":"partial",'
+        else:
+          machineIdFound=False
+          for invDevice in inventoryDetails['items']:
+            if invDevice['infoState']['machineId'] == item['machineId']:
+              machineIdFound=True
+              if "errors" in invDevice['infoState']:
+                # BIG-IP unreachable, inventory incomplete
+                inventoryData = inventoryData + '"inventoryStatus":"partial",'
+              else:
+                # Get platform name and SKU
+                platformCode=invDevice['infoState']['platform']
+                platformInsights=''
+                if platformCode in hwPlatforms:
+                  platformDetails=hwPlatforms[platformCode]
+                  platformType=platformDetails.split('|')[0]
+                  platformSKU=platformDetails.split('|')[1]
+
+                  platformInsights=',"type":"'+platformType+'","sku":"'+platformSKU+'"'
+
+                inventoryData = inventoryData + '"inventoryStatus":"full","platform":{'+ \
+                  '"code":"'+platformCode+'"'+platformInsights+'},'+ \
+                  '"registrationKey":"'+invDevice['infoState']['license']['registrationKey']+ \
+                  '","licenseEndDateTime":"'+invDevice['infoState']['license']['licenseEndDateTime']+ \
+                  '","chassisSerialNumber":"'+invDevice['infoState']['chassisSerialNumber']+'",'
+          if machineIdFound == False:
+            inventoryData = inventoryData + '"inventoryStatus":"partial",'
+
         # Gets TMOS modules provisioning for the current BIG-IP device
+        # https://support.f5.com/csp/article/K4309
         provModules = ''
         pFirstLoop = True
         for prov in provisioningDetails['items']:
@@ -566,23 +651,18 @@ def bigIqInventory(mode):
             else:
               provModules+=','
 
-            provModules += '{"module":"'+prov['name']+'","level":"'+prov['level']+'"}'
+            # Retrieving relevant SKUs and platform types
+            if prov['name'] in swModules:
+              moduleName = swModules[prov['name']]
+            else:
+              moduleName = ''
 
-        # Gets TMOS registration key and serial number for the current BIG-IP device
-        inventoryData = '"inventoryTimestamp":"'+str(inventoryDetails['lastUpdateMicros']//1000)+'",'
-        if rcode2 == 204:
-          inventoryData = inventoryData + '"inventoryStatus":"partial",'
-        else:
-          for invDevice in inventoryDetails['items']:
-            if invDevice['infoState']['machineId'] == item['machineId']:
-              if "errors" in invDevice['infoState']:
-                # BIG-IP unreachable, inventory incomplete
-                inventoryData = inventoryData + '"inventoryStatus":"partial",'
-              else:
-                inventoryData = inventoryData + '"inventoryStatus":"full","platform":"'+invDevice['infoState']['platform']+ \
-                  '","registrationKey":"'+invDevice['infoState']['license']['registrationKey']+ \
-                  '","licenseEndDateTime":"'+invDevice['infoState']['license']['licenseEndDateTime']+ \
-                  '","chassisSerialNumber":"'+invDevice['infoState']['chassisSerialNumber']+'",'
+            if platformType == '' or moduleName == '':
+              moduleSKU = ''
+            else:
+              moduleSKU = "H-"+platformType+"-"+moduleName
+
+            provModules += '{"module":"'+prov['name']+'","level":"'+prov['level']+'","sku":"'+moduleSKU+'"}'
 
         # Gets TMOS licensed modules for the current BIG-IP device
         retcode,instanceDetails = bigIQInstanceDetails(nc_fqdn,nc_user,nc_pass,item['uuid'])
