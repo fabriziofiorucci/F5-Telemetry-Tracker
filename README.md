@@ -518,7 +518,11 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
       "restFrameworkVersion": "16.1.0-0.0.19",
       "inventoryTimestamp": "1634121930315",
       "inventoryStatus": "full",
-      "platform": "Z100",
+      "platform": {
+         "code": "Z100",
+         "type": "VE",
+         "sku": "F5-VE3G-BT"
+      },
       "registrationKey": "XXXXX-XXXXX-XXXXX-XXXXX-XXXXXXX",
       "licenseEndDateTime": "2021-11-26T00:00:00+01:00",
       "chassisSerialNumber": "00000000-0000-0000-000000000000",
@@ -542,7 +546,8 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
         },
         {
           "module": "ltm",
-          "level": "nominal"
+          "level": "nominal",
+          "sku": "H-BIGIPVE-LTM"
         },
         {
           "module": "urldb",
@@ -574,7 +579,8 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
         },
         {
           "module": "asm",
-          "level": "nominal"
+          "level": "nominal",
+          "sku": "H-BIGIPVE-AWF"
         },
         {
           "module": "lc",
