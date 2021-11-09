@@ -12,6 +12,7 @@ import time
 import threading
 import smtplib
 import urllib3.exceptions
+import base64
 from requests import Request, Session
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from email.message import EmailMessage
@@ -73,6 +74,11 @@ swModules = {
   "asm": "AWF",
   "afm": "AFM",
   "ilx": ""
+}
+
+# NGINX dynamic modules
+nginxModules = {
+  "ngx_http_app_protect_module.so": "nap"
 }
 
 # Scheduler for automated statistics push / call home
@@ -284,43 +290,9 @@ def nginxControllerInstances(fqdn,cookie,location):
 
 ### NGINX Instance Manager REST API
 
-# Returns NIM Controller license information
-def nginxInstanceManagerLicense(fqdn):
+def nginxInstanceManagerRESTCall(method,fqdn,uri):
   s = Session()
-  req = Request('GET',fqdn+"/api/v0/about/license")
-
-  p = s.prepare_request(req)
-  s.proxies = proxyDict
-  res = s.send(p,verify=False)
-
-  if res.status_code == 200:
-    data = res.json()
-  else:
-    data = {}
-
-  return res.status_code,data
-
-# Returns NIM Controller system information
-def nginxInstanceManagerSystem(fqdn):
-  s = Session()
-  req = Request('GET',fqdn+"/api/v0/about/system")
-
-  p = s.prepare_request(req)
-  s.proxies = proxyDict
-  res = s.send(p,verify=False)
-
-  if res.status_code == 200:
-    data = res.json()
-  else:
-    data = {}
-
-  return res.status_code,data
-
-
-# Returns NGINX OSS/Plus instances managed by NIM
-def nginxInstanceManagerInstances(fqdn):
-  s = Session()
-  req = Request('GET',fqdn+"/api/v0/instances")
+  req = Request(method,fqdn+uri)
 
   p = s.prepare_request(req)
   s.proxies = proxyDict
@@ -512,12 +484,13 @@ def ncInstances(mode):
 # Returns NGINX OSS/Plus instances managed by NIM in JSON format
 def nimInstances(mode):
   # Fetching NIM license
-  status,license = nginxInstanceManagerLicense(nc_fqdn)
+  status,license = nginxInstanceManagerRESTCall(method='GET',fqdn=nc_fqdn,uri='/api/v0/about/license')
+
   if status != 200:
     return make_response(jsonify({'error': 'fetching license failed'}), 401)
 
   # Fetching NIM system information
-  status,system = nginxInstanceManagerSystem(nc_fqdn)
+  status,system = nginxInstanceManagerRESTCall(method='GET',fqdn=nc_fqdn,uri='/api/v0/about/system')
   if status != 200:
     return make_response(jsonify({'error': 'fetching system information failed'}), 401)
 
@@ -529,7 +502,7 @@ def nimInstances(mode):
   totalManaged=license['total_instances_managed']
 
   # Fetching instances
-  status,instances = nginxInstanceManagerInstances(nc_fqdn)
+  status,instances = nginxInstanceManagerRESTCall(method='GET',fqdn=nc_fqdn,uri='/api/v0/instances')
 
   if status != 200:
     return make_response(jsonify({'error': 'instances fetch error'}), 404)
@@ -550,14 +523,48 @@ def nimInstances(mode):
       else:
         output+=','
 
+      # Parses /etc/nginx/nginx.conf to detect NGINX App Protect usage
+      instanceId=i['instance_id']
+      status,configFiles = nginxInstanceManagerRESTCall(method='GET',fqdn=nc_fqdn,uri='/api/v0/instances/'+instanceId+'/config')
+
+      nginxModulesJSON=''
+
+      if status == 200:
+        for configFile in configFiles['files']:
+          if configFile['name'] == '/etc/nginx/nginx.conf':
+            fileContent=str(base64.b64decode(configFile['contents']))
+
+            # Looks for modules in nginxModules "load_module modules/MODULE_NAME;"
+            mFirstLoop=True
+            for module in nginxModules:
+              modulePosition=fileContent.find(module)
+
+              if modulePosition != -1:
+                # Looks for line containing the module name
+                previousCrPosition=fileContent.rfind('\\n',0,modulePosition)
+                nextCrPosition=max(0,fileContent.find('\\n',modulePosition))
+                moduleLine=fileContent[previousCrPosition:max(nextCrPosition,modulePosition+len(module))].replace('\\n','')
+
+                # Checks that load_module is used and not commented out
+                loadModulePosition=moduleLine.find('load_module')
+                if loadModulePosition != -1:
+                  if moduleLine.rfind('#',0,loadModulePosition) == -1:
+                    if mFirstLoop == True :
+                      mFirstLoop=False
+                    else:
+                      nginxModulesJSON+=','
+
+                    nginxModulesJSON+='"'+nginxModules[module]+'":"enabled"'
+
       output = output + '{ \
-        "instance_id": "'+i['instance_id'] + '", \
+        "instance_id": "' + instanceId + '", \
         "uname": "'+i['uname'] + '", \
         "containerized": "'+str(i['containerized']) + '", \
         "type": "'+i['nginx']['type'] + '", \
         "version": "'+i['nginx']['version'] + '", \
         "last_seen": "'+i['lastseen']+'", \
         "createtime": "'+i['added']+'", \
+        "modules": {'+nginxModulesJSON+'}, \
         "networkconfig": { "host_ips": '+str(i['host_ips']).replace('\'','"')+'}, \
         "hostname": "'+i['hostname']+'" \
       }'
