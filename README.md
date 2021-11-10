@@ -435,7 +435,7 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
           "H-VE-1G-LTM": 2,
           "H-VE-1G-SSLO": 1,
           "H-VE-1G-DNS": 1,
-          "H-VE-1G-APM": 2,
+          "H-VE-1G-APM": 2
         }
       ]
     }
