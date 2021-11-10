@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 import flask
-from flask import Flask, jsonify, abort, make_response, request
+from flask import Flask, jsonify, abort, make_response, request, Response
 import os
 import sys
 import ssl
@@ -594,17 +594,19 @@ def bigIqInventory(mode):
   status,details = bigIQInstances(nc_fqdn,nc_user,nc_pass)
   if status != 200:
     return make_response(jsonify(details), status)
-    #return make_response(jsonify({'error': 'fetching instances failed'}), 401)
 
   output=''
 
   if mode == 'JSON':
-    output = '{ "instances": [{ "bigip":"'+str(len(details['items']))+'"}], "details": ['
+    output = ''
     firstLoop = True
 
     # Gets TMOS modules provisioning state for all devices
     rcode,provisioningDetails = bigIQInstanceProvisioning(nc_fqdn,nc_user,nc_pass)
     rcode2,inventoryDetails = bigIQgetInventory(nc_fqdn,nc_user,nc_pass)
+
+    hwSKUGrandTotals={}
+    swSKUGrandTotals={}
 
     for item in details['items']:
       if mode == 'JSON':
@@ -637,6 +639,11 @@ def bigIqInventory(mode):
                   platformType=platformDetails.split('|')[0]
                   platformSKU=platformDetails.split('|')[1]
 
+                  if platformSKU in hwSKUGrandTotals:
+                    hwSKUGrandTotals[platformSKU] += 1
+                  else:
+                    hwSKUGrandTotals[platformSKU] = 1
+
                   platformInsights=',"type":"'+platformType+'","sku":"'+platformSKU+'"'
 
                 inventoryData = inventoryData + '"inventoryStatus":"full","platform":{'+ \
@@ -659,6 +666,8 @@ def bigIqInventory(mode):
               provModules+=','
 
             # Retrieving relevant SKUs and platform types
+            moduleProvisioningLevel=''
+
             if prov['name'] in swModules:
               moduleName = swModules[prov['name']]
             else:
@@ -668,8 +677,15 @@ def bigIqInventory(mode):
               moduleSKU = ''
             else:
               moduleSKU = "H-"+platformType+"-"+moduleName
+              moduleProvisioningLevel=prov['level']
 
-            provModules += '{"module":"'+prov['name']+'","level":"'+prov['level']+'","sku":"'+moduleSKU+'"}'
+              if moduleProvisioningLevel != 'none':
+                if moduleSKU in swSKUGrandTotals:
+                  swSKUGrandTotals[moduleSKU] += 1
+                else:
+                  swSKUGrandTotals[moduleSKU] = 1
+
+            provModules += '{"module":"'+prov['name']+'","level":"'+moduleProvisioningLevel+'","sku":"'+moduleSKU+'"}'
 
         # Gets TMOS licensed modules for the current BIG-IP device
         retcode,instanceDetails = bigIQInstanceDetails(nc_fqdn,nc_user,nc_pass,item['uuid'])
@@ -681,7 +697,10 @@ def bigIqInventory(mode):
           '","platformMarketingName":"'+item['platformMarketingName']+'","restFrameworkVersion":"'+ \
           item['restFrameworkVersion']+'",'+inventoryData+'"licensedModules":'+str(licensedModules).replace('\'','"')+',"provisionedModules":['+provModules+']}'
 
-    output = output + ']}'
+    output = '{ "instances": [{ "bigip":"'+str(len(details['items']))+'",'+ \
+      '"hwTotals":['+json.dumps(hwSKUGrandTotals)+'],' \
+      '"swTotals":['+json.dumps(swSKUGrandTotals)+ \
+      ']}], "details": [' + output + ']}'
   elif mode == 'PROMETHEUS' or mode == 'PUSHGATEWAY':
     if mode == 'PROMETHEUS':
       output = '# HELP bigip_online_instances Online BIG-IP instances\n'
@@ -697,11 +716,11 @@ def bigIqInventory(mode):
 @app.route('/counter/instances', methods=['GET'])
 def getInstances():
   if nc_mode == 'NGINX_CONTROLLER':
-    return ncInstances(mode='JSON')
+    return Response(ncInstances(mode='JSON'),mimetype='application/json')
   elif nc_mode == 'NGINX_INSTANCE_MANAGER':
-    return nimInstances(mode='JSON')
+    return Response(nimInstances(mode='JSON'),mimetype='application/json')
   elif nc_mode == 'BIG_IQ':
-    return bigIqInventory(mode='JSON')
+    return Response(bigIqInventory(mode='JSON'),mimetype='application/json')
 
 
 # Returns stats in prometheus format

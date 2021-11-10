@@ -50,7 +50,7 @@ Push mode: Instance Counter pushes stats to a remote data collection and visuali
 The NGINX Instance Counter image is available on Docker Hub as:
 
 ```
-fiorucci/nginx-instance-counter:4.0
+fiorucci/nginx-instance-counter:4.1
 ```
 
 The 1.instancecounter.yaml file references that by default.
@@ -61,8 +61,8 @@ If you need to build and push NGINX your own image to a private registry:
 git clone fabriziofiorucci/NGINX-InstanceCounter
 cd NGINX-InstanceCounter/nginx-instance-counter
 
-docker build --no-cache -t PRIVATE_REGISTRY:PORT/nginx-instance-counter:4.0 .
-docker push PRIVATE_REGISTRY:PORT/nginx-instance-counter:4.0
+docker build --no-cache -t PRIVATE_REGISTRY:PORT/nginx-instance-counter:4.1 .
+docker push PRIVATE_REGISTRY:PORT/nginx-instance-counter:4.1
 ```
 
 ## As a native python application
@@ -422,7 +422,22 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
 {
   "instances": [
     {
-      "bigip": "2"
+      "bigip": "2",
+      "hwTotals": [
+        {
+          "F5-VE-1G": 2
+        }
+      ],
+      "swTotals": [
+        {
+          "H-VE-1G-AFM": 1,
+          "H-VE-1G-AWF": 1,
+          "H-VE-1G-LTM": 2,
+          "H-VE-1G-SSLO": 1,
+          "H-VE-1G-DNS": 1,
+          "H-VE-1G-APM": 2,
+        }
+      ]
     }
   ],
   "details": [
