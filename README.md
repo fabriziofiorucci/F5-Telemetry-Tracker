@@ -425,17 +425,15 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
       "bigip": "2",
       "hwTotals": [
         {
-          "F5-VE-1G": 2
+          "F5-VE-1G": 2                                                                                                                         
         }
       ],
       "swTotals": [
         {
-          "H-VE-1G-AFM": 1,
-          "H-VE-1G-AWF": 1,
           "H-VE-1G-LTM": 2,
-          "H-VE-1G-SSLO": 1,
           "H-VE-1G-DNS": 1,
-          "H-VE-1G-APM": 2
+          "H-VE-1G-AFM": 1,
+          "H-VE-1G-AWF": 1                                                                                                                      
         }
       ]
     }
@@ -452,72 +450,95 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
       "isClustered": "False",
       "platformMarketingName": "BIG-IP Virtual Edition",
       "restFrameworkVersion": "16.1.0-0.0.19",
-      "inventoryTimestamp": "1634121930315",
-      "inventoryStatus": "partial",
+      "inventoryTimestamp": "1636538199786",
+      "inventoryStatus": "full",
+      "platform": {
+        "code": "Z100",
+        "type": "VE-1G",
+        "sku": "F5-VE-1G"
+      },
+      "registrationKey": "XXXXX-XXXXX-XXXXX-XXXXX-XXXXXX",
+      "licenseEndDateTime": "2021-11-27T00:00:00+01:00",
+      "chassisSerialNumber": "00000000-0000-0000-000000000000",
       "licensedModules": [
         "adc",
         "BigIPDevice"
       ],
       "provisionedModules": [
         {
-          "module": "ltm",
-          "level": "nominal"
-        },
-        {
-          "module": "avr",
-          "level": "none"
-        },
-        {
-          "module": "asm",
-          "level": "none"
-        },
-        {
-          "module": "sslo",
-          "level": "none"
-        },
-        {
-          "module": "lc",
-          "level": "none"
+          "module": "afm",
+          "level": "none",
+          "sku": "H-VE-1G-AFM"
         },
         {
           "module": "dos",
-          "level": "none"
+          "level": "",
+          "sku": ""
         },
         {
-          "module": "ilx",
-          "level": "none"
+          "module": "asm",
+          "level": "none",
+          "sku": "H-VE-1G-AWF"
         },
         {
-          "module": "afm",
-          "level": "none"
+          "module": "ltm",
+          "level": "nominal",
+          "sku": "H-VE-1G-LTM"
         },
         {
-          "module": "apm",
-          "level": "none"
+          "module": "avr",
+          "level": "",
+          "sku": ""
+        },
+        {
+          "module": "sslo",
+          "level": "none",
+          "sku": "H-VE-1G-SSLO"
         },
         {
           "module": "cgnat",
-          "level": "none"
+          "level": "none",
+          "sku": "H-VE-1G-CGNAT"
         },
         {
-          "module": "gtm",
-          "level": "none"
+          "module": "ilx",
+          "level": "",
+          "sku": ""
+        },
+        {
+          "module": "lc",
+          "level": "",
+          "sku": ""
         },
         {
           "module": "swg",
-          "level": "none"
+          "level": "",
+          "sku": ""
+        },
+        {
+          "module": "gtm",
+          "level": "none",
+          "sku": "H-VE-1G-DNS"
+        },
+        {
+          "module": "apm",
+          "level": "none",
+          "sku": "H-VE-1G-APM"
         },
         {
           "module": "pem",
-          "level": "none"
+          "level": "none",
+          "sku": "H-VE-1G-PEM"
         },
         {
           "module": "fps",
-          "level": "none"
+          "level": "",
+          "sku": ""
         },
         {
           "module": "urldb",
-          "level": "none"
+          "level": "",
+          "sku": ""
         }
       ]
     },
@@ -532,87 +553,100 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
       "isClustered": "False",
       "platformMarketingName": "BIG-IP Virtual Edition",
       "restFrameworkVersion": "16.1.0-0.0.19",
-      "inventoryTimestamp": "1634121930315",
+      "inventoryTimestamp": "1636538199786",
       "inventoryStatus": "full",
       "platform": {
-         "code": "Z100",
-         "type": "VE",
-         "sku": "F5-VE3G-BT"
+        "code": "Z100",
+        "type": "VE-1G",
+        "sku": "F5-VE-1G"
       },
-      "registrationKey": "XXXXX-XXXXX-XXXXX-XXXXX-XXXXXXX",
+      "registrationKey": "XXXXX-XXXXX-XXXXX-XXXXX-XXXXXX",
       "licenseEndDateTime": "2021-11-26T00:00:00+01:00",
       "chassisSerialNumber": "00000000-0000-0000-000000000000",
       "licensedModules": [
         "asmsecurity",
         "adc",
-        "dns",
         "Access",
+        "dns",
         "BigIPDevice",
         "networksecurity",
         "sharedsecurity"
       ],
       "provisionedModules": [
         {
-          "module": "afm",
-          "level": "nominal"
+          "module": "gtm",
+          "level": "nominal",
+          "sku": "H-VE-1G-DNS"
         },
         {
           "module": "sslo",
-          "level": "none"
+          "level": "none",
+          "sku": "H-VE-1G-SSLO"
+        },
+        {
+          "module": "apm",
+          "level": "none",
+          "sku": "H-VE-1G-APM"
+        },
+        {
+          "module": "cgnat",
+          "level": "none",
+          "sku": "H-VE-1G-CGNAT"
         },
         {
           "module": "ltm",
           "level": "nominal",
-          "sku": "H-BIGIPVE-LTM"
-        },
-        {
-          "module": "urldb",
-          "level": "none"
-        },
-        {
-          "module": "cgnat",
-          "level": "none"
-        },
-        {
-          "module": "gtm",
-          "level": "nominal"
-        },
-        {
-          "module": "ilx",
-          "level": "none"
-        },
-        {
-          "module": "pem",
-          "level": "none"
-        },
-        {
-          "module": "swg",
-          "level": "none"
+          "sku": "H-VE-1G-LTM"
         },
         {
           "module": "avr",
-          "level": "nominal"
+          "level": "",
+          "sku": ""
+        },
+        {
+          "module": "fps",
+          "level": "",
+          "sku": ""
+        },
+        {
+          "module": "dos",
+          "level": "",
+          "sku": ""
+        },
+        {
+          "module": "lc",
+          "level": "",
+          "sku": ""
+        },
+        {
+          "module": "pem",
+          "level": "none",
+          "sku": "H-VE-1G-PEM"
+        },
+        {
+          "module": "urldb",
+          "level": "",
+          "sku": ""
+        },
+        {
+          "module": "swg",
+          "level": "",
+          "sku": ""
+        },
+        {
+          "module": "afm",
+          "level": "nominal",
+          "sku": "H-VE-1G-AFM"
         },
         {
           "module": "asm",
           "level": "nominal",
-          "sku": "H-BIGIPVE-AWF"
+          "sku": "H-VE-1G-AWF"
         },
         {
-          "module": "lc",
-          "level": "none"
-        },
-        {
-          "module": "dos",
-          "level": "none"
-        },
-        {
-          "module": "fps",
-          "level": "none"
-        },
-        {
-          "module": "apm",
-          "level": "none"
+          "module": "ilx",
+          "level": "",
+          "sku": ""
         }
       ]
     }
