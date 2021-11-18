@@ -2,10 +2,10 @@
 
 ## Description
 
-The bigIQCollect.sh can be copied and run directly on a BIG-IQ Centralized Manager instance to collect raw JSON files and package them into a single .tgz file
-The .tgz file can then be processed offline by the Instance Counter to generate the final JSON file
+The bigIQCollect.sh script must be copied and run on a BIG-IQ Centralized Manager instance. It will collect raw JSON files and package them into a single .tgz file:
+the .tgz file can then be processed offline by the Instance Counter to generate the final JSON file
 
-The sampledata.tgz is provided for testing purposes
+sampledata.tgz is provided for testing purposes
 
 ## Usage
 
@@ -48,7 +48,7 @@ $ scp root@bigiq.f5:/tmp/20211119-0000-bigIQCollect.tgz .
 $ 
 ```
 
-- Start the Instance Counter to process the tgz file and generate the target JSON file
+- Start the Instance Counter and the additional fileserver script to process the tgz file and generate the target JSON file
 
 ```
 $ ./nicfsStart.sh 20211119-0000-bigIQCollect.tgz
