@@ -31,6 +31,9 @@ nc_pass=os.environ['NGINX_CONTROLLER_PASSWORD']
 # https://support.f5.com/csp/article/K4309
 # platformcode: platformType|SKU|first letter of the SW reporting SKU
 hwPlatforms = {
+  "D110": "7250|F5-BIG-7250",
+  "D113": "10200|F5-BIG-10200",
+  "C113": "4200|F5-BIG-4200",
   "D116": "I15800|F5-BIG-I15800",
   "C124": "I11800|F5-BIG-I11800-DS",
   "C123": "I11800|F5-BIG-I11800",
@@ -54,7 +57,9 @@ hwPlatforms = {
   "J102": "C4480|F5-VPR-C4480-AC",
   "    ": "C4480|F5-VPR-C4480-DCN",
   "S100": "C4800|F5-VPR-C4800-AC",
-  "S101": "C4800|F5-VPR-C4800-AC"
+  "S101": "C4800|F5-VPR-C4800-AC",
+  "Z100": "VE|F5-VE",
+  "Z101": "VE-VCMP|F5-VE-VCMP"
 }
 
 # SKUs are H-[H|B][platformType]-[swModule]
@@ -358,16 +363,15 @@ def bigIQcallRESTURI(fqdn,username,password,method,uri,body):
 
   if authRes.status_code != 200:
     return authRes.status_code,authRes.json()
-    #return authRes.status_code,{'error':'authentication failed'}
   authToken = authRes.json()['token']['token']
 
   # Invokes the BIG-IQ REST API method
   res = requests.request(method, fqdn+uri, headers = { 'X-F5-Auth-Token': authToken }, json = body, verify=False, proxies=proxyDict)
 
+  data = {}
   if res.status_code == 200 or res.status_code == 202:
-    data = res.json()
-  else:
-    data = {}
+    if res.content != '':
+      data = res.json()
 
   return res.status_code,data
 
@@ -610,11 +614,6 @@ def bigIqInventory(mode):
 
     for item in details['items']:
       if mode == 'JSON':
-        if firstLoop == True :
-          firstLoop = False
-        else:
-          output+=','
-
         # Gets TMOS registration key and serial number for the current BIG-IP device
         inventoryData = '"inventoryTimestamp":"'+str(inventoryDetails['lastUpdateMicros']//1000)+'",'
 
@@ -646,11 +645,15 @@ def bigIqInventory(mode):
 
                   platformInsights=',"type":"'+platformType+'","sku":"'+platformSKU+'"'
 
-                inventoryData = inventoryData + '"inventoryStatus":"full","platform":{'+ \
+                #'","licenseEndDateTime":"'+invDevice['infoState']['license']['licenseEndDateTime']+ \
+                inventoryData += '"inventoryStatus":"full","platform":{'+ \
                   '"code":"'+platformCode+'"'+platformInsights+'},'+ \
                   '"registrationKey":"'+invDevice['infoState']['license']['registrationKey']+ \
-                  '","licenseEndDateTime":"'+invDevice['infoState']['license']['licenseEndDateTime']+ \
                   '","chassisSerialNumber":"'+invDevice['infoState']['chassisSerialNumber']+'",'
+
+                if 'licenseEndDateTime' in invDevice['infoState']['license']:
+                  inventoryData += '"licenseEndDateTime":"'+invDevice['infoState']['license']['licenseEndDateTime']+'",'
+
           if machineIdFound == False:
             inventoryData = inventoryData + '"inventoryStatus":"partial",'
 
@@ -659,7 +662,8 @@ def bigIqInventory(mode):
         provModules = ''
         pFirstLoop = True
         for prov in provisioningDetails['items']:
-          if prov['deviceReference']['machineId'] == item['uuid']:
+          #if prov['deviceReference']['machineId'] == item['uuid']:
+          if prov['deviceReference']['machineId'] == item['machineId']:
             if pFirstLoop == True:
               pFirstLoop = False
             else:
@@ -688,14 +692,26 @@ def bigIqInventory(mode):
             provModules += '{"module":"'+prov['name']+'","level":"'+moduleProvisioningLevel+'","sku":"'+moduleSKU+'"}'
 
         # Gets TMOS licensed modules for the current BIG-IP device
-        retcode,instanceDetails = bigIQInstanceDetails(nc_fqdn,nc_user,nc_pass,item['uuid'])
+        #retcode,instanceDetails = bigIQInstanceDetails(nc_fqdn,nc_user,nc_pass,item['uuid'])
+        retcode,instanceDetails = bigIQInstanceDetails(nc_fqdn,nc_user,nc_pass,item['machineId'])
 
-        licensedModules = instanceDetails['properties']['cm:gui:module']
+        if retcode == 200:
+          if instanceDetails != '':
+            if firstLoop == True :
+              firstLoop = False
+            else:
+              output+=','
 
-        output += '{"hostname":"'+item['hostname']+'","address":"'+item['address']+'","product":"'+item['product']+'","version":"'+item['version']+'","edition":"'+ \
-          item['edition']+'","build":"'+item['build']+'","isVirtual":"'+str(item['isVirtual'])+'","isClustered":"'+str(item['isClustered'])+ \
-          '","platformMarketingName":"'+item['platformMarketingName']+'","restFrameworkVersion":"'+ \
-          item['restFrameworkVersion']+'",'+inventoryData+'"licensedModules":'+str(licensedModules).replace('\'','"')+',"provisionedModules":['+provModules+']}'
+            licensedModules = instanceDetails['properties']['cm:gui:module']
+
+            platformMarketingName=''
+            if 'platformMarketingName' in item:
+              platformMarketingName=item['platformMarketingName']
+
+            output += '{"hostname":"'+item['hostname']+'","address":"'+item['address']+'","product":"'+item['product']+'","version":"'+item['version']+'","edition":"'+ \
+              item['edition']+'","build":"'+item['build']+'","isVirtual":"'+str(item['isVirtual'])+'","isClustered":"'+str(item['isClustered'])+ \
+              '","platformMarketingName":"'+platformMarketingName+'","restFrameworkVersion":"'+ \
+              item['restFrameworkVersion']+'",'+inventoryData+'"licensedModules":'+str(licensedModules).replace('\'','"')+',"provisionedModules":['+provModules+']}'
 
     output = '{ "instances": [{ "bigip":"'+str(len(details['items']))+'",'+ \
       '"hwTotals":['+json.dumps(hwSKUGrandTotals)+'],' \
@@ -810,7 +826,6 @@ if __name__ == '__main__':
           email_auth_pass=''
 
         print('Email reporting to',email_recipient,'every',email_interval,'days')
-        print(email_auth_user,'***',email_auth_pass)
         print('Running push thread')
         emailThread = threading.Thread(target=scheduledEmail,args=(email_server,email_server_port,email_server_type,email_auth_user,email_auth_pass,email_sender,email_recipient,email_interval*60))
         emailThread.start()

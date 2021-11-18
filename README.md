@@ -50,7 +50,7 @@ Push mode: Instance Counter pushes stats to a remote data collection and visuali
 The NGINX Instance Counter image is available on Docker Hub as:
 
 ```
-fiorucci/nginx-instance-counter:4.1
+fiorucci/nginx-instance-counter:4.2
 ```
 
 The 1.instancecounter.yaml file references that by default.
@@ -61,8 +61,8 @@ If you need to build and push NGINX your own image to a private registry:
 git clone fabriziofiorucci/NGINX-InstanceCounter
 cd NGINX-InstanceCounter/nginx-instance-counter
 
-docker build --no-cache -t PRIVATE_REGISTRY:PORT/nginx-instance-counter:4.1 .
-docker push PRIVATE_REGISTRY:PORT/nginx-instance-counter:4.1
+docker build --no-cache -t PRIVATE_REGISTRY:PORT/nginx-instance-counter:4.2 .
+docker push PRIVATE_REGISTRY:PORT/nginx-instance-counter:4.2
 ```
 
 ## As a native python application
@@ -82,6 +82,9 @@ nginx-instance-counter/nicstart.sh is a sample script to run NGINX Instance Coun
 - [AppImage for Linux](/portable/Linux)
 - [AppImage for Windows 10](/portable/Windows)
 
+## Offline BIG-IQ mode
+
+See the [BIG-IQ Collection script](/contrib/bigiq-collect)
 
 # How to deploy
 
