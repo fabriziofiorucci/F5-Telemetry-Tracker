@@ -12,5 +12,8 @@ RUN /deployment/env/bin/pip3 install flask
 RUN /deployment/env/bin/pip3 install requests
 WORKDIR /deployment
 COPY app.py .
+COPY nc.py .
+COPY nim.py .
+COPY bigiq.py .
 
 CMD env/bin/python3 app.py
