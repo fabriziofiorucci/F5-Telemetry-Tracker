@@ -8,6 +8,9 @@
 #export HTTP_PROXY="http(s)://username:password@proxy_ip:port"
 #export HTTPS_PROXY="http(s)://username:password@proxy_ip:port"
 
+### Optional NIST API Key for CVE tracking (https://nvd.nist.gov/developers/request-an-api-key)
+#export NIST_API_KEY=xxxxxxxx
+
 ### Section to use when polling NGINX Controller
 
 #export NGINX_CONTROLLER_TYPE=NGINX_CONTROLLER

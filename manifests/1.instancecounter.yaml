@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: nginx-instance-counter
-        image: fiorucci/nginx-instance-counter:4.3
+        image: fiorucci/nginx-instance-counter:4.4
         ports:
         - containerPort: 5000
         env:
@@ -32,6 +32,10 @@ spec:
           #  value: "http(s)://username:password@proxy_ip:port"
           #- name: HTTPS_PROXY
           #  value: "http(s)://username:password@proxy_ip:port"
+
+          ### Optional NIST NVD CVE tracking REST API key (https://nvd.nist.gov/developers/request-an-api-key)
+          #- name: NIST_API_KEY
+          #  value: xxxxxxxxxxxx
 
           ### REST API mode
 

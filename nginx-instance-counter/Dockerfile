@@ -15,5 +15,6 @@ COPY app.py .
 COPY nc.py .
 COPY nim.py .
 COPY bigiq.py .
+COPY cveDB.py .
 
 CMD env/bin/python3 app.py

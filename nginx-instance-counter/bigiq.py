@@ -15,6 +15,8 @@ from requests import Request, Session
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from email.message import EmailMessage
 
+import cveDB
+
 this = sys.modules[__name__]
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
@@ -78,11 +80,13 @@ this.bigiq_password=''
 this.bigiq_proxy={}
 
 # Module initialization
-def init(fqdn,username,password,proxy):
+def init(fqdn,username,password,proxy,nistApiKey):
   this.bigiq_fqdn=fqdn
   this.bigiq_username=username
   this.bigiq_password=password
   this.bigiq_proxy=proxy
+
+  cveDB.init(nistApiKey=nistApiKey,proxy=proxy)
 
 
 # Thread for scheduled inventory generation
@@ -216,7 +220,6 @@ def bigIqInventory(mode):
 
                   platformInsights=',"type":"'+platformType+'","sku":"'+platformSKU+'"'
 
-                #'","licenseEndDateTime":"'+invDevice['infoState']['license']['licenseEndDateTime']+ \
                 inventoryData += '"inventoryStatus":"full","platform":{'+ \
                   '"code":"'+platformCode+'"'+platformInsights+'},'+ \
                   '"registrationKey":"'+invDevice['infoState']['license']['registrationKey']+ \
@@ -231,9 +234,9 @@ def bigIqInventory(mode):
         # Gets TMOS modules provisioning for the current BIG-IP device
         # https://support.f5.com/csp/article/K4309
         provModules = ''
+        foundCVEs={}
         pFirstLoop = True
         for prov in provisioningDetails['items']:
-          #if prov['deviceReference']['machineId'] == item['uuid']:
           if prov['deviceReference']['machineId'] == item['machineId']:
             if pFirstLoop == True:
               pFirstLoop = False
@@ -255,6 +258,10 @@ def bigIqInventory(mode):
               moduleProvisioningLevel=prov['level']
 
               if moduleProvisioningLevel != 'none':
+                # CVE tracking
+                allCVE=cveDB.getF5(product=prov['name'],version=item['version'])
+                foundCVEs.update(allCVE)
+
                 if moduleSKU in swSKUGrandTotals:
                   swSKUGrandTotals[moduleSKU] += 1
                 else:
@@ -281,7 +288,8 @@ def bigIqInventory(mode):
             output += '{"hostname":"'+item['hostname']+'","address":"'+item['address']+'","product":"'+item['product']+'","version":"'+item['version']+'","edition":"'+ \
               item['edition']+'","build":"'+item['build']+'","isVirtual":"'+str(item['isVirtual'])+'","isClustered":"'+str(item['isClustered'])+ \
               '","platformMarketingName":"'+platformMarketingName+'","restFrameworkVersion":"'+ \
-              item['restFrameworkVersion']+'",'+inventoryData+'"licensedModules":'+str(licensedModules).replace('\'','"')+',"provisionedModules":['+provModules+']}'
+              item['restFrameworkVersion']+'",'+inventoryData+'"licensedModules":'+str(licensedModules).replace('\'','"')+ \
+              ',"provisionedModules":['+provModules+'],"CVE":['+json.dumps(foundCVEs)+']}'
 
     output = '{ "instances": [{ "bigip":"'+str(len(details['items']))+'",'+ \
       '"hwTotals":['+json.dumps(hwSKUGrandTotals)+'],' \

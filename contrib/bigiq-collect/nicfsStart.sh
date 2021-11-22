@@ -22,6 +22,9 @@ export NGINX_CONTROLLER_FQDN="http://127.0.0.1:5001"
 export NGINX_CONTROLLER_USERNAME="notused"
 export NGINX_CONTROLLER_PASSWORD="notused"
 
+### Optional NIST API Key for CVE tracking (https://nvd.nist.gov/developers/request-an-api-key)
+#export NIST_API_KEY=xxxxxxx
+
 python3 ../../nginx-instance-counter/app.py
 kill $NICFS_PID
 

@@ -26,7 +26,6 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 app = Flask(__name__)
 
-sessionCookie = ''
 nc_mode=os.environ['NGINX_CONTROLLER_TYPE']
 nc_fqdn=os.environ['NGINX_CONTROLLER_FQDN']
 nc_user=os.environ['NGINX_CONTROLLER_USERNAME']
@@ -189,9 +188,17 @@ if __name__ == '__main__':
       "https": https_proxy
     }
 
+    # CVE tracking
+    nist_apikey=''
+    if "NIST_API_KEY" in os.environ:
+      nist_apikey=os.environ['NIST_API_KEY']
+      print('CVE Tracking enabled using key',nist_apikey)
+    else:
+      print('Basic CVE Tracking - for full tracking get a NIST API key at https://nvd.nist.gov/developers/request-an-api-key')
+
     # Push thread
     if nc_mode == 'BIG_IQ':
-      bigiq.init(fqdn=nc_fqdn,username=nc_user,password=nc_pass,proxy=proxyDict)
+      bigiq.init(fqdn=nc_fqdn,username=nc_user,password=nc_pass,nistApiKey=nist_apikey,proxy=proxyDict)
       print('Running BIG-IQ inventory refresh thread')
       inventoryThread = threading.Thread(target=bigiq.scheduledInventory)
       inventoryThread.start()

@@ -25,6 +25,7 @@ Communication to NGINX Controller / NGINX Instance Manager / BIG-IQ is based on 
   - Support for plaintext SMTP, STARTTLS, SMTP over TLS, SMTP authentication, custom SMTP port
   - Configurable push interval (in days)
 - HTTP(S) proxy support
+- CVE tracking (beta - currently available for BIG-IQ mode)
 
 ## Deployment modes
 
@@ -40,8 +41,12 @@ Push mode: Instance Counter pushes stats to a remote data collection and visuali
 
 - Kubernetes or Openshift cluster
 - Private registry to push the NGINX Instance Counter image
-- NGINX Controller 3.18, 3.18.2, apim-3.19.2 or NGINX Instance Manager 1.0.1, 1.0.2, 1.0.3 or BIG-IP 8.1.0, 8.1.0.2
+- One of:
+  - NGINX Controller 3.18, 3.18.2, apim-3.19.2
+  - NGINX Instance Manager 1.0.1, 1.0.2, 1.0.3
+  - BIG-IQ 8.1.0, 8.1.0.2
 - SMTP server if automated email reporting is used
+- NIST NVD REST API Key for full CVE tracking (https://nvd.nist.gov/developers/request-an-api-key)
 
 # How to build and run
 
@@ -104,6 +109,8 @@ Edit 1.instancecounter.yaml to customize:
 
   - HTTP_PROXY - to be set if HTTP proxy must be used to connect to NGINX Controller, NGINX Instance Manager or BIG-IQ
   - HTTPS_PROXY - to be set if HTTPS proxy must be used to connect to NGINX Controller, NGINX Instance Manager or BIG-IQ
+
+  - NIST_API_KEY - API Key for full NIST NVD CVE tracking (get your key at https://nvd.nist.gov/developers/request-an-api-key)
 
   - NGINX_CONTROLLER_TYPE - can be NGINX_CONTROLLER, NGINX_INSTANCE_MANAGER or BIG_IQ
   - NGINX_CONTROLLER_FQDN - the FQDN of your NGINX Controller / NGINX Instance Manager / BIG-IQ instance - format must be http[s]://FQDN:port
@@ -428,15 +435,15 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
       "bigip": "2",
       "hwTotals": [
         {
-          "F5-VE-1G": 2                                                                                                                         
+          "F5-VE": 2
         }
       ],
       "swTotals": [
         {
-          "H-VE-1G-LTM": 2,
-          "H-VE-1G-DNS": 1,
-          "H-VE-1G-AFM": 1,
-          "H-VE-1G-AWF": 1                                                                                                                      
+          "H-VE-LTM": 2,
+          "H-VE-DNS": 1,
+          "H-VE-AWF": 1,
+          "H-VE-AFM": 1
         }
       ]
     }
@@ -453,16 +460,16 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
       "isClustered": "False",
       "platformMarketingName": "BIG-IP Virtual Edition",
       "restFrameworkVersion": "16.1.0-0.0.19",
-      "inventoryTimestamp": "1636538199786",
+      "inventoryTimestamp": "1636713114979",
       "inventoryStatus": "full",
       "platform": {
         "code": "Z100",
-        "type": "VE-1G",
-        "sku": "F5-VE-1G"
+        "type": "VE",
+        "sku": "F5-VE"
       },
-      "registrationKey": "XXXXX-XXXXX-XXXXX-XXXXX-XXXXXX",
-      "licenseEndDateTime": "2021-11-27T00:00:00+01:00",
+      "registrationKey": "XXXXX-XXXXX-XXXXX-XXXXX-XXXXXXX",
       "chassisSerialNumber": "00000000-0000-0000-000000000000",
+      "licenseEndDateTime": "2021-11-27T00:00:00+01:00",
       "licensedModules": [
         "adc",
         "BigIPDevice"
@@ -471,7 +478,7 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
         {
           "module": "afm",
           "level": "none",
-          "sku": "H-VE-1G-AFM"
+          "sku": "H-VE-AFM"
         },
         {
           "module": "dos",
@@ -479,14 +486,14 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
           "sku": ""
         },
         {
-          "module": "asm",
-          "level": "none",
-          "sku": "H-VE-1G-AWF"
-        },
-        {
           "module": "ltm",
           "level": "nominal",
-          "sku": "H-VE-1G-LTM"
+          "sku": "H-VE-LTM"
+        },
+        {
+          "module": "asm",
+          "level": "none",
+          "sku": "H-VE-AWF"
         },
         {
           "module": "avr",
@@ -496,12 +503,7 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
         {
           "module": "sslo",
           "level": "none",
-          "sku": "H-VE-1G-SSLO"
-        },
-        {
-          "module": "cgnat",
-          "level": "none",
-          "sku": "H-VE-1G-CGNAT"
+          "sku": "H-VE-SSLO"
         },
         {
           "module": "ilx",
@@ -509,9 +511,9 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
           "sku": ""
         },
         {
-          "module": "lc",
-          "level": "",
-          "sku": ""
+          "module": "cgnat",
+          "level": "none",
+          "sku": "H-VE-CGNAT"
         },
         {
           "module": "swg",
@@ -520,28 +522,54 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
         },
         {
           "module": "gtm",
-          "level": "none",
-          "sku": "H-VE-1G-DNS"
+          "level": "nominal",
+          "sku": "H-VE-DNS"
         },
         {
-          "module": "apm",
-          "level": "none",
-          "sku": "H-VE-1G-APM"
+          "module": "lc",
+          "level": "",
+          "sku": ""
         },
         {
           "module": "pem",
           "level": "none",
-          "sku": "H-VE-1G-PEM"
+          "sku": "H-VE-PEM"
         },
         {
-          "module": "fps",
-          "level": "",
-          "sku": ""
+          "module": "apm",
+          "level": "none",
+          "sku": "H-VE-APM"
         },
         {
           "module": "urldb",
           "level": "",
           "sku": ""
+        },
+        {
+          "module": "fps",
+          "level": "",
+          "sku": ""
+        }
+      ],
+      "CVE": [
+        {
+          "CVE-2021-23037": {
+            "id": "CVE-2021-23037",
+            "url": "https://support.f5.com/csp/article/K21435974",
+            "description": "On all versions of 16.1.x, 16.0.x, 15.1.x, 14.1.x, 13.1.x, 12.1.x, and 11.6.x, a reflected cross-site scripting (XSS) vulnerability exists in an undisclosed page of the BIG-IP Configuration utility that allows an attacker to execute JavaScript in the context of the currently logged-in user. Note: Software versions which have reached End of Technical Support (EoTS) are not evaluated.",
+            "tags": [
+              "Mitigation",
+              "Vendor Advisory"
+            ]
+          },
+          "CVE-2021-23043": {
+            "id": "CVE-2021-23043",
+            "url": "https://support.f5.com/csp/article/K63163637",
+            "description": "On BIG-IP, on all versions of 16.1.x, 16.0.x, 15.1.x, 14.1.x, 13.1.x, 12.1.x, and 11.6.x, a directory traversal vulnerability exists in an undisclosed page of the BIG-IP Configuration utility that allows an attacker to access arbitrary files. Note: Software versions which have reached End of Technical Support (EoTS) are not evaluated.",
+            "tags": [
+              "Vendor Advisory"
+            ]
+          }
         }
       ]
     },
@@ -556,16 +584,16 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
       "isClustered": "False",
       "platformMarketingName": "BIG-IP Virtual Edition",
       "restFrameworkVersion": "16.1.0-0.0.19",
-      "inventoryTimestamp": "1636538199786",
+      "inventoryTimestamp": "1636713114979",
       "inventoryStatus": "full",
       "platform": {
         "code": "Z100",
-        "type": "VE-1G",
-        "sku": "F5-VE-1G"
+        "type": "VE",
+        "sku": "F5-VE"
       },
-      "registrationKey": "XXXXX-XXXXX-XXXXX-XXXXX-XXXXXX",
-      "licenseEndDateTime": "2021-11-26T00:00:00+01:00",
+      "registrationKey": "XXXXX-XXXXX-XXXXX-XXXXX-XXXXXXX",
       "chassisSerialNumber": "00000000-0000-0000-000000000000",
+      "licenseEndDateTime": "2021-11-26T00:00:00+01:00",
       "licensedModules": [
         "asmsecurity",
         "adc",
@@ -577,37 +605,37 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
       ],
       "provisionedModules": [
         {
-          "module": "gtm",
-          "level": "nominal",
-          "sku": "H-VE-1G-DNS"
-        },
-        {
           "module": "sslo",
           "level": "none",
-          "sku": "H-VE-1G-SSLO"
+          "sku": "H-VE-SSLO"
         },
         {
-          "module": "apm",
+          "module": "gtm",
           "level": "none",
-          "sku": "H-VE-1G-APM"
+          "sku": "H-VE-DNS"
         },
         {
           "module": "cgnat",
           "level": "none",
-          "sku": "H-VE-1G-CGNAT"
+          "sku": "H-VE-CGNAT"
+        },
+        {
+          "module": "apm",
+          "level": "none",
+          "sku": "H-VE-APM"
         },
         {
           "module": "ltm",
           "level": "nominal",
-          "sku": "H-VE-1G-LTM"
+          "sku": "H-VE-LTM"
         },
         {
-          "module": "avr",
+          "module": "fps",
           "level": "",
           "sku": ""
         },
         {
-          "module": "fps",
+          "module": "avr",
           "level": "",
           "sku": ""
         },
@@ -624,7 +652,7 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
         {
           "module": "pem",
           "level": "none",
-          "sku": "H-VE-1G-PEM"
+          "sku": "H-VE-PEM"
         },
         {
           "module": "urldb",
@@ -637,19 +665,40 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
           "sku": ""
         },
         {
-          "module": "afm",
-          "level": "nominal",
-          "sku": "H-VE-1G-AFM"
-        },
-        {
           "module": "asm",
           "level": "nominal",
-          "sku": "H-VE-1G-AWF"
+          "sku": "H-VE-AWF"
         },
         {
           "module": "ilx",
           "level": "",
           "sku": ""
+        },
+        {
+          "module": "afm",
+          "level": "nominal",
+          "sku": "H-VE-AFM"
+        }
+      ],
+      "CVE": [
+        {
+          "CVE-2021-23037": {
+            "id": "CVE-2021-23037",
+            "url": "https://support.f5.com/csp/article/K21435974",
+            "description": "On all versions of 16.1.x, 16.0.x, 15.1.x, 14.1.x, 13.1.x, 12.1.x, and 11.6.x, a reflected cross-site scripting (XSS) vulnerability exists in an undisclosed page of the BIG-IP Configuration utility that allows an attacker to execute JavaScript in the context of the currently logged-in user. Note: Software versions which have reached End of Technical Support (EoTS) are not evaluated.",
+            "tags": [
+              "Mitigation",
+              "Vendor Advisory"
+            ]
+          },
+          "CVE-2021-23043": {
+            "id": "CVE-2021-23043",
+            "url": "https://support.f5.com/csp/article/K63163637",
+            "description": "On BIG-IP, on all versions of 16.1.x, 16.0.x, 15.1.x, 14.1.x, 13.1.x, 12.1.x, and 11.6.x, a directory traversal vulnerability exists in an undisclosed page of the BIG-IP Configuration utility that allows an attacker to access arbitrary files. Note: Software versions which have reached End of Technical Support (EoTS) are not evaluated.",
+            "tags": [
+              "Vendor Advisory"
+            ]
+          }
         }
       ]
     }
