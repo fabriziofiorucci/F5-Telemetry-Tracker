@@ -99,40 +99,39 @@ See the [BIG-IQ Collection script](/contrib/bigiq-collect)
 cd NGINX-InstanceCounter/manifests
 ```
 
-Edit 1.instancecounter.yaml to customize:
+Edit `1.instancecounter.yaml` to customize:
 
 - image name:
   - To be set to your private registry image (only if not using the image available on Docker Hub)
 - environment variables:
-  - NIC_ADDRESS - optional IP address NGINX Instance Counter should listen on. Default is 0.0.0.0
-  - NIC_PORT - optional TCP port NGINX Instance Counter should listen on. Default is 5000
 
-  - HTTP_PROXY - to be set if HTTP proxy must be used to connect to NGINX Controller, NGINX Instance Manager or BIG-IQ
-  - HTTPS_PROXY - to be set if HTTPS proxy must be used to connect to NGINX Controller, NGINX Instance Manager or BIG-IQ
+| Variable  | Description |
+| ------------- |-------------|
+| NIC_ADDRESS | optional IP address NGINX Instance Counter should listen on. Default is 0.0.0.0 |
+| NIC_PORT| optional TCP port NGINX Instance Counter should listen on. Default is 5000
+| HTTP_PROXY| to be set if HTTP proxy must be used to connect to NGINX Controller, NGINX Instance Manager or BIG-IQ
+| HTTPS_PROXY| to be set if HTTPS proxy must be used to connect to NGINX Controller, NGINX Instance Manager or BIG-IQ
+| NIST_API_KEY| API Key for full NIST NVD CVE tracking (get your key at https://nvd.nist.gov/developers/request-an-api-key)
+| NGINX_CONTROLLER_TYPE| can be NGINX_CONTROLLER, NGINX_INSTANCE_MANAGER or BIG_IQ
+| NGINX_CONTROLLER_FQDN| the FQDN of your NGINX Controller / NGINX Instance Manager / BIG-IQ instance| format must be http[s]://FQDN:port
+| NGINX_CONTROLLER_USERNAME| the username for authentication
+| NGINX_CONTROLLER_PASSWORD| the password for authentication
+| STATS_PUSH_ENABLE | if set to "true" push mode is enabled, disabled if set to "false" |
+| STATS_PUSH_MODE | either CUSTOM or NGINX_PUSH, to push (HTTP POST) JSON to custom URL and to push metrics to pushgateway, respectively |
+| STATS_PUSH_URL | the URL where to push statistics |
+| STATS_PUSH_INTERVAL | the interval in seconds between two consecutive push |
+| STATS_PUSH_USERNAME | (optional) the username for POST Basic Authentication |
+| STATS_PUSH_PASSWORD | (optional) the password for POST Basic Authentication |
+| EMAIL_ENABLED | if set to "true" automated email reporting is enabled, disabled if set to "false" |
+| EMAIL_INTERVAL| the interval in days between two consecutive email reports |
+| EMAIL_SERVER | the FQDN of the SMTP server to use |
+| EMAIL_SERVER_PORT| the SMTP server port |
+| EMAIL_SERVER_TYPE| either "plaintext", "starttls" or "ssl" |
+| EMAIL_AUTH_USER| optional, the username for SMTP authentication |
+| EMAIL_AUTH_PASS| optional, the password for SMTP authentication |
+| EMAIL_SENDER| the sender email address |
+| EMAIL_RECIPIENT| the recipient email address |
 
-  - NIST_API_KEY - API Key for full NIST NVD CVE tracking (get your key at https://nvd.nist.gov/developers/request-an-api-key)
-
-  - NGINX_CONTROLLER_TYPE - can be NGINX_CONTROLLER, NGINX_INSTANCE_MANAGER or BIG_IQ
-  - NGINX_CONTROLLER_FQDN - the FQDN of your NGINX Controller / NGINX Instance Manager / BIG-IQ instance - format must be http[s]://FQDN:port
-  - NGINX_CONTROLLER_USERNAME - the username for authentication
-  - NGINX_CONTROLLER_PASSWORD - the password for authentication
-
-  - STATS_PUSH_ENABLE - if set to "true" push mode is enabled, disabled if set to "false"
-  - STATS_PUSH_MODE - either CUSTOM or NGINX_PUSH, to push (HTTP POST) JSON to custom URL and to push metrics to pushgateway, respectively
-  - STATS_PUSH_URL - the URL where to push statistics
-  - STATS_PUSH_INTERVAL - the interval in seconds between two consecutive push
-  - STATS_PUSH_USERNAME - (optional) the username for POST Basic Authentication
-  - STATS_PUSH_PASSWORD - (optional) the password for POST Basic Authentication
-
-  - EMAIL_ENABLED - if set to "true" automated email reporting is enabled, disabled if set to "false"
-  - EMAIL_INTERVAL - the interval in days between two consecutive email reports
-  - EMAIL_SERVER - the FQDN of the SMTP server to use
-  - EMAIL_SERVER_PORT - the SMTP server port
-  - EMAIL_SERVER_TYPE - either "plaintext", "starttls" or "ssl"
-  - EMAIL_AUTH_USER - optional, the username for SMTP authentication
-  - EMAIL_AUTH_PASS - optional, the password for SMTP authentication
-  - EMAIL_SENDER - the sender email address
-  - EMAIL_RECIPIENT - the recipient email address
 - Ingress host:
   - By default it is set to counter.nginx.ff.lan
 
@@ -151,7 +150,7 @@ kubectl apply -f 3.grafana.yaml
 kubectl apply -f 4.pushgateway.yaml
 ```
 
-By default 2.prometheus.yaml is configured for push mode, it must be edited decommenting the relevant section for pull mode
+By default `2.prometheus.yaml` is configured for push mode, it must be edited decommenting the relevant section for pull mode
 
 To setup visualization:
 
