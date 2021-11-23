@@ -103,9 +103,38 @@ def getF5(product="*",version="*"):
             cveId=cve['cve']['CVE_data_meta']['ID']
             cveUrl=cve['cve']['references']['reference_data'][0]['url']
             cveDesc=cve['cve']['description']['description_data'][0]['value']
-            cveTags=cve['cve']['references']['reference_data'][0]['tags']
+            cveBaseSeverity=cve['impact']['baseMetricV3']['cvssV3']['baseSeverity']
+            cveBaseScore=cve['impact']['baseMetricV3']['cvssV3']['baseScore']
+            cveExplScore=cve['impact']['baseMetricV2']['exploitabilityScore']
 
             if cveId not in matchingCVE:
-              matchingCVE[cveId]={"id":cveId,"url":cveUrl,"description":cveDesc,"tags":cveTags}
+              matchingCVE[cveId]={"id":cveId,"url":cveUrl,"description":cveDesc,"baseSeverity":cveBaseSeverity,"baseScore":cveBaseScore,"exploitabilityScore":cveExplScore}
+
+  return matchingCVE
+
+
+# Returns all CVE for the given F5 TMOS product/version
+def getNGINX(version="*"):
+  allCVE = __getFromNist(vendor="nginx",version=version)
+  matchingCVE={}
+
+  for cve in allCVE['result']['CVE_Items']:
+    allCPEMatches=cve['configurations']['nodes'][0]['cpe_match']
+
+    for cpeMatch in allCPEMatches:
+      # Found CVE match
+      cveId=cve['cve']['CVE_data_meta']['ID']
+      cveUrl=cve['cve']['references']['reference_data'][0]['url']
+      cveDesc=cve['cve']['description']['description_data'][0]['value']
+      cveBaseSeverity=cve['impact']['baseMetricV3']['cvssV3']['baseSeverity']
+      cveBaseScore=cve['impact']['baseMetricV3']['cvssV3']['baseScore']
+      cveExplScore=cve['impact']['baseMetricV2']['exploitabilityScore']
+
+      if cveId not in matchingCVE:
+        matchingCVE[cveId]={"id":cveId,"url":cveUrl,"description":cveDesc,"baseSeverity":cveBaseSeverity,"baseScore":cveBaseScore,"exploitabilityScore":cveExplScore}
+
+  cveF5 = getF5(product="nginx",version=version)
+
+  matchingCVE.update(cveF5)
 
   return matchingCVE

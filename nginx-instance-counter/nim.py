@@ -15,6 +15,8 @@ from requests import Request, Session
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from email.message import EmailMessage
 
+import cveDB
+
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 # NGINX dynamic modules
@@ -118,6 +120,9 @@ def nimInstances(fqdn,mode,proxy):
 
                     nginxModulesJSON+='"'+nginxModules[module]+'":"enabled"'
 
+      # CVE tracking
+      allCVE=cveDB.getNGINX(version=i['nginx']['version'].split(' ')[0])
+
       output = output + '{ \
         "instance_id": "' + instanceId + '", \
         "uname": "'+i['uname'] + '", \
@@ -128,7 +133,8 @@ def nimInstances(fqdn,mode,proxy):
         "createtime": "'+i['added']+'", \
         "modules": {'+nginxModulesJSON+'}, \
         "networkconfig": { "host_ips": '+str(i['host_ips']).replace('\'','"')+'}, \
-        "hostname": "'+i['hostname']+'" \
+        "hostname": "'+i['hostname']+'", \
+        "CVE":[' + json.dumps(allCVE) + '] \
       }'
 
     output = output + ']}'

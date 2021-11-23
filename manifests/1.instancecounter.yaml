@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: nginx-instance-counter
-        image: fiorucci/nginx-instance-counter:4.4
+        image: fiorucci/nginx-instance-counter:4.5
         ports:
         - containerPort: 5000
         env:

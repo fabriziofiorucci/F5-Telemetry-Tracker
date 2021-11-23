@@ -25,7 +25,7 @@ Communication to NGINX Controller / NGINX Instance Manager / BIG-IQ is based on 
   - Support for plaintext SMTP, STARTTLS, SMTP over TLS, SMTP authentication, custom SMTP port
   - Configurable push interval (in days)
 - HTTP(S) proxy support
-- CVE tracking (beta - currently available for BIG-IQ mode)
+- CVE tracking (beta)
 
 ## Deployment modes
 
@@ -55,7 +55,7 @@ Push mode: Instance Counter pushes stats to a remote data collection and visuali
 The NGINX Instance Counter image is available on Docker Hub as:
 
 ```
-fiorucci/nginx-instance-counter:4.4
+fiorucci/nginx-instance-counter:4.5
 ```
 
 The 1.instancecounter.yaml file references that by default.
@@ -66,8 +66,8 @@ If you need to build and push NGINX your own image to a private registry:
 git clone fabriziofiorucci/NGINX-InstanceCounter
 cd NGINX-InstanceCounter/nginx-instance-counter
 
-docker build --no-cache -t PRIVATE_REGISTRY:PORT/nginx-instance-counter:4.4 .
-docker push PRIVATE_REGISTRY:PORT/nginx-instance-counter:4.4
+docker build --no-cache -t PRIVATE_REGISTRY:PORT/nginx-instance-counter:4.5 .
+docker push PRIVATE_REGISTRY:PORT/nginx-instance-counter:4.5
 ```
 
 ## As a native python application
@@ -218,7 +218,10 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
           "10.200.200.10"
         ]
       },
-      "hostname": "vm-gw"
+      "hostname": "vm-gw",
+      "CVE": [
+        {}
+      ]
     }
   ]
 }
@@ -273,7 +276,10 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
         ]
       },
       "hostname": "nginx-76cd77586b-76g8k",
-      "name": "nginx-devportal"
+      "name": "nginx-devportal",
+      "CVE": [
+        {}
+      ]
     },
     {
       "instance_id": "61b945d0-6e4d-4225-a91f-52ae36b290cc",
@@ -296,7 +302,10 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
         ]
       },
       "hostname": "nginx-76cd77586b-xs5mm",
-      "name": "nginx-76cd77586b-xs5mm"
+      "name": "nginx-76cd77586b-xs5mm",
+      "CVE": [
+        {}
+      ]
     },
     {
       "instance_id": "e56260de-691f-4585-a4f5-9f6a93095f73",
@@ -319,7 +328,10 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
         ]
       },
       "hostname": "nginx-76cd77586b-srb4c",
-      "name": "nginx-76cd77586b-srb4c"
+      "name": "nginx-76cd77586b-srb4c",
+      "CVE": [
+        {}
+      ]
     },
     {
       "instance_id": "fb67428e-40f6-43a8-bcda-0621ee0d4331",
@@ -342,7 +354,10 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
         ]
       },
       "hostname": "nginx-76cd77586b-n8f2k",
-      "name": "nginx-api"
+      "name": "nginx-api",
+      "CVE": [
+        {}
+      ]
     },
     {
       "instance_id": "d78c7b6c-bde3-458c-933d-847d023bb2d5",
@@ -372,7 +387,10 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
         ]
       },
       "hostname": "ubuntu",
-      "name": "ubuntu"
+      "name": "ubuntu",
+      "CVE": [
+        {}
+      ]
     },
     {
       "instance_id": "ada757cf-df90-4125-b966-8db891431835",
@@ -395,7 +413,10 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
         ]
       },
       "hostname": "nginx-646545df5d-h2p7f",
-      "name": "nginx-646545df5d-h2p7f"
+      "name": "nginx-646545df5d-h2p7f",
+      "CVE": [
+        {}
+      ]
     },
     {
       "instance_id": "c9409b38-17d8-4345-9f31-b37f816195a8",
@@ -418,7 +439,10 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
         ]
       },
       "hostname": "nginx-646545df5d-5wkqv",
-      "name": "nginx-646545df5d-5wkqv"
+      "name": "nginx-646545df5d-5wkqv",
+      "CVE": [
+        {}
+      ]
     }
   ]
 }
@@ -556,18 +580,17 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
             "id": "CVE-2021-23037",
             "url": "https://support.f5.com/csp/article/K21435974",
             "description": "On all versions of 16.1.x, 16.0.x, 15.1.x, 14.1.x, 13.1.x, 12.1.x, and 11.6.x, a reflected cross-site scripting (XSS) vulnerability exists in an undisclosed page of the BIG-IP Configuration utility that allows an attacker to execute JavaScript in the context of the currently logged-in user. Note: Software versions which have reached End of Technical Support (EoTS) are not evaluated.",
-            "tags": [
-              "Mitigation",
-              "Vendor Advisory"
-            ]
+            "baseSeverity": "CRITICAL",
+            "baseScore": 9.6,
+            "exploitabilityScore": 8.6
           },
           "CVE-2021-23043": {
             "id": "CVE-2021-23043",
             "url": "https://support.f5.com/csp/article/K63163637",
             "description": "On BIG-IP, on all versions of 16.1.x, 16.0.x, 15.1.x, 14.1.x, 13.1.x, 12.1.x, and 11.6.x, a directory traversal vulnerability exists in an undisclosed page of the BIG-IP Configuration utility that allows an attacker to access arbitrary files. Note: Software versions which have reached End of Technical Support (EoTS) are not evaluated.",
-            "tags": [
-              "Vendor Advisory"
-            ]
+            "baseSeverity": "MEDIUM",
+            "baseScore": 6.5,
+            "exploitabilityScore": 8
           }
         }
       ]

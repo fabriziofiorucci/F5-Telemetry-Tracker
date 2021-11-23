@@ -15,6 +15,8 @@ from requests import Request, Session
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from email.message import EmailMessage
 
+import cveDB
+
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 ### NGINX Controller REST API
@@ -178,6 +180,9 @@ def ncInstances(fqdn,username,password,mode,proxy):
         else:
           containerized = "False"
 
+        # CVE tracking
+        allCVE=cveDB.getNGINX(version=i['currentStatus']['version'])
+
         instanceDetails = instanceDetails + '{' + \
           '"instance_id":"' + i['metadata']['uid'] + '",' + \
           '"uname":"' + uname + '",' + \
@@ -188,7 +193,8 @@ def ncInstances(fqdn,username,password,mode,proxy):
           '"createtime":"' + i['metadata']['createTime'] + '",' + \
           '"networkConfig":' + str(i['currentStatus']['networkConfig']).replace('\'','"') + ',' + \
           '"hostname":"' + i['currentStatus']['hostname'] + '",' + \
-          '"name":"' + i['metadata']['name'] + '"' + \
+          '"name":"' + i['metadata']['name'] + '",' + \
+          '"CVE":[' + json.dumps(allCVE) + ']' + \
           '}'
 
     if mode == 'JSON':
