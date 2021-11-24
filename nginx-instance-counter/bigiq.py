@@ -223,7 +223,7 @@ def bigIqInventory(mode):
                 inventoryData += '"inventoryStatus":"full","platform":{'+ \
                   '"code":"'+platformCode+'"'+platformInsights+'},'+ \
                   '"registrationKey":"'+invDevice['infoState']['license']['registrationKey']+ \
-                  '","chassisSerialNumber":"'+invDevice['infoState']['chassisSerialNumber']+'",'
+                  '","chassisSerialNumber":"'+invDevice['infoState']['chassisSerialNumber'].strip()+'",'
 
                 if 'licenseEndDateTime' in invDevice['infoState']['license']:
                   inventoryData += '"licenseEndDateTime":"'+invDevice['infoState']['license']['licenseEndDateTime']+'",'
