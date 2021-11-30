@@ -7,7 +7,7 @@ This tool helps tracking NGINX Plus instances managed by NGINX Controller and NG
 It has been tested against:
 
 - NGINX Controller 3.18, 3.18.2, apim-3.19.2
-- NGINX Instance Manager 1.0.1, 1.0.2, 1.0.3
+- NGINX Instance Manager 1.0.1, 1.0.2, 1.0.3, 1.0.4
 - BIG-IQ 8.1.0, 8.1.0.2
 
 Communication to NGINX Controller / NGINX Instance Manager / BIG-IQ is based on REST API, current features are:
@@ -43,7 +43,7 @@ Push mode: Instance Counter pushes stats to a remote data collection and visuali
 - Private registry to push the NGINX Instance Counter image
 - One of:
   - NGINX Controller 3.18, 3.18.2, apim-3.19.2
-  - NGINX Instance Manager 1.0.1, 1.0.2, 1.0.3
+  - NGINX Instance Manager 1.0.1, 1.0.2, 1.0.3, 1.0.4
   - BIG-IQ 8.1.0, 8.1.0.2
 - SMTP server if automated email reporting is used
 - NIST NVD REST API Key for full CVE tracking (https://nvd.nist.gov/developers/request-an-api-key)
