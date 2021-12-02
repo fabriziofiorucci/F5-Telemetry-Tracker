@@ -7,6 +7,15 @@ The report can also be generated in realtime/online by sending a GET request to 
 
 sampledata.json is provided for testing purposes
 
+Required python packages:
+
+```
+pip install flask
+pip install requests
+pip install xlsxwriter
+pip install pandas
+```
+
 ## Usage
 
 ```
