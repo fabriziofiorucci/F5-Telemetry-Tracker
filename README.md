@@ -825,8 +825,8 @@ Authorization: Basic YWE6YmI=
 
 A dynamically updated report in xls format can be downloaded by accessing either:
 
-- /reporting/xls
-- /counter/reporting/xls
+- `/reporting/xls`
+- `/counter/reporting/xls`
 
 This is currently available when querying BIG-IQ
 
