@@ -13,10 +13,10 @@ It has been tested against:
 Communication to NGINX Controller / NGINX Instance Manager / BIG-IQ is based on REST API, current features are:
 
 - REST API mode
-  - /instances and /counter/instances - return JSON output
-  - /metrics and /counter/metrics - return Prometheus compliant output
+  - `/instances` and `/counter/instances` - return JSON output
+  - `/metrics` and `/counter/metrics` - return Prometheus compliant output
 - High level reporting
-  - /reporting/xls and /counter/reporting/xls - return a reporting spreadsheet in xls format (currently available when querying BIG-IQ)
+  - `/reporting/xls` and `/counter/reporting/xls` - return a reporting spreadsheet in xls format (currently available when querying BIG-IQ, when running as native python code and docker image only)
 - Push mode
   - POSTs instance statistics to a user-defined HTTP(S) URL (STATS_PUSH_MODE: CUSTOM)
   - Pushes instance statistics to pushgateway (STATS_PUSH_MODE: NGINX_PUSH)
