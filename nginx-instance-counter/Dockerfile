@@ -10,6 +10,9 @@ RUN virtualenv /deployment/env/
 RUN /deployment/env/bin/python -m pip install --upgrade pip
 RUN /deployment/env/bin/pip3 install flask
 RUN /deployment/env/bin/pip3 install requests
+RUN /deployment/env/bin/pip3 install pandas
+RUN /deployment/env/bin/pip3 install xlsxwriter
+
 WORKDIR /deployment
 COPY app.py .
 COPY nc.py .

@@ -10,15 +10,19 @@ Steps to (re)build it:
 ```
 pip install flask
 pip install requests
+pip install xlsxwriter
+pip install pandas
 ```
 
 - Package the `app.py` script
 
 ```
-python3 -m nuitka --onefile app.py
+python3 -m nuitka --plugin-enable=numpy --onefile app.py
 ```
 
 - Edit and use the provided `nicstart.sh` script to run the generated image
-- When the NGINX Instance Counter has started, it can be queried sending a GET request to http://127.0.0.1:5000/instances or http://127.0.0.1:5000/counter/instances for JSON reporting. Prometheus metrics can be polled using http://127.0.0.1:5000/metrics or http://127.0.0.1:5000/counter/metrics
+- When the NGINX Instance Counter has started, it can be queried sending GET requests to:
+  - http://127.0.0.1:5000/instances or http://127.0.0.1:5000/counter/instances for JSON reporting.
+  - http://127.0.0.1:5000/metrics or http://127.0.0.1:5000/counter/metrics for Prometheus metrics
 - Port 5000 is used by default, it can be customized setting NIC_PORT in `nicstart.sh`
 - For full NIST NVD CVE tracking, get a REST API key at https://nvd.nist.gov/developers/request-an-api-key and configure it in `nicstart.sh`

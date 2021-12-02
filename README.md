@@ -15,6 +15,8 @@ Communication to NGINX Controller / NGINX Instance Manager / BIG-IQ is based on 
 - REST API mode
   - /instances and /counter/instances - return JSON output
   - /metrics and /counter/metrics - return Prometheus compliant output
+- High level reporting
+  - /reporting/xls and /counter/reporting/xls - return a reporting spreadsheet in xls format (currently available when querying BIG-IQ)
 - Push mode
   - POSTs instance statistics to a user-defined HTTP(S) URL (STATS_PUSH_MODE: CUSTOM)
   - Pushes instance statistics to pushgateway (STATS_PUSH_MODE: NGINX_PUSH)
@@ -55,7 +57,7 @@ Push mode: Instance Counter pushes stats to a remote data collection and visuali
 The NGINX Instance Counter image is available on Docker Hub as:
 
 ```
-fiorucci/nginx-instance-counter:4.7
+fiorucci/nginx-instance-counter:4.8
 ```
 
 The 1.instancecounter.yaml file references that by default.
@@ -66,8 +68,8 @@ If you need to build and push NGINX your own image to a private registry:
 git clone fabriziofiorucci/NGINX-InstanceCounter
 cd NGINX-InstanceCounter/nginx-instance-counter
 
-docker build --no-cache -t PRIVATE_REGISTRY:PORT/nginx-instance-counter:4.7 .
-docker push PRIVATE_REGISTRY:PORT/nginx-instance-counter:4.7
+docker build --no-cache -t PRIVATE_REGISTRY:PORT/nginx-instance-counter:4.8 .
+docker push PRIVATE_REGISTRY:PORT/nginx-instance-counter:4.8
 ```
 
 ## As a native python application
@@ -817,6 +819,16 @@ Authorization: Basic YWE6YmI=
   ...
 }
 ```
+
+
+## High level reporting
+
+A dynamically updated report in xls format can be downloaded by accessing either:
+
+- /reporting/xls
+- /counter/reporting/xls
+
+This is currently available when querying BIG-IQ
 
 
 # Visualization
