@@ -80,6 +80,8 @@ NGINX Instance Counter requires:
 - Python 3 (tested on 3.9+)
 - [Flask framework](https://flask.palletsprojects.com/en/2.0.x/)
 - [Requests](https://docs.python-requests.org/en/master/)
+- [XLSX Writer](https://pypi.org/project/XlsxWriter/)
+- [Pandas](https://pandas.pydata.org/)
 
 nginx-instance-counter/nicstart.sh is a sample script to run NGINX Instance Counter from bash
 
