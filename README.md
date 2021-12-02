@@ -159,7 +159,7 @@ By default `2.prometheus.yaml` is configured for push mode, it must be edited de
 To setup visualization:
 
 - Grafana shall be configured with a Prometheus datasource using by default http://prometheus.nginx.ff.lan
-- Import the dashboard NGINX-InstanceCounter-dashboard.json in Grafana
+- Import the `contrib\NGINX-InstanceCounter-dashboard.json` sample dashboard in Grafana
 
 Service names created by default as Ingress resources are:
 
