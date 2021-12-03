@@ -3,7 +3,6 @@
 import sys
 import json
 import pandas as pd
-from io import BytesIO
 
 this = sys.modules[__name__]
 

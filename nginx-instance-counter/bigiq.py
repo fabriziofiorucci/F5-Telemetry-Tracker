@@ -301,7 +301,7 @@ def bigIQcallRESTURI(method,uri,body):
 
 ### BIG-IQ query functions
 
-# Returns NGINX OSS/Plus instances managed by BIG-IQ in JSON format
+# Returns TMOS instances managed by BIG-IQ in JSON format
 def bigIqInventory(mode):
 
   status,details = bigIQInstances()
@@ -428,7 +428,7 @@ def bigIqInventory(mode):
     output = '{ "instances": [{ "bigip":"'+str(len(details['items']))+'",'+ \
       '"hwTotals":['+json.dumps(hwSKUGrandTotals)+'],' \
       '"swTotals":['+json.dumps(swSKUGrandTotals)+ \
-      ']}], "details": [' + output + ']}'
+      ']}], "details": [' + output + '], "telemetry": ['+bigIqTelemetry(mode)+']}'
   elif mode == 'PROMETHEUS' or mode == 'PUSHGATEWAY':
     if mode == 'PROMETHEUS':
       output = '# HELP bigip_online_instances Online BIG-IP instances\n'
@@ -437,3 +437,65 @@ def bigIqInventory(mode):
     output = output + 'bigip_online_instances{instanceType="BIG-IQ",bigiq_url="'+bigiq_fqdn+'"} '+str(len(details['items']))+'\n'
 
   return output
+
+
+# Builds BIG-IQ telemetry request body
+def _getTelemetryRequestBody(module,metricSet,timeRange):
+
+  body = '{ \
+    "kind": "ap:query:stats:byEntities", \
+    "module": "'+module+'", \
+    "timeRange": { \
+            "from": "'+timeRange+'", \
+            "to": "now" \
+    }, \
+    "dimension": "hostname", \
+    "aggregations": { \
+            "'+metricSet+'$avg-value-per-event": { \
+                    "metricSet": "'+metricSet+'", \
+                    "metric": "avg-value-per-event" \
+            } \
+    } \
+  }'
+
+  return json.loads(body)
+
+# Returns TMOS instances telemetry
+def bigIqTelemetry(mode):
+  telemetryURI = "/mgmt/ap/query/v1/tenants/default/products/device/metric-query"
+
+  allStats = [
+    { "module":"bigip-cpu","metricSet":"cpu-usage","timeRange":"-1H" },
+    { "module":"bigip-cpu","metricSet":"cpu-usage","timeRange":"-1W" },
+    { "module":"bigip-cpu","metricSet":"cpu-usage","timeRange":"-1M" },
+    { "module":"bigip-memory","metricSet":"free-ram","timeRange":"-1H" },
+    { "module":"bigip-memory","metricSet":"free-ram","timeRange":"-1W" },
+    { "module":"bigip-memory","metricSet":"free-ram","timeRange":"-1M" }
+  ]
+
+  telemetryBody={}
+
+  if mode == 'JSON':
+    for stat in allStats:
+      res,body = bigIQcallRESTURI(method = "POST", uri = telemetryURI, body = _getTelemetryRequestBody(module=stat['module'],metricSet=stat['metricSet'],timeRange=stat['timeRange']) )
+
+      if res == 200:
+        for r in body['result']['result']: 
+          telHostname = r['hostname']
+          telTimeRange = stat['timeRange']
+          telVarName = stat['metricSet']
+          telVarValue = r[stat['metricSet']+'$avg-value-per-event']
+
+          if telHostname not in telemetryBody:
+            telemetryBody[telHostname] = {}
+
+          if telVarName not in telemetryBody[telHostname]:
+            telemetryBody[telHostname][telVarName] = {}
+
+          telemetryBody[telHostname][telVarName][telTimeRange] = telVarValue
+
+      return json.dumps(telemetryBody)
+  elif mode == 'PROMETHEUS' or mode == 'PUSHGATEWAY':
+    print("PROMETHEUS/PUSHGATEWAY")
+  else:
+    return json.dumps(telemetryBody)

@@ -16,7 +16,7 @@ Communication to NGINX Controller / NGINX Instance Manager / BIG-IQ is based on 
   - `/instances` and `/counter/instances` - return JSON output
   - `/metrics` and `/counter/metrics` - return Prometheus compliant output
 - High level reporting
-  - `/reporting/xls` and `/counter/reporting/xls` - return a reporting spreadsheet in xls format (currently available when querying BIG-IQ, when running as native python code and docker image only)
+  - `/reporting/xls` and `/counter/reporting/xls` - return a reporting spreadsheet in xls format (currently supported for BIG-IQ, when running as native python code and docker image only)
 - Push mode
   - POSTs instance statistics to a user-defined HTTP(S) URL (STATS_PUSH_MODE: CUSTOM)
   - Pushes instance statistics to pushgateway (STATS_PUSH_MODE: NGINX_PUSH)
@@ -28,6 +28,7 @@ Communication to NGINX Controller / NGINX Instance Manager / BIG-IQ is based on 
   - Configurable push interval (in days)
 - HTTP(S) proxy support
 - CVE tracking
+- Resource and applications telemetry (currently supported for BIG-IQ, when running as native python code and docker image only)
 
 ## Additional tools
 
@@ -61,7 +62,7 @@ Push mode: Instance Counter pushes stats to a remote data collection and visuali
 The NGINX Instance Counter image is available on Docker Hub as:
 
 ```
-fiorucci/nginx-instance-counter:4.8
+fiorucci/nginx-instance-counter:4.9
 ```
 
 The 1.instancecounter.yaml file references that by default.
@@ -72,8 +73,8 @@ If you need to build and push NGINX your own image to a private registry:
 git clone fabriziofiorucci/NGINX-InstanceCounter
 cd NGINX-InstanceCounter/nginx-instance-counter
 
-docker build --no-cache -t PRIVATE_REGISTRY:PORT/nginx-instance-counter:4.8 .
-docker push PRIVATE_REGISTRY:PORT/nginx-instance-counter:4.8
+docker build --no-cache -t PRIVATE_REGISTRY:PORT/nginx-instance-counter:4.9 .
+docker push PRIVATE_REGISTRY:PORT/nginx-instance-counter:4.9
 ```
 
 ## As a native python application
@@ -604,7 +605,7 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
       ]
     },
     {
-      "hostname": "bigip.f5.ff.lan",
+      "hostname": "bigip2.f5.ff.lan",
       "address": "192.168.1.70",
       "product": "BIG-IP",
       "version": "16.1.0",
@@ -731,6 +732,34 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
           }
         }
       ]
+    }
+  ],
+  "telemetry": [
+    {
+      "bigip1.f5.ff.lan": {
+        "cpu-usage": {
+          "-1H": 4.611763869013105,
+          "-1W": 4.859152033462287,
+          "-1M": 4.165137052536011
+        },
+        "free-ram": {
+          "-1H": 9355243529.411764,
+          "-1W": 9372458241.590214,
+          "-1M": 9359400000.0
+        }
+      },
+      "bigip2.f5.ff.lan": {
+        "cpu-usage": {
+          "-1H": 6.664462372034538,
+          "-1W": 6.885606513630529,
+          "-1M": 6.02909779548645
+        },
+        "free-ram": {
+          "-1H": 7000567226.890757,
+          "-1W": 7017898746.17737,
+          "-1M": 7000200000.0
+        }
+      }
     }
   ]
 }
