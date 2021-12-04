@@ -311,9 +311,6 @@ def bigIqInventory(mode):
   output=''
 
   if mode == 'JSON':
-    output = ''
-    firstLoop = True
-
     # Gets TMOS modules provisioning state for all devices
     rcode,provisioningDetails = bigIQInstanceProvisioning()
     rcode2,inventoryDetails = bigIQgetInventory()
@@ -416,11 +413,6 @@ def bigIqInventory(mode):
 
         if retcode == 200:
           if instanceDetails != '':
-            if firstLoop == True :
-              firstLoop = False
-            else:
-              output+=','
-
             licensedModules = instanceDetails['properties']['cm:gui:module']
 
             platformMarketingName=''
@@ -525,8 +517,8 @@ def bigIqTelemetry(mode):
 
           telemetryBody[telHostname][telVarName][telTimeRange] = telVarValue
 
-    return json.dumps(telemetryBody)
+    return telemetryBody
   elif mode == 'PROMETHEUS' or mode == 'PUSHGATEWAY':
     print("PROMETHEUS/PUSHGATEWAY")
   else:
-    return json.dumps(telemetryBody)
+    return telemetryBody
