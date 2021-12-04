@@ -1,8 +1,8 @@
 # NGINX Instance Counter - Portable image for Linux
 
-This portable image has been built using [Nuitka](https://nuitka.net/)
+Portable images have been built using [Nuitka](https://nuitka.net/) and can be downloaded from the [releases page](/fabriziofiorucci/NGINX-InstanceCounter/releases)
 
-Steps to (re)build it:
+Steps to (re)build:
 
 - Setup nuitka
 - install additional python packages
@@ -10,11 +10,9 @@ Steps to (re)build it:
 ```
 pip install flask
 pip install requests
-pip install xlsxwriter
-pip install pandas
 ```
 
-- Package the `app.py` script
+- Package the source files in `/portable/src`
 
 ```
 python3 -m nuitka --plugin-enable=numpy --onefile app.py

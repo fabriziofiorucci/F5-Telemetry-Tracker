@@ -320,16 +320,18 @@ def bigIqInventory(mode):
 
     hwSKUGrandTotals={}
     swSKUGrandTotals={}
+    wholeInventory=[]
 
     for item in details['items']:
       if mode == 'JSON':
         # Gets TMOS registration key and serial number for the current BIG-IP device
-        inventoryData = '"inventoryTimestamp":"'+str(inventoryDetails['lastUpdateMicros']//1000)+'",'
+        inventoryData = {}
+        inventoryData['inventoryTimestamp'] = inventoryDetails['lastUpdateMicros']//1000
 
         platformType=''
 
         if rcode2 == 204:
-          inventoryData = inventoryData + '"inventoryStatus":"partial",'
+          inventoryData['inventoryStatus']="partial"
         else:
           machineIdFound=False
           for invDevice in inventoryDetails['items']:
@@ -337,11 +339,11 @@ def bigIqInventory(mode):
               machineIdFound=True
               if "errors" in invDevice['infoState']:
                 # BIG-IP unreachable, inventory incomplete
-                inventoryData = inventoryData + '"inventoryStatus":"partial",'
+                inventoryData['inventoryStatus']="partial"
               else:
                 # Get platform name and SKU
                 platformCode=invDevice['infoState']['platform']
-                platformInsights=''
+                platformInsights={}
                 if platformCode in hwPlatforms:
                   platformDetails=hwPlatforms[platformCode]
                   platformType=platformDetails.split('|')[0]
@@ -352,30 +354,31 @@ def bigIqInventory(mode):
                   else:
                     hwSKUGrandTotals[platformSKU] = 1
 
-                  platformInsights=',"type":"'+platformType+'","sku":"'+platformSKU+'"'
+                  platformInsights['type']=platformType
+                  platformInsights['sku']=platformSKU
 
-                inventoryData += '"inventoryStatus":"full","platform":{'+ \
-                  '"code":"'+platformCode+'"'+platformInsights+'},'+ \
-                  '"registrationKey":"'+invDevice['infoState']['license']['registrationKey']+ \
-                  '","chassisSerialNumber":"'+invDevice['infoState']['chassisSerialNumber'].strip()+'",'
+                platformInsights['code']=platformCode
+
+                inventoryData['inventoryStatus'] = "full"
+                inventoryData['registrationKey'] = invDevice['infoState']['license']['registrationKey']
+                inventoryData['chassisSerialNumber'] = invDevice['infoState']['chassisSerialNumber'].strip()
+                inventoryData['platform'] = platformInsights
 
                 if 'licenseEndDateTime' in invDevice['infoState']['license']:
-                  inventoryData += '"licenseEndDateTime":"'+invDevice['infoState']['license']['licenseEndDateTime']+'",'
+                  inventoryData['licenseEndDateTime']=invDevice['infoState']['license']['licenseEndDateTime']
 
           if machineIdFound == False:
-            inventoryData = inventoryData + '"inventoryStatus":"partial",'
+            inventoryData['inventoryStatus']="partial"
 
         # Gets TMOS modules provisioning for the current BIG-IP device
         # https://support.f5.com/csp/article/K4309
-        provModules = ''
+        provModules = {}
+        provModules['provisionedModules']=[]
+
         foundCVEs={}
-        pFirstLoop = True
+
         for prov in provisioningDetails['items']:
           if prov['deviceReference']['machineId'] == item['machineId']:
-            if pFirstLoop == True:
-              pFirstLoop = False
-            else:
-              provModules+=','
 
             # Retrieving relevant SKUs and platform types
             moduleProvisioningLevel=''
@@ -401,7 +404,12 @@ def bigIqInventory(mode):
                 else:
                   swSKUGrandTotals[moduleSKU] = 1
 
-            provModules += '{"module":"'+prov['name']+'","level":"'+moduleProvisioningLevel+'","sku":"'+moduleSKU+'"}'
+            thisModule = {}
+            thisModule['module']=prov['name']
+            thisModule['level']=moduleProvisioningLevel
+            thisModule['sku']=moduleSKU
+
+            provModules['provisionedModules'].append(thisModule)
 
         # Gets TMOS licensed modules for the current BIG-IP device
         retcode,instanceDetails = bigIQInstanceDetails(item['machineId'])
@@ -419,16 +427,39 @@ def bigIqInventory(mode):
             if 'platformMarketingName' in item:
               platformMarketingName=item['platformMarketingName']
 
-            output += '{"hostname":"'+item['hostname']+'","address":"'+item['address']+'","product":"'+item['product']+'","version":"'+item['version']+'","edition":"'+ \
-              item['edition']+'","build":"'+item['build']+'","isVirtual":"'+str(item['isVirtual'])+'","isClustered":"'+str(item['isClustered'])+ \
-              '","platformMarketingName":"'+platformMarketingName+'","restFrameworkVersion":"'+ \
-              item['restFrameworkVersion']+'",'+inventoryData+'"licensedModules":'+str(licensedModules).replace('\'','"')+ \
-              ',"provisionedModules":['+provModules+'],"CVE":['+json.dumps(foundCVEs)+']}'
+            inventoryData['hostname']=item['hostname']
+            inventoryData['address']=item['address']
+            inventoryData['product']=item['product']
+            inventoryData['version']=item['version']
+            inventoryData['edition']=item['edition']
+            inventoryData['build']=item['build']
+            inventoryData['isVirtual']=item['isVirtual']
+            inventoryData['isClustered']=item['isClustered']
+            inventoryData['platformMarketingName']=platformMarketingName
+            inventoryData['restFrameworkVersion']=item['restFrameworkVersion']
+            inventoryData['licensedModules']=licensedModules
+            inventoryData['provisionedModules']=provModules['provisionedModules']
+            inventoryData['CVE']=[]
+            inventoryData['CVE'].append(foundCVEs)
 
-    output = '{ "instances": [{ "bigip":"'+str(len(details['items']))+'",'+ \
-      '"hwTotals":['+json.dumps(hwSKUGrandTotals)+'],' \
-      '"swTotals":['+json.dumps(swSKUGrandTotals)+ \
-      ']}], "details": [' + output + '], "telemetry": ['+bigIqTelemetry(mode)+']}'
+            wholeInventory.append(inventoryData)
+
+    instancesDict={}
+    instancesDict['bigip']=len(details['items'])
+    instancesDict['hwTotals'] = []
+    instancesDict['hwTotals'].append(hwSKUGrandTotals)
+    instancesDict['swTotals'] = []
+    instancesDict['swTotals'].append(swSKUGrandTotals)
+
+    output = {}
+    output['instances'] = []
+    output['instances'].append(instancesDict)
+    output['details'] = wholeInventory
+    output['telemetry'] = []
+    output['telemetry'] = bigIqTelemetry(mode)
+
+    output=str(json.dumps(output))
+
   elif mode == 'PROMETHEUS' or mode == 'PUSHGATEWAY':
     if mode == 'PROMETHEUS':
       output = '# HELP bigip_online_instances Online BIG-IP instances\n'
@@ -442,23 +473,23 @@ def bigIqInventory(mode):
 # Builds BIG-IQ telemetry request body
 def _getTelemetryRequestBody(module,metricSet,timeRange):
 
-  body = '{ \
-    "kind": "ap:query:stats:byEntities", \
-    "module": "'+module+'", \
-    "timeRange": { \
-            "from": "'+timeRange+'", \
-            "to": "now" \
-    }, \
-    "dimension": "hostname", \
-    "aggregations": { \
-            "'+metricSet+'$avg-value-per-event": { \
-                    "metricSet": "'+metricSet+'", \
-                    "metric": "avg-value-per-event" \
-            } \
-    } \
-  }'
+  tr = {}
+  tr['from'] = timeRange
+  tr['to'] = "now"
 
-  return json.loads(body)
+  aggregations = {}
+  aggregations[metricSet+'$avg-value-per-event'] = {}
+  aggregations[metricSet+'$avg-value-per-event']['metricSet'] = metricSet
+  aggregations[metricSet+'$avg-value-per-event']['metric'] = "avg-value-per-event"
+
+  body = {}
+  body['kind'] = "ap:query:stats:byEntities"
+  body['module'] = module
+  body['dimension'] = "hostname"
+  body['timeRange'] = tr
+  body['aggregations'] = aggregations
+
+  return body
 
 # Returns TMOS instances telemetry
 def bigIqTelemetry(mode):
@@ -494,7 +525,7 @@ def bigIqTelemetry(mode):
 
           telemetryBody[telHostname][telVarName][telTimeRange] = telVarValue
 
-      return json.dumps(telemetryBody)
+    return json.dumps(telemetryBody)
   elif mode == 'PROMETHEUS' or mode == 'PUSHGATEWAY':
     print("PROMETHEUS/PUSHGATEWAY")
   else:

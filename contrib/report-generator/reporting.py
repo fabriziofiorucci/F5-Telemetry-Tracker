@@ -36,11 +36,11 @@ def bigiqXLS(jsonfile,outputfile):
   allVersionSummary=pd.DataFrame(f5AllDetails.groupby(['version'])['hostname'].count()).rename(columns={'hostname':'count'})
 
   print("-- Analyzing hardware devices")
-  f5Hardware = f5AllDetails[f5AllDetails['isVirtual'] == 'False'].filter(['hostname','platformMarketingName'])
+  f5Hardware = f5AllDetails[f5AllDetails['isVirtual'] == False].filter(['hostname','platformMarketingName'])
   f5Hardware = pd.DataFrame(f5Hardware.groupby(['platformMarketingName'])['hostname'].count()).rename(columns={'hostname':'count'})
 
   print("-- Analyzing Virtual Editions")
-  f5VE = f5AllDetails[f5AllDetails['isVirtual'] == 'True']
+  f5VE = f5AllDetails[f5AllDetails['isVirtual'] == True]
 
   print("All devices:",f5AllDetails.shape[0])
   print("- Hardware :",f5Hardware.shape[0])
