@@ -1,0 +1,545 @@
+{
+  "__inputs": [
+    {
+      "name": "DS_PROMETHEUS",
+      "label": "Prometheus",
+      "description": "",
+      "type": "datasource",
+      "pluginId": "prometheus",
+      "pluginName": "Prometheus"
+    }
+  ],
+  "__requires": [
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "8.1.1"
+    },
+    {
+      "type": "datasource",
+      "id": "prometheus",
+      "name": "Prometheus",
+      "version": "1.0.0"
+    },
+    {
+      "type": "panel",
+      "id": "stat",
+      "name": "Stat",
+      "version": ""
+    },
+    {
+      "type": "panel",
+      "id": "text",
+      "name": "Text",
+      "version": ""
+    },
+    {
+      "type": "panel",
+      "id": "timeseries",
+      "name": "Time series",
+      "version": ""
+    }
+  ],
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "dashboard"
+        },
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "gnetId": null,
+  "graphTooltip": 0,
+  "id": null,
+  "iteration": 1629195029917,
+  "links": [],
+  "panels": [
+    {
+      "collapsed": false,
+      "datasource": null,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 15,
+      "panels": [],
+      "title": "Subscription details",
+      "type": "row"
+    },
+    {
+      "datasource": null,
+      "description": "",
+      "gridPos": {
+        "h": 3,
+        "w": 6,
+        "x": 0,
+        "y": 1
+      },
+      "id": 8,
+      "options": {
+        "content": "<center><h1>$subscription</h1></center>",
+        "mode": "html"
+      },
+      "pluginVersion": "8.1.1",
+      "title": "Subscription",
+      "type": "text"
+    },
+    {
+      "datasource": null,
+      "description": "",
+      "gridPos": {
+        "h": 3,
+        "w": 4,
+        "x": 6,
+        "y": 1
+      },
+      "id": 9,
+      "options": {
+        "content": "<center><h1>$instanceType</h1></center>",
+        "mode": "html"
+      },
+      "pluginVersion": "8.1.1",
+      "title": "Type",
+      "type": "text"
+    },
+    {
+      "datasource": null,
+      "description": "",
+      "gridPos": {
+        "h": 3,
+        "w": 3,
+        "x": 10,
+        "y": 1
+      },
+      "id": 12,
+      "options": {
+        "content": "<center><h1>$instanceVersion</h1></center>",
+        "mode": "html"
+      },
+      "pluginVersion": "8.1.1",
+      "title": "Version",
+      "type": "text"
+    },
+    {
+      "datasource": null,
+      "description": "",
+      "gridPos": {
+        "h": 3,
+        "w": 6,
+        "x": 13,
+        "y": 1
+      },
+      "id": 13,
+      "options": {
+        "content": "$location\n=",
+        "mode": "markdown"
+      },
+      "pluginVersion": "8.1.1",
+      "title": "Location",
+      "type": "text"
+    },
+    {
+      "datasource": null,
+      "description": "",
+      "gridPos": {
+        "h": 3,
+        "w": 5,
+        "x": 19,
+        "y": 1
+      },
+      "id": 17,
+      "options": {
+        "content": "$instanceSerial\n=",
+        "mode": "markdown"
+      },
+      "pluginVersion": "8.1.1",
+      "title": "Serial",
+      "type": "text"
+    },
+    {
+      "collapsed": false,
+      "datasource": null,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 4
+      },
+      "id": 11,
+      "panels": [],
+      "title": "NGINX Usage Tracking",
+      "type": "row"
+    },
+    {
+      "datasource": null,
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 3,
+        "x": 0,
+        "y": 5
+      },
+      "id": 4,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {},
+        "textMode": "auto"
+      },
+      "pluginVersion": "8.1.1",
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "nginx_oss_online_instances{subscription=~\"$subscription\",instanceType=~\"$instanceType\",instanceVersion=~\"$instanceVersion\",location=~\"$location\"}",
+          "instant": false,
+          "interval": "",
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "title": "Total OSS Instances",
+      "type": "stat"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 21,
+        "x": 3,
+        "y": 5
+      },
+      "id": 2,
+      "options": {
+        "legend": {
+          "calcs": [
+            "min",
+            "max",
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "right"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "pluginVersion": "8.0.6",
+      "targets": [
+        {
+          "exemplar": false,
+          "expr": "nginx_oss_online_instances{subscription=~\"$subscription\",instanceType=~\"$instanceType\",instanceVersion=~\"$instanceVersion\",location=~\"$location\"}",
+          "hide": false,
+          "instant": false,
+          "interval": "",
+          "legendFormat": "NGINX OSS {{location}}",
+          "queryType": "randomWalk",
+          "refId": "A"
+        },
+        {
+          "exemplar": true,
+          "expr": "nginx_plus_online_instances{subscription=~\"$subscription\",instanceType=~\"$instanceType\",instanceVersion=~\"$instanceVersion\",location=~\"$location\"}",
+          "hide": false,
+          "instant": false,
+          "interval": "",
+          "legendFormat": "NGINX Plus {{location}}",
+          "refId": "D"
+        },
+        {
+          "exemplar": true,
+          "expr": "nginx_plus_offline_instances{subscription=~\"$subscription\",instanceType=~\"$instanceType\",instanceVersion=~\"$instanceVersion\",location=~\"$location\"}",
+          "hide": false,
+          "instant": false,
+          "interval": "",
+          "legendFormat": "Offline instances {{location}}",
+          "refId": "B"
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "NGINX Instances usage",
+      "type": "timeseries"
+    },
+    {
+      "datasource": null,
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 3,
+        "x": 0,
+        "y": 11
+      },
+      "id": 16,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {},
+        "textMode": "auto"
+      },
+      "pluginVersion": "8.1.1",
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "nginx_plus_online_instances{subscription=~\"$subscription\",instanceType=~\"$instanceType\",instanceVersion=~\"$instanceVersion\",location=~\"$location\"}",
+          "instant": false,
+          "interval": "",
+          "legendFormat": "{{location}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Total Plus Instances",
+      "type": "stat"
+    }
+  ],
+  "refresh": "",
+  "schemaVersion": 30,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "allValue": null,
+        "current": {},
+        "datasource": "${DS_PROMETHEUS}",
+        "definition": "label_values(subscription)",
+        "description": null,
+        "error": null,
+        "hide": 0,
+        "includeAll": false,
+        "label": "Subscription",
+        "multi": false,
+        "name": "subscription",
+        "options": [],
+        "query": {
+          "query": "label_values(subscription)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allValue": null,
+        "current": {},
+        "datasource": "${DS_PROMETHEUS}",
+        "definition": "label_values({subscription=\"$subscription\"},instanceType)",
+        "description": null,
+        "error": null,
+        "hide": 0,
+        "includeAll": false,
+        "label": "Instance Type",
+        "multi": false,
+        "name": "instanceType",
+        "options": [],
+        "query": {
+          "query": "label_values({subscription=\"$subscription\"},instanceType)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allValue": null,
+        "current": {},
+        "datasource": "${DS_PROMETHEUS}",
+        "definition": "label_values({subscription=\"$subscription\"},instanceVersion)",
+        "description": null,
+        "error": null,
+        "hide": 0,
+        "includeAll": false,
+        "label": "Instance Version",
+        "multi": false,
+        "name": "instanceVersion",
+        "options": [],
+        "query": {
+          "query": "label_values({subscription=\"$subscription\"},instanceVersion)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allValue": null,
+        "current": {},
+        "datasource": "${DS_PROMETHEUS}",
+        "definition": "label_values({subscription=\"$subscription\"},location)",
+        "description": null,
+        "error": null,
+        "hide": 0,
+        "includeAll": false,
+        "label": "Location",
+        "multi": true,
+        "name": "location",
+        "options": [],
+        "query": {
+          "query": "label_values({subscription=\"$subscription\"},location)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allValue": null,
+        "current": {},
+        "datasource": "${DS_PROMETHEUS}",
+        "definition": "label_values({subscription=\"$subscription\"},instanceSerial)",
+        "description": null,
+        "error": null,
+        "hide": 0,
+        "includeAll": false,
+        "label": "Instance Serial",
+        "multi": false,
+        "name": "instanceSerial",
+        "options": [],
+        "query": {
+          "query": "label_values({subscription=\"$subscription\"},instanceSerial)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-15m",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "",
+  "title": "NGINX Instances",
+  "uid": "ypDUGrZnk",
+  "version": 77
+}

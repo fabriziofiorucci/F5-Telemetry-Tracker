@@ -1,0 +1,246 @@
+{
+  "instances": [
+    {
+      "bigip": "2",
+      "hwTotals": [
+        {
+          "F5-VE": 1
+        }
+      ],
+      "swTotals": [
+        {
+          "H-VE-LTM": 1,
+          "H-VE-DNS": 1
+        }
+      ]
+    }
+  ],
+  "details": [
+    {
+      "hostname": "bigip1.f5.ff.lan",
+      "address": "192.168.1.69",
+      "product": "BIG-IP",
+      "version": "16.1.0",
+      "edition": "Final",
+      "build": "0.0.19",
+      "isVirtual": "True",
+      "isClustered": "False",
+      "platformMarketingName": "BIG-IP Virtual Edition",
+      "restFrameworkVersion": "16.1.0-0.0.19",
+      "inventoryTimestamp": "1638438626318",
+      "inventoryStatus": "full",
+      "platform": {
+        "code": "Z100",
+        "type": "VE",
+        "sku": "F5-VE"
+      },
+      "registrationKey": "UXUZK-PTNUA-RNBJE-VWDPX-TYQQEPF",
+      "chassisSerialNumber": "00000000-0000-0000-000000000000",
+      "licenseEndDateTime": "2022-01-14T00:00:00+01:00",
+      "licensedModules": [
+        "adc",
+        "BigIPDevice"
+      ],
+      "provisionedModules": [
+        {
+          "module": "afm",
+          "level": "none",
+          "sku": "H-VE-AFM"
+        },
+        {
+          "module": "asm",
+          "level": "none",
+          "sku": "H-VE-AWF"
+        },
+        {
+          "module": "dos",
+          "level": "",
+          "sku": ""
+        },
+        {
+          "module": "avr",
+          "level": "",
+          "sku": ""
+        },
+        {
+          "module": "sslo",
+          "level": "none",
+          "sku": "H-VE-SSLO"
+        },
+        {
+          "module": "ltm",
+          "level": "nominal",
+          "sku": "H-VE-LTM"
+        },
+        {
+          "module": "cgnat",
+          "level": "none",
+          "sku": "H-VE-CGNAT"
+        },
+        {
+          "module": "ilx",
+          "level": "",
+          "sku": ""
+        },
+        {
+          "module": "gtm",
+          "level": "nominal",
+          "sku": "H-VE-DNS"
+        },
+        {
+          "module": "lc",
+          "level": "",
+          "sku": ""
+        },
+        {
+          "module": "swg",
+          "level": "",
+          "sku": ""
+        },
+        {
+          "module": "apm",
+          "level": "none",
+          "sku": "H-VE-APM"
+        },
+        {
+          "module": "pem",
+          "level": "none",
+          "sku": "H-VE-PEM"
+        },
+        {
+          "module": "fps",
+          "level": "",
+          "sku": ""
+        },
+        {
+          "module": "urldb",
+          "level": "",
+          "sku": ""
+        }
+      ],
+      "CVE": [
+        {
+          "CVE-2021-23037": {
+            "id": "CVE-2021-23037",
+            "url": "https://support.f5.com/csp/article/K21435974",
+            "description": "On all versions of 16.1.x, 16.0.x, 15.1.x, 14.1.x, 13.1.x, 12.1.x, and 11.6.x, a reflected cross-site scripting (XSS) vulnerability exists in an undisclosed page of the BIG-IP Configuration utility that allows an attacker to execute JavaScript in the context of the currently logged-in user. Note: Software versions which have reached End of Technical Support (EoTS) are not evaluated.",
+            "baseSeverity": "CRITICAL",
+            "baseScore": 9.6,
+            "exploitabilityScore": 8.6
+          },
+          "CVE-2021-23043": {
+            "id": "CVE-2021-23043",
+            "url": "https://support.f5.com/csp/article/K63163637",
+            "description": "On BIG-IP, on all versions of 16.1.x, 16.0.x, 15.1.x, 14.1.x, 13.1.x, 12.1.x, and 11.6.x, a directory traversal vulnerability exists in an undisclosed page of the BIG-IP Configuration utility that allows an attacker to access arbitrary files. Note: Software versions which have reached End of Technical Support (EoTS) are not evaluated.",
+            "baseSeverity": "MEDIUM",
+            "baseScore": 6.5,
+            "exploitabilityScore": 8.0
+          }
+        }
+      ]
+    },
+    {
+      "hostname": "bigip2.f5.ff.lan",
+      "address": "192.168.1.70",
+      "product": "BIG-IP",
+      "version": "16.1.0",
+      "edition": "Final",
+      "build": "0.0.19",
+      "isVirtual": "True",
+      "isClustered": "False",
+      "platformMarketingName": "BIG-IP Virtual Edition",
+      "restFrameworkVersion": "16.1.0-0.0.19",
+      "inventoryTimestamp": "1638438626318",
+      "inventoryStatus": "partial",
+      "licensedModules": [
+        "asmsecurity",
+        "adc",
+        "Access",
+        "dns",
+        "BigIPDevice",
+        "networksecurity",
+        "sharedsecurity"
+      ],
+      "provisionedModules": [
+        {
+          "module": "gtm",
+          "level": "",
+          "sku": ""
+        },
+        {
+          "module": "sslo",
+          "level": "",
+          "sku": ""
+        },
+        {
+          "module": "cgnat",
+          "level": "",
+          "sku": ""
+        },
+        {
+          "module": "apm",
+          "level": "",
+          "sku": ""
+        },
+        {
+          "module": "ltm",
+          "level": "",
+          "sku": ""
+        },
+        {
+          "module": "fps",
+          "level": "",
+          "sku": ""
+        },
+        {
+          "module": "avr",
+          "level": "",
+          "sku": ""
+        },
+        {
+          "module": "lc",
+          "level": "",
+          "sku": ""
+        },
+        {
+          "module": "dos",
+          "level": "",
+          "sku": ""
+        },
+        {
+          "module": "pem",
+          "level": "",
+          "sku": ""
+        },
+        {
+          "module": "urldb",
+          "level": "",
+          "sku": ""
+        },
+        {
+          "module": "swg",
+          "level": "",
+          "sku": ""
+        },
+        {
+          "module": "ilx",
+          "level": "",
+          "sku": ""
+        },
+        {
+          "module": "asm",
+          "level": "",
+          "sku": ""
+        },
+        {
+          "module": "afm",
+          "level": "",
+          "sku": ""
+        }
+      ],
+      "CVE": [
+        {}
+      ]
+    }
+  ]
+}
