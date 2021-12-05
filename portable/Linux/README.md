@@ -1,6 +1,6 @@
 # NGINX Instance Counter - Portable image for Linux
 
-Portable images have been built using [Nuitka](https://nuitka.net/) and can be downloaded from the [releases page](/fabriziofiorucci/NGINX-InstanceCounter/releases)
+Portable images have been built using [Nuitka](https://nuitka.net/) and can be downloaded from the [releases page](https://github.com/fabriziofiorucci/NGINX-InstanceCounter/releases)
 
 Steps to (re)build:
 
