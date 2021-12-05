@@ -134,22 +134,18 @@ def ncInstances(fqdn,username,password,mode,proxy):
     return make_response(jsonify({'error': 'locations fetch error'}), 404)
 
   if mode == 'JSON':
-    output = '{ "subscription": {"id": "'+subscriptionId+'","type":"'+instanceType+'","version":"'+instanceVersion+'"},"instances": ['
-    firstLoop = True
+    subscriptionDict = {}
+    subscriptionDict['id'] = subscriptionId
+    subscriptionDict['type'] = instanceType
+    subscriptionDict['version'] = instanceVersion
   else:
     output = ''
 
-  firstILoop = True
-  instanceDetails = ''
+  allDetailsDict = []
+  instancesDict = []
 
   # Iterates locations
   for l in locations['items']:
-    if mode == 'JSON':
-      if firstLoop == True :
-        firstLoop=False
-      else:
-        output+=','
-
     locName = l['metadata']['name']
 
     # Iterates and counts online instances
@@ -166,39 +162,41 @@ def ncInstances(fqdn,username,password,mode,proxy):
         offline+=1
 
       if mode == 'JSON':
-        if firstILoop == True :
-          firstILoop = False
-        else:
-          instanceDetails = instanceDetails + ','
-
         # Retrieves instance details
         lsm = i['currentStatus']['legacySystemMetadata']
         uname = lsm['os-type']+' '+lsm['release']['name']+ ' '+lsm['release']['version']+' '+lsm['processor']['architecture']+' '+lsm['processor']['model']
 
         if lsm['processor']['hypervisor'] == 'container':
-          containerized = "True"
+          containerized = True
         else:
-          containerized = "False"
+          containerized = False
 
         # CVE tracking
         allCVE=cveDB.getNGINX(version=i['currentStatus']['version'])
 
-        instanceDetails = instanceDetails + '{' + \
-          '"instance_id":"' + i['metadata']['uid'] + '",' + \
-          '"uname":"' + uname + '",' + \
-          '"containerized":"' + containerized + '",' + \
-          '"type":"' + 'plus' + '",' + \
-          '"version":"' + i['currentStatus']['version'] + '",' + \
-          '"last_seen":"' + i['currentStatus']['legacyNginxMetadata']['last_seen'] + '",' + \
-          '"createtime":"' + i['metadata']['createTime'] + '",' + \
-          '"networkConfig":' + str(i['currentStatus']['networkConfig']).replace('\'','"') + ',' + \
-          '"hostname":"' + i['currentStatus']['hostname'] + '",' + \
-          '"name":"' + i['metadata']['name'] + '",' + \
-          '"CVE":[' + json.dumps(allCVE) + ']' + \
-          '}'
+        detailsDict = {}
+        detailsDict['instance_id'] = i['metadata']['uid']
+        detailsDict['uname'] = uname
+        detailsDict['containerized'] = containerized
+        detailsDict['type'] = "plus"
+        detailsDict['version'] = i['currentStatus']['version']
+        detailsDict['last_seen'] = i['currentStatus']['legacyNginxMetadata']['last_seen']
+        detailsDict['createtime'] = i['metadata']['createTime']
+        detailsDict['networkConfig'] = i['currentStatus']['networkConfig']
+        detailsDict['hostname'] = i['currentStatus']['hostname']
+        detailsDict['name'] = i['metadata']['name']
+        detailsDict['CVE'] = []
+        detailsDict['CVE'].append(allCVE)
+
+        allDetailsDict.append(detailsDict)
 
     if mode == 'JSON':
-      output = output + '{"location": "'+locName+'", "nginx_plus_online": '+str(online)+', "nginx_plus_offline": '+str(offline)+'}'
+      thisInstanceDict = {}
+      thisInstanceDict['location'] = locName
+      thisInstanceDict['nginx_plus_online'] = online
+      thisInstanceDict['nginx_plus_offline'] = offline
+
+      instancesDict.append(thisInstanceDict)
     elif mode == 'PROMETHEUS' or mode == 'PUSHGATEWAY':
       if mode == 'PROMETHEUS':
         output = output + '# HELP nginx_plus_online_instances Online NGINX Plus instances\n'
@@ -213,7 +211,12 @@ def ncInstances(fqdn,username,password,mode,proxy):
       output = output + 'nginx_plus_offline_instances{subscription="'+subscriptionId+'",instanceType="'+instanceType+'",instanceVersion="'+instanceVersion+'",location="'+locName+'"} '+str(offline)+'\n'
 
   if mode == 'JSON':
-    output = output + '], "details": [' + instanceDetails + ']}'
+    output = {}
+    output['subscription'] = subscriptionDict
+    output['instances'] = instancesDict
+    output['details'] = allDetailsDict
+
+    output = str(json.dumps(output))
 
   nginxControllerLogout(fqdn,sessionCookie,proxy)
 

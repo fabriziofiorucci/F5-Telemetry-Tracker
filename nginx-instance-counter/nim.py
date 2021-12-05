@@ -62,7 +62,7 @@ def nimInstances(fqdn,mode,proxy):
   instanceType=license['licenses'][0]['product_code']
   instanceVersion=system['version']
   instanceSerial=license['licenses'][0]['serial']
-  plusManaged=license['plus_instances_managed']
+  plusManaged=int(license['plus_instances_managed'])
   totalManaged=license['total_instances_managed']
 
   # Fetching instances
@@ -74,24 +74,28 @@ def nimInstances(fqdn,mode,proxy):
   output=''
 
   if mode == 'JSON':
-    output = '{ "subscription": {"id": "'+subscriptionId+'","type":"'+instanceType+'","version":"'+instanceVersion+'","serial":"'+instanceSerial+'"},' + \
-             '"instances": [ {"nginx_plus_online": '+plusManaged+', "nginx_oss_online": '+str(int(totalManaged)-int(plusManaged)) + \
-             '}],"details": ['
+    subscriptionDict = {}
+    subscriptionDict['id'] = subscriptionId
+    subscriptionDict['type'] = instanceType
+    subscriptionDict['version'] = instanceVersion
+    subscriptionDict['serial'] = instanceSerial
 
-    firstLoop=True
+    instancesDict = {}
+    instancesDict['nginx_plus_online'] = plusManaged
+    instancesDict['nginx_oss_online'] = int(totalManaged)-int(plusManaged)
+
+    output = {}
+    output['subscription'] = subscriptionDict
+    output['instances'] = instancesDict
+    output['details'] = []
+
 
     for i in instances['list']:
-
-      if firstLoop == True :
-        firstLoop=False
-      else:
-        output+=','
-
       # Parses /etc/nginx/nginx.conf to detect NGINX App Protect usage
       instanceId=i['instance_id']
       status,configFiles = nginxInstanceManagerRESTCall(method='GET',fqdn=fqdn,uri='/api/v0/instances/'+instanceId+'/config',proxy=proxy)
 
-      nginxModulesJSON=''
+      nginxModulesJSON = {}
 
       if status == 200:
         for configFile in configFiles['files']:
@@ -99,7 +103,6 @@ def nimInstances(fqdn,mode,proxy):
             fileContent=str(base64.b64decode(configFile['contents']))
 
             # Looks for modules in nginxModules "load_module modules/MODULE_NAME;"
-            mFirstLoop=True
             for module in nginxModules:
               modulePosition=fileContent.find(module)
 
@@ -113,31 +116,32 @@ def nimInstances(fqdn,mode,proxy):
                 loadModulePosition=moduleLine.find('load_module')
                 if loadModulePosition != -1:
                   if moduleLine.rfind('#',0,loadModulePosition) == -1:
-                    if mFirstLoop == True :
-                      mFirstLoop=False
-                    else:
-                      nginxModulesJSON+=','
-
-                    nginxModulesJSON+='"'+nginxModules[module]+'":"enabled"'
+                    nginxModulesJSON[nginxModules[module]] = True
+                  else:
+                    nginxModulesJSON[nginxModules[module]] = False
 
       # CVE tracking
       allCVE=cveDB.getNGINX(version=i['nginx']['version'].split(' ')[0])
 
-      output = output + '{ \
-        "instance_id": "' + instanceId + '", \
-        "uname": "'+i['uname'] + '", \
-        "containerized": "'+str(i['containerized']) + '", \
-        "type": "'+i['nginx']['type'] + '", \
-        "version": "'+i['nginx']['version'] + '", \
-        "last_seen": "'+i['lastseen']+'", \
-        "createtime": "'+i['added']+'", \
-        "modules": {'+nginxModulesJSON+'}, \
-        "networkconfig": { "host_ips": '+str(i['host_ips']).replace('\'','"')+'}, \
-        "hostname": "'+i['hostname']+'", \
-        "CVE":[' + json.dumps(allCVE) + '] \
-      }'
+      detailsDict = {}
+      detailsDict['instance_id'] = instanceId
+      detailsDict['uname'] = i['uname']
+      detailsDict['containerized'] = i['containerized']
+      detailsDict['type'] = i['nginx']['type']
+      detailsDict['version'] = i['nginx']['version']
+      detailsDict['last_seen'] = i['lastseen']
+      detailsDict['createtime'] = i['added']
+      detailsDict['modules'] = nginxModulesJSON
+      detailsDict['networkconfig'] = {}
+      detailsDict['networkconfig']['host_ips'] = i['host_ips']
+      detailsDict['hostname'] = i['hostname']
+      detailsDict['CVE'] = []
+      detailsDict['CVE'].append(allCVE)
 
-    output = output + ']}'
+      output['details'].append(detailsDict)
+
+    output = str(json.dumps(output))
+
   elif mode == 'PROMETHEUS' or mode == 'PUSHGATEWAY':
     if mode == 'PROMETHEUS':
       output = '# HELP nginx_oss_online_instances Online NGINX OSS instances\n'
@@ -149,6 +153,6 @@ def nimInstances(fqdn,mode,proxy):
       output = output + '# HELP nginx_plus_online_instances Online NGINX Plus instances\n'
       output = output + '# TYPE nginx_plus_online_instances gauge\n'
 
-    output = output + 'nginx_plus_online_instances{subscription="'+subscriptionId+'",instanceType="'+instanceType+'",instanceVersion="'+instanceVersion+'",instanceSerial="'+instanceSerial+'"} '+plusManaged+'\n'
+    output = output + 'nginx_plus_online_instances{subscription="'+subscriptionId+'",instanceType="'+instanceType+'",instanceVersion="'+instanceVersion+'",instanceSerial="'+instanceSerial+'"} '+str(plusManaged)+'\n'
 
   return output

@@ -15,7 +15,7 @@ pip install requests
 - Package the source files in `/portable/src`
 
 ```
-python3 -m nuitka --plugin-enable=numpy --onefile app.py
+python3 -m nuitka --onefile app.py
 ```
 
 - Edit and use the provided `nicstart.sh` script to run the generated image

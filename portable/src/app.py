@@ -139,7 +139,7 @@ def scheduledEmail(email_server, email_server_port, email_server_type, email_aut
 
         except:
             e = sys.exc_info()[0]
-            print(datetime.datetime.now(), 'Sending email stats to', url, 'failed:', e)
+            print(datetime.datetime.now(), 'Sending email stats to',email_recipient,'failed:', e)
 
         time.sleep(email_interval)
 

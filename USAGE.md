@@ -25,7 +25,7 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
     {
       "instance_id": "c613e90d-3051-4090-b9cd-a32cb725b785",
       "uname": "Linux vm-gw 5.7.6 #1 SMP PREEMPT Fri Jun 26 17:39:22 CEST 2020 x86_64 QEMU Virtual CPU version 2.5+ AuthenticAMD GNU/Linux",
-      "containerized": "False",
+      "containerized": False,
       "type": "oss",
       "version": "1.20.1",
       "last_seen": "2021-08-31T11:37:04.587986759Z",
@@ -81,7 +81,7 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
     {
       "instance_id": "2933d801-02f6-4a1e-bd76-213e6a723235",
       "uname": "linux Ubuntu 18.04.5 LTS (Bionic Beaver) x86_64 QEMU Virtual CPU version 2.5+",
-      "containerized": "True",
+      "containerized": True,
       "type": "plus",
       "version": "1.19.10",
       "last_seen": "2021-08-22T08:32:52.058499Z",
@@ -107,7 +107,7 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
     {
       "instance_id": "61b945d0-6e4d-4225-a91f-52ae36b290cc",
       "uname": "linux Ubuntu 18.04.5 LTS (Bionic Beaver) x86_64 QEMU Virtual CPU version 2.5+",
-      "containerized": "True",
+      "containerized": True,
       "type": "plus",
       "version": "1.19.10",
       "last_seen": "2021-09-15T16:37:48.566275Z",
@@ -133,7 +133,7 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
     {
       "instance_id": "e56260de-691f-4585-a4f5-9f6a93095f73",
       "uname": "linux Ubuntu 18.04.5 LTS (Bionic Beaver) x86_64 QEMU Virtual CPU version 2.5+",
-      "containerized": "True",
+      "containerized": True,
       "type": "plus",
       "version": "1.19.10",
       "last_seen": "2021-08-22T08:33:31.006875Z",
@@ -159,7 +159,7 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
     {
       "instance_id": "fb67428e-40f6-43a8-bcda-0621ee0d4331",
       "uname": "linux Ubuntu 18.04.5 LTS (Bionic Beaver) x86_64 QEMU Virtual CPU version 2.5+",
-      "containerized": "True",
+      "containerized": True,
       "type": "plus",
       "version": "1.19.10",
       "last_seen": "2021-09-15T16:37:46.244602Z",
@@ -185,7 +185,7 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
     {
       "instance_id": "d78c7b6c-bde3-458c-933d-847d023bb2d5",
       "uname": "linux Ubuntu 20.04.3 LTS (Focal Fossa) x86_64 QEMU Virtual CPU version 2.5+",
-      "containerized": "False",
+      "containerized": False,
       "type": "plus",
       "version": "1.19.10",
       "last_seen": "2021-09-13T22:01:05.598863Z",
@@ -218,7 +218,7 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
     {
       "instance_id": "ada757cf-df90-4125-b966-8db891431835",
       "uname": "linux Ubuntu 18.04.5 LTS (Bionic Beaver) x86_64 QEMU Virtual CPU version 2.5+",
-      "containerized": "True",
+      "containerized": True,
       "type": "plus",
       "version": "1.19.10",
       "last_seen": "2021-08-19T09:57:52.472761Z",
@@ -244,7 +244,7 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
     {
       "instance_id": "c9409b38-17d8-4345-9f31-b37f816195a8",
       "uname": "linux Ubuntu 18.04.5 LTS (Bionic Beaver) x86_64 QEMU Virtual CPU version 2.5+",
-      "containerized": "True",
+      "containerized": True,
       "type": "plus",
       "version": "1.19.10",
       "last_seen": "2021-08-19T09:57:53.956519Z",
@@ -425,8 +425,8 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
       "version": "16.1.0",
       "edition": "Final",
       "build": "0.0.19",
-      "isVirtual": "True",
-      "isClustered": "False",
+      "isVirtual": True,
+      "isClustered": False,
       "platformMarketingName": "BIG-IP Virtual Edition",
       "restFrameworkVersion": "16.1.0-0.0.19",
       "inventoryTimestamp": "1636713114979",

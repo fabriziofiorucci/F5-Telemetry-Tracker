@@ -15,7 +15,7 @@ pip install requests
 - Package the source files in `/portable/src`
 
 ```
-python -m nuitka --plugin-enable=numpy --onefile --mingw64 app.py
+python -m nuitka --onefile --mingw64 app.py
 ```
 
 - Edit and use the provided `nicstart.bat` script to run the generated image
