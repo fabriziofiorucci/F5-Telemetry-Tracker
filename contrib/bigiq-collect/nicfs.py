@@ -62,6 +62,12 @@ def getDeviceInventoryResults(inventoryId):
 def getMachineIdResolver(machineId):
   return getFileContent("machineid-resolver-"+machineId+".json")
 
+@app.route('/mgmt/ap/query/v1/tenants/default/products/device/metric-query', methods=['POST'])
+def getDeviceMetric():
+  content = request.get_json(silent=True)
+
+  return getFileContent("telemetry-"+content['module']+"-"+content['timeRange']['from']+".json")
+
 @app.route('/mgmt/shared/authn/login', methods=['POST'])
 def bigiqLogin():
   return jsonify({

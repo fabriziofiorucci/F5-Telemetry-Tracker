@@ -39,6 +39,48 @@ do
 	restcurl -u $BIGIQ_USERNAME:$BIGIQ_PASSWORD /mgmt/cm/system/machineid-resolver/$M > $OUTPUTDIR/machineid-resolver-$M.json
 done
 
+echo "-> Reading device telemetry"
+ALL_TELEMETRY="
+bigip-cpu|cpu-usage|-1H
+bigip-cpu|cpu-usage|-1W
+bigip-cpu|cpu-usage|-1M
+bigip-memory|free-ram|-1H
+bigip-memory|free-ram|-1W
+bigip-memory|free-ram|-1M
+"
+
+AUTH_TOKEN=`curl -ks -X POST 'https://127.0.0.1/mgmt/shared/authn/login' -H 'Content-Type: text/plain' -d '{"username": "'$BIGIQ_USERNAME'","password": "'$BIGIQ_PASSWORD'"}' | jq '.token.token' -r`
+
+for T in $ALL_TELEMETRY
+do
+	T_MODULE=`echo $T | awk -F\| '{print $1}'`
+	T_METRICSET=`echo $T | awk -F\| '{print $2}'`
+	T_TIMERANGE=`echo $T | awk -F\| '{print $3}'`
+
+	echo "- $T_MODULE / $T_METRICSET / $T_TIMERANGE"
+
+	TELEMETRY_JSON='{
+    "kind": "ap:query:stats:byEntities",
+    "module": "'$T_MODULE'",
+    "timeRange": {
+            "from": "'$T_TIMERANGE'",
+            "to": "now"
+    },
+    "dimension": "hostname",
+    "aggregations": {
+            "'$T_METRICSET'$avg-value-per-event": {
+                    "metricSet": "'$T_METRICSET'",
+                    "metric": "avg-value-per-event"
+            }
+    },
+    "limit": 5
+}'
+
+	TELEMETRY_OUTPUT=`curl -ks -X POST https://127.0.0.1/mgmt/ap/query/v1/tenants/default/products/device/metric-query -H 'X-F5-Auth-Token: '$AUTH_TOKEN -H 'Content-Type: application/json' -d "$TELEMETRY_JSON"`
+
+	echo $TELEMETRY_OUTPUT > $OUTPUTDIR/telemetry-$T_MODULE-$T_TIMERANGE.json
+done
+
 echo "-> Data collection completed, building tarfile"
 TARFILE=$OUTPUTROOT/`date +"%Y%m%d-%H%M"`-bigIQCollect.tgz
 tar zcmf $TARFILE $OUTPUTDIR 2>/dev/null
