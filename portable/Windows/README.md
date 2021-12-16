@@ -18,6 +18,8 @@ pip install requests
 python -m nuitka --onefile --mingw64 app.py
 ```
 
+- Rename `app.exe` to `NGINX-InstanceCounter.exe` and move it to /portable/Linux
+
 - Edit and use the provided `nicstart.bat` script to run the generated image
 
 - Upon startup Windows will ask to allow traffic from the image to NGINX Instance Manager, NGINX Controller or BIG-IQ: all traffic is sent to NIM/NC/BIG-IQ management IP address and port (configurabile from `nicstart.bat`)

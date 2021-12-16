@@ -18,6 +18,12 @@ pip install requests
 python3 -m nuitka --onefile app.py
 ```
 
+- Rename `app.bin` to `NGINX-InstanceCounter.AppImage` and move it to /portable/Linux
+
+```
+mv app.bin ../Linux/NGINX-InstanceCounter.AppImage
+```
+
 - Edit and use the provided `nicstart.sh` script to run the generated image
 - When the NGINX Instance Counter has started, it can be queried sending GET requests to:
   - http://127.0.0.1:5000/instances or http://127.0.0.1:5000/counter/instances for JSON reporting.
