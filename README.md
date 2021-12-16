@@ -62,7 +62,7 @@ Push mode: Instance Counter pushes stats to a remote data collection and visuali
 The NGINX Instance Counter image is available on Docker Hub as:
 
 ```
-fiorucci/nginx-instance-counter:4.9
+fiorucci/nginx-instance-counter:5.0
 ```
 
 The 1.instancecounter.yaml file references that by default.
@@ -73,8 +73,8 @@ If you need to build and push NGINX your own image to a private registry:
 git clone fabriziofiorucci/NGINX-InstanceCounter
 cd NGINX-InstanceCounter/nginx-instance-counter
 
-docker build --no-cache -t PRIVATE_REGISTRY:PORT/nginx-instance-counter:4.9 .
-docker push PRIVATE_REGISTRY:PORT/nginx-instance-counter:4.9
+docker build --no-cache -t PRIVATE_REGISTRY:PORT/nginx-instance-counter:5.0 .
+docker push PRIVATE_REGISTRY:PORT/nginx-instance-counter:5.0
 ```
 
 ## As a native python application
@@ -83,7 +83,8 @@ NGINX Instance Counter requires:
 
 - Any Linux distribution
 - Python 3 (tested on 3.9+)
-- [Flask framework](https://flask.palletsprojects.com/en/2.0.x/)
+- [FastAPI](https://fastapi.tiangolo.com/)
+- [Uvicorn](https://www.uvicorn.org/)
 - [Requests](https://docs.python-requests.org/en/master/)
 - [XLSX Writer](https://pypi.org/project/XlsxWriter/)
 - [Pandas](https://pandas.pydata.org/)

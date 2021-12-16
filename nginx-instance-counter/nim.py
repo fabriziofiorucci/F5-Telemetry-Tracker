@@ -1,5 +1,3 @@
-import flask
-from flask import Flask, jsonify, abort, make_response, request, Response
 import os
 import sys
 import ssl
@@ -27,7 +25,7 @@ nginxModules = {
 
 ### NGINX Instance Manager REST API
 
-def nginxInstanceManagerRESTCall(method,fqdn,uri,proxy):
+def nimRESTCall(method,fqdn,uri,proxy):
   s = Session()
   req = Request(method,fqdn+uri)
 
@@ -48,15 +46,15 @@ def nginxInstanceManagerRESTCall(method,fqdn,uri,proxy):
 # Returns NGINX OSS/Plus instances managed by NIM in JSON format
 def nimInstances(fqdn,mode,proxy):
   # Fetching NIM license
-  status,license = nginxInstanceManagerRESTCall(method='GET',fqdn=fqdn,uri='/api/v0/about/license',proxy=proxy)
+  status,license = nimRESTCall(method='GET',fqdn=fqdn,uri='/api/v0/about/license',proxy=proxy)
 
   if status != 200:
-    return make_response(jsonify({'error': 'fetching license failed'}), 401)
+    return {'error': 'fetching license failed'},status
 
   # Fetching NIM system information
-  status,system = nginxInstanceManagerRESTCall(method='GET',fqdn=fqdn,uri='/api/v0/about/system',proxy=proxy)
+  status,system = nimRESTCall(method='GET',fqdn=fqdn,uri='/api/v0/about/system',proxy=proxy)
   if status != 200:
-    return make_response(jsonify({'error': 'fetching system information failed'}), 401)
+    return {'error': 'fetching system information failed'},status
 
   subscriptionId=license['attributes']['subscription']
   instanceType=license['licenses'][0]['product_code']
@@ -66,10 +64,10 @@ def nimInstances(fqdn,mode,proxy):
   totalManaged=license['total_instances_managed']
 
   # Fetching instances
-  status,instances = nginxInstanceManagerRESTCall(method='GET',fqdn=fqdn,uri='/api/v0/instances',proxy=proxy)
+  status,instances = nimRESTCall(method='GET',fqdn=fqdn,uri='/api/v0/instances',proxy=proxy)
 
   if status != 200:
-    return make_response(jsonify({'error': 'instances fetch error'}), 404)
+    return {'error': 'instances fetch error'},status
 
   output=''
 
@@ -93,7 +91,7 @@ def nimInstances(fqdn,mode,proxy):
     for i in instances['list']:
       # Parses /etc/nginx/nginx.conf to detect NGINX App Protect usage
       instanceId=i['instance_id']
-      status,configFiles = nginxInstanceManagerRESTCall(method='GET',fqdn=fqdn,uri='/api/v0/instances/'+instanceId+'/config',proxy=proxy)
+      status,configFiles = nimRESTCall(method='GET',fqdn=fqdn,uri='/api/v0/instances/'+instanceId+'/config',proxy=proxy)
 
       nginxModulesJSON = {}
 
@@ -140,8 +138,6 @@ def nimInstances(fqdn,mode,proxy):
 
       output['details'].append(detailsDict)
 
-    output = str(json.dumps(output))
-
   elif mode == 'PROMETHEUS' or mode == 'PUSHGATEWAY':
     if mode == 'PROMETHEUS':
       output = '# HELP nginx_oss_online_instances Online NGINX OSS instances\n'
@@ -155,4 +151,4 @@ def nimInstances(fqdn,mode,proxy):
 
     output = output + 'nginx_plus_online_instances{subscription="'+subscriptionId+'",instanceType="'+instanceType+'",instanceVersion="'+instanceVersion+'",instanceSerial="'+instanceSerial+'"} '+str(plusManaged)+'\n'
 
-  return output
+  return output,200

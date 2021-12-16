@@ -1,7 +1,8 @@
 #!/usr/bin/python3
 
-import flask
-from flask import Flask, jsonify, abort, make_response, request, Response, send_file
+import uvicorn
+from fastapi import FastAPI, Response
+from fastapi.responses import JSONResponse,StreamingResponse
 import os
 import sys
 import ssl
@@ -11,26 +12,27 @@ import requests
 import time
 import threading
 import smtplib
+import mimetypes
 import urllib3.exceptions
 import base64
 from requests import Request, Session
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from email.message import EmailMessage
 
-# BIG-IQ, NGINX Controller and NGINX Instance Manager modules
+# All modules
 import bigiq
 import nc
 import nim
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
-app = Flask(__name__)
+app = FastAPI()
 
 nc_mode = os.environ['NGINX_CONTROLLER_TYPE']
 nc_fqdn = os.environ['NGINX_CONTROLLER_FQDN']
 nc_user = os.environ['NGINX_CONTROLLER_USERNAME']
 nc_pass = os.environ['NGINX_CONTROLLER_PASSWORD']
-
+proxyDict = {}
 
 # Scheduler for automated statistics push / call home
 def scheduledPush(url, username, password, interval, pushmode):
@@ -42,27 +44,25 @@ def scheduledPush(url, username, password, interval, pushmode):
         try:
             if nc_mode == 'NGINX_CONTROLLER':
                 if pushmode == 'CUSTOM':
-                    payload = nc.ncInstances(fqdn=nc_fqdn, username=nc_user, password=nc_pass, mode='JSON',
-                                             proxy=proxyDict)
+                    payload,code = nc.ncInstances(fqdn=nc_fqdn, username=nc_user, password=nc_pass, mode='JSON', proxy=proxyDict)
                 elif pushmode == 'NGINX_PUSH':
-                    payload = nc.ncInstances(fqdn=nc_fqdn, username=nc_user, password=nc_pass, mode='PUSHGATEWAY',
-                                             proxy=proxyDict)
+                    payload,code = nc.ncInstances(fqdn=nc_fqdn, username=nc_user, password=nc_pass, mode='PUSHGATEWAY', proxy=proxyDict)
             elif nc_mode == 'NGINX_INSTANCE_MANAGER':
                 if pushmode == 'CUSTOM':
-                    payload = nim.nimInstances(fqdn=nc_fqdn, mode='JSON', proxy=proxyDict)
+                    payload,code = nim.nimInstances(fqdn=nc_fqdn, mode='JSON', proxy=proxyDict)
                 elif pushmode == 'NGINX_PUSH':
-                    payload = nim.nimInstances(fqdn=nc_fqdn, mode='PUSHGATEWAY', proxy=proxyDict)
+                    payload,code = nim.nimInstances(fqdn=nc_fqdn, mode='PUSHGATEWAY', proxy=proxyDict)
             elif nc_mode == 'BIG_IQ':
                 if pushmode == 'CUSTOM':
-                    payload = bigiq.bigIqInventory(mode='JSON')
+                    payload,code = bigiq.bigIqInventory(mode='JSON')
                 elif pushmode == 'NGINX_PUSH':
-                    payload = bigiq.bigIqInventory(mode='PUSHGATEWAY')
+                    payload,code = bigiq.bigIqInventory(mode='PUSHGATEWAY')
 
             try:
                 if username == '' or password == '':
                     if pushmode == 'CUSTOM':
                         # Push json to custom URL
-                        r = requests.post(url, data=payload, headers={'Content-Type': 'application/json'}, timeout=10,
+                        r = requests.post(url, data=json.dumps(payload), headers={'Content-Type': 'application/json'}, timeout=10,
                                           proxies=proxyDict)
                     elif pushmode == 'NGINX_PUSH':
                         # Push to pushgateway
@@ -70,7 +70,7 @@ def scheduledPush(url, username, password, interval, pushmode):
                 else:
                     if pushmode == 'CUSTOM':
                         # Push json to custom URL with basic auth
-                        r = requests.post(url, auth=(username, password), data=payload,
+                        r = requests.post(url, auth=(username, password), data=json.dumps(payload),
                                           headers={'Content-Type': 'application/json'}, timeout=10, proxies=proxyDict)
                     elif pushmode == 'NGINX_PUSH':
                         # Push to pushgateway
@@ -96,19 +96,17 @@ def scheduledEmail(email_server, email_server_port, email_server_type, email_aut
     while True:
         try:
             if nc_mode == 'NGINX_CONTROLLER':
-                payload = nc.ncInstances(fqdn=nc_fqdn, username=nc_user, password=nc_pass, mode='JSON', proxy=proxyDict)
-                jsonPayload = json.loads(payload)
-                subscriptionId = '[' + jsonPayload['subscription']['id'] + '] '
+                payload,code = nc.ncInstances(fqdn=nc_fqdn, username=nc_user, password=nc_pass, mode='JSON', proxy=proxyDict)
+                subscriptionId = '[' + payload['subscription']['id'] + '] '
                 subjectPostfix = 'NGINX Usage Reporting'
                 attachname = 'nginx_report.json'
             elif nc_mode == 'NGINX_INSTANCE_MANAGER':
-                payload = nim.nimInstances(fqdn=nc_fqdn, mode='JSON', proxy=proxyDict)
-                jsonPayload = json.loads(payload)
-                subscriptionId = '[' + jsonPayload['subscription']['id'] + '] '
+                payload,code = nim.nimInstances(fqdn=nc_fqdn, mode='JSON', proxy=proxyDict)
+                subscriptionId = '[' + payload['subscription']['id'] + '] '
                 subjectPostfix = 'NGINX Usage Reporting'
                 attachname = 'nginx_report.json'
             elif nc_mode == 'BIG_IQ':
-                payload = bigiq.bigIqInventory(mode='JSON')
+                payload,code = bigiq.bigIqInventory(mode='JSON')
                 subscriptionId = ''
                 subjectPostfix = 'BIG-IP Usage Reporting'
                 attachname = 'bigip_report.json'
@@ -120,7 +118,10 @@ def scheduledEmail(email_server, email_server_port, email_server_type, email_aut
             message['From'] = email_sender
             message['To'] = email_recipient
             message.set_content('This is the ' + subjectPostfix + ' for ' + dateNow)
-            message.add_attachment(payload, filename=attachname)
+
+            attachment = json.dumps(payload)
+            bs = attachment.encode('utf-8')
+            message.add_attachment(bs,maintype='application',subtype='json',filename=attachname)
 
             if email_server_type == 'ssl':
                 context = ssl._create_unverified_context()
@@ -138,52 +139,64 @@ def scheduledEmail(email_server, email_server_port, email_server_type, email_aut
             print(datetime.datetime.now(), 'Reporting email successfully sent to', email_recipient)
 
         except:
-            e = sys.exc_info()[0]
-            print(datetime.datetime.now(), 'Sending email stats to',email_recipient,'failed:', e)
+            print(datetime.datetime.now(), 'Sending email stats to',email_recipient,'failed:', sys.exc_info())
 
         time.sleep(email_interval)
 
 
 # Returns stats in json format
-@app.route('/instances', methods=['GET'])
-@app.route('/counter/instances', methods=['GET'])
+@app.get("/instances")
+@app.get("/counter/instances")
 def getInstances():
     if nc_mode == 'NGINX_CONTROLLER':
-        return Response(nc.ncInstances(fqdn=nc_fqdn, username=nc_user, password=nc_pass, mode='JSON', proxy=proxyDict),
-                        mimetype='application/json')
+        reply,code = nc.ncInstances(fqdn=nc_fqdn, username=nc_user, password=nc_pass, mode='JSON', proxy=proxyDict)
     elif nc_mode == 'NGINX_INSTANCE_MANAGER':
-        return Response(nim.nimInstances(fqdn=nc_fqdn, mode='JSON', proxy=proxyDict), mimetype='application/json')
+        reply,code = nim.nimInstances(fqdn=nc_fqdn, mode='JSON', proxy=proxyDict)
     elif nc_mode == 'BIG_IQ':
-        return Response(bigiq.bigIqInventory(mode='JSON'), mimetype='application/json')
+        reply,code = bigiq.bigIqInventory(mode='JSON')
 
+    return JSONResponse(content=reply,status_code=code)
 
 # Returns stats in prometheus format
-@app.route('/metrics', methods=['GET'])
-@app.route('/counter/metrics', methods=['GET'])
+@app.get("/metrics")
+@app.get("/counter/metrics")
 def getMetrics():
     if nc_mode == 'NGINX_CONTROLLER':
-        return nc.ncInstances(fqdn=nc_fqdn, username=nc_user, password=nc_pass, mode='PROMETHEUS', proxy=proxyDict)
+        reply,code = nc.ncInstances(fqdn=nc_fqdn, username=nc_user, password=nc_pass, mode='PROMETHEUS', proxy=proxyDict)
     elif nc_mode == 'NGINX_INSTANCE_MANAGER':
-        return nim.nimInstances(fqdn=nc_fqdn, mode='PROMETHEUS', proxy=proxyDict)
+        reply,code = nim.nimInstances(fqdn=nc_fqdn, mode='PROMETHEUS', proxy=proxyDict)
     elif nc_mode == 'BIG_IQ':
-        return bigiq.bigIqInventory(mode='PROMETHEUS')
+        reply,code = bigiq.bigIqInventory(mode='PROMETHEUS')
+
+    return Response(content=reply,media_type="text/plain")
 
 
-# Reporting
-@app.route('/reporting/<string:reportingType>', methods=['GET'])
-@app.route('/counter/reporting/<string:reportingType>', methods=['GET'])
-def getReporting(reportingType):
+@app.get("/reporting/{reportingType}")
+@app.get("/counter/reporting/{reportingType}")
+def getReporting(reportingType: str):
     if nc_mode == 'BIG_IQ':
         if reportingType == 'xls':
-            xlsfile=bigiq.xlsReport(instancesJson=bigiq.bigIqInventory(mode='JSON'))
-            return send_file(xlsfile, download_name="bigiq-report.xlsx", as_attachment=True)
+            instancesJson,code = bigiq.bigIqInventory(mode='JSON')
 
-    return make_response('',406)
+            if code != 200:
+                return JSONResponse(content=json.dumps(instancesJson),status_code=code)
+
+            xlsfile=bigiq.xlsReport(instancesJson)
+            headers = {
+                'Content-Disposition': 'attachment; filename="bigiq-report.xlsx"'
+            }
+
+            return StreamingResponse(xlsfile, headers=headers)
+
+    return JSONResponse(content={'error': 'Not found'},status_code=404)
 
 
-@app.errorhandler(404)
-def not_found(error):
-    return make_response(jsonify({'error': 'Not found'}), 404)
+@app.get("/{uri}")
+@app.post("/{uri}")
+@app.put("/{uri}")
+@app.delete("/{uri}")
+def not_found(uri: str):
+  return JSONResponse(content={'error': 'Not found',},status_code=404)
 
 
 if __name__ == '__main__':
@@ -284,4 +297,4 @@ if __name__ == '__main__':
         if "NIC_ADDRESS" in os.environ:
             nicAddress = os.environ['NIC_ADDRESS']
 
-        app.run(host=nicAddress, port=nicPort)
+        uvicorn.run("app:app", host=nicAddress, port=nicPort)

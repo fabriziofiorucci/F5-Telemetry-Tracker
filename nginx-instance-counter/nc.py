@@ -1,5 +1,3 @@
-import flask
-from flask import Flask, jsonify, abort, make_response, request, Response
 import os
 import sys
 import ssl
@@ -117,12 +115,12 @@ def ncInstances(fqdn,username,password,mode,proxy):
   # NGINX Controller login
   status,sessionCookie = nginxControllerLogin(fqdn,username,password,proxy)
   if status != 204:
-    return make_response(jsonify({'error': 'authentication failed'}), 401)
+    return {'error': 'authentication failed'},status
 
   # Fetches controller license
   status,license = nginxControllerLicense(fqdn,sessionCookie,proxy)
   if status != 200:
-    return make_response(jsonify({'error': 'fetching license failed'}), 401)
+    return {'error': 'fetching license failed'},status
 
   subscriptionId=license['currentStatus']['subscription']['id']
   instanceType=license['currentStatus']['state']['currentInstance']['type']
@@ -131,7 +129,7 @@ def ncInstances(fqdn,username,password,mode,proxy):
   # Fetches ocations
   status,locations = nginxControllerLocations(fqdn,sessionCookie,proxy)
   if status != 200:
-    return make_response(jsonify({'error': 'locations fetch error'}), 404)
+    return {'error': 'locations fetch error'},status
 
   if mode == 'JSON':
     subscriptionDict = {}
@@ -151,7 +149,7 @@ def ncInstances(fqdn,username,password,mode,proxy):
     # Iterates and counts online instances
     status,instances = nginxControllerInstances(fqdn,sessionCookie,locName,proxy)
     if status != 200:
-      return make_response(jsonify({'error': 'instances fetch error'}), 404)
+      return {'error': 'instances fetch error'},status
 
     online = 0
     offline = 0
@@ -216,8 +214,6 @@ def ncInstances(fqdn,username,password,mode,proxy):
     output['instances'] = instancesDict
     output['details'] = allDetailsDict
 
-    output = str(json.dumps(output))
-
   nginxControllerLogout(fqdn,sessionCookie,proxy)
 
-  return output
+  return output,200

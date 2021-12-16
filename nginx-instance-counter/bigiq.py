@@ -1,5 +1,3 @@
-import flask
-from flask import Flask, jsonify, abort, make_response, request, Response
 import os
 import sys
 import ssl
@@ -104,7 +102,7 @@ def scheduledInventory():
 
 # Reporting
 def xlsReport(instancesJson):
-  iJson=json.loads(instancesJson)
+  iJson=instancesJson
 
   #print("-- Importing JSON")
   f5AllDetails = pd.DataFrame(iJson['details'])
@@ -229,7 +227,6 @@ def xlsReport(instancesJson):
 
   Excelwriter.close()
   outputfile.seek(0)
-  #Excelwriter.save()
 
   return outputfile
 
@@ -306,7 +303,7 @@ def bigIqInventory(mode):
 
   status,details = bigIQInstances()
   if status != 200:
-    return make_response(jsonify(details), status)
+    return details,status
 
   output=''
 
@@ -450,7 +447,7 @@ def bigIqInventory(mode):
     output['telemetry'] = []
     output['telemetry'] = bigIqTelemetry(mode)
 
-    output=str(json.dumps(output))
+    #output=str(json.dumps(output))
 
   elif mode == 'PROMETHEUS' or mode == 'PUSHGATEWAY':
     if mode == 'PROMETHEUS':
@@ -459,7 +456,7 @@ def bigIqInventory(mode):
 
     output = output + 'bigip_online_instances{instanceType="BIG-IQ",bigiq_url="'+bigiq_fqdn+'"} '+str(len(details['items']))+'\n'
 
-  return output
+  return output,200
 
 
 # Builds BIG-IQ telemetry request body
