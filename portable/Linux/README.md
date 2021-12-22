@@ -2,6 +2,12 @@
 
 Portable images have been built using [Nuitka](https://nuitka.net/) and can be downloaded from the [releases page](https://github.com/fabriziofiorucci/NGINX-InstanceCounter/releases)
 
+Supported control planes:
+
+ -  NGINX Controller 3.18, 3.18.2, apim-3.19.2
+ -  NGINX Instance Manager 1.0.1, 1.0.2, 1.0.3, 1.0.4
+ -  BIG-IQ 8.1.0, 8.1.0.2
+
 Steps to (re)build:
 
 - Setup nuitka
