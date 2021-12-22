@@ -7,7 +7,7 @@ This tool helps tracking NGINX Plus instances managed by NGINX Controller and NG
 It has been tested against:
 
 - NGINX Controller 3.18, 3.18.2, apim-3.19.2
-- NGINX Instance Manager 1.0.1, 1.0.2, 1.0.3, 1.0.4
+- NGINX Instance Manager 1.0.1, 1.0.2, 1.0.3, 1.0.4, 2.0
 - BIG-IQ 8.1.0, 8.1.0.2
 
 Communication to NGINX Controller / NGINX Instance Manager / BIG-IQ is based on REST API, current features are:
@@ -50,7 +50,7 @@ Push mode: Instance Counter pushes stats to a remote data collection and visuali
 - Private registry to push the NGINX Instance Counter image
 - One of:
   - NGINX Controller 3.18, 3.18.2, apim-3.19.2
-  - NGINX Instance Manager 1.0.1, 1.0.2, 1.0.3, 1.0.4
+  - NGINX Instance Manager 1.0.1, 1.0.2, 1.0.3, 1.0.4, 2.0
   - BIG-IQ 8.1.0, 8.1.0.2
 - SMTP server if automated email reporting is used
 - NIST NVD REST API Key for full CVE tracking (https://nvd.nist.gov/developers/request-an-api-key)
@@ -62,7 +62,7 @@ Push mode: Instance Counter pushes stats to a remote data collection and visuali
 The NGINX Instance Counter image is available on Docker Hub as:
 
 ```
-fiorucci/nginx-instance-counter:5.0
+fiorucci/nginx-instance-counter:5.1
 ```
 
 The 1.instancecounter.yaml file references that by default.
@@ -73,8 +73,8 @@ If you need to build and push NGINX your own image to a private registry:
 git clone fabriziofiorucci/NGINX-InstanceCounter
 cd NGINX-InstanceCounter/nginx-instance-counter
 
-docker build --no-cache -t PRIVATE_REGISTRY:PORT/nginx-instance-counter:5.0 .
-docker push PRIVATE_REGISTRY:PORT/nginx-instance-counter:5.0
+docker build --no-cache -t PRIVATE_REGISTRY:PORT/nginx-instance-counter:5.1 .
+docker push PRIVATE_REGISTRY:PORT/nginx-instance-counter:5.1
 ```
 
 ## As a native python application
@@ -122,8 +122,8 @@ Edit `1.instancecounter.yaml` to customize:
 | HTTP_PROXY| to be set if HTTP proxy must be used to connect to NGINX Controller, NGINX Instance Manager or BIG-IQ
 | HTTPS_PROXY| to be set if HTTPS proxy must be used to connect to NGINX Controller, NGINX Instance Manager or BIG-IQ
 | NIST_API_KEY| API Key for full NIST NVD CVE tracking (get your key at https://nvd.nist.gov/developers/request-an-api-key)
-| NGINX_CONTROLLER_TYPE| can be NGINX_CONTROLLER, NGINX_INSTANCE_MANAGER or BIG_IQ
-| NGINX_CONTROLLER_FQDN| the FQDN of your NGINX Controller / NGINX Instance Manager / BIG-IQ instance| format must be http[s]://FQDN:port
+| NGINX_CONTROLLER_TYPE| can be NGINX_CONTROLLER, NGINX_INSTANCE_MANAGER (NIM 1.x), NGINX_MANAGEMENT_SYSTEM (NIM 2.x) or BIG_IQ
+| NGINX_CONTROLLER_FQDN| the FQDN of your NGINX Controller / NGINX Instance Manager 1.x-2.x / BIG-IQ instance| format must be http[s]://FQDN:port
 | NGINX_CONTROLLER_USERNAME| the username for authentication
 | NGINX_CONTROLLER_PASSWORD| the password for authentication
 | STATS_PUSH_ENABLE | if set to "true" push mode is enabled, disabled if set to "false" |

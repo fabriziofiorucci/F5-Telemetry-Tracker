@@ -4,7 +4,7 @@
 
 To get instance statistics in JSON format:
 
-NGINX Instance Manager
+NGINX Instance Manager 1.x
 
 ```
 $ curl -s http://counter.nginx.ff.lan/instances | jq
@@ -42,6 +42,90 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
         ]
       },
       "hostname": "vm-gw",
+      "CVE": [
+        {}
+      ]
+    }
+  ]
+}
+```
+
+NGINX Instance Manager 2.x
+
+```
+$ curl -s http://counter.nginx.ff.lan/instances | jq 
+{
+  "subscription": {
+    "id": "NGX-Subscription-1-TRL-XXXXXX",
+    "type": "INSTANCE_MANAGER",
+    "version": "",
+    "serial": ""
+  },
+  "instances": {
+    "nginx_plus_online": 0,
+    "nginx_oss_online": 1
+  },
+  "details": [
+    {
+      "instance_id": "5b110d0d-a2e7-5d93-ae2b-2b908b169d46",
+      "osInfo": {
+        "name": "ubuntu",
+        "version": "5.4.0-90-generic",
+        "versionId": "20.04"
+      },
+      "containerized": "",
+      "type": "oss",
+      "version": "1.18.0",
+      "last_seen": "2021-12-21T23:42:45.961293545Z",
+      "createtime": "2021-12-09T21:47:19Z",
+      "modules": [
+        "ngx_http_image_filter_module",
+        "ngx_http_xslt_filter_module",
+        "ngx_mail_module",
+        "ngx_stream_module"
+      ],
+      "networkconfig": {
+        "networkInterfaces": [
+          {
+            "ipv4AddressList": [
+              {
+                "address": "127.0.0.1",
+                "netmask": "255.0.0.0",
+                "prefixLen": 8
+              }
+            ],
+            "ipv6AddressList": [
+              {
+                "address": "::1",
+                "netmask": "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff",
+                "prefixLen": 128
+              }
+            ],
+            "macAddress": "de:ad:be:ef:ff:25",
+            "name": "ens3"
+          },
+          {
+            "ipv4AddressList": [
+              {
+                "address": "192.168.1.25",
+                "netmask": "255.255.255.0",
+                "prefixLen": 24
+              }
+            ],
+            "ipv6AddressList": [
+              {
+                "address": "fe80::dcad:beff:feef:ff25",
+                "netmask": "ffff:ffff:ffff:ffff::",
+                "prefixLen": 64
+              }
+            ],
+            "macAddress": "de:ad:be:ef:ff:25",
+            "name": "ens3"
+          }
+        ]
+      },
+      "hostname": "devel",
+      "name": "devel",
       "CVE": [
         {}
       ]
