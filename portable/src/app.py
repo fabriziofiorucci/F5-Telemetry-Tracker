@@ -21,6 +21,7 @@ from email.message import EmailMessage
 import bigiq
 import nc
 import nim
+import nms
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
@@ -52,6 +53,11 @@ def scheduledPush(url, username, password, interval, pushmode):
                     payload = nim.nimInstances(fqdn=nc_fqdn, mode='JSON', proxy=proxyDict)
                 elif pushmode == 'NGINX_PUSH':
                     payload = nim.nimInstances(fqdn=nc_fqdn, mode='PUSHGATEWAY', proxy=proxyDict)
+            elif nc_mode == 'NGINX_MANAGEMENT_SYSTEM':
+                if pushmode == 'CUSTOM':
+                    payload = nms.nmsInstances(mode='JSON')
+                elif pushmode == 'NGINX_PUSH':
+                    payload = nms.nmsInstances(mode='PUSHGATEWAY')
             elif nc_mode == 'BIG_IQ':
                 if pushmode == 'CUSTOM':
                     payload = bigiq.bigIqInventory(mode='JSON')
@@ -107,6 +113,12 @@ def scheduledEmail(email_server, email_server_port, email_server_type, email_aut
                 subscriptionId = '[' + jsonPayload['subscription']['id'] + '] '
                 subjectPostfix = 'NGINX Usage Reporting'
                 attachname = 'nginx_report.json'
+            elif nc_mode == 'NGINX_MANAGEMENT_SYSTEM':
+                payload = nms.nmsInstances(mode='JSON')
+                jsonPayload = json.loads(payload)
+                subscriptionId = '[' + jsonPayload['subscription']['id'] + '] '
+                subjectPostfix = 'NGINX Usage Reporting'
+                attachname = 'nginx_report.json'
             elif nc_mode == 'BIG_IQ':
                 payload = bigiq.bigIqInventory(mode='JSON')
                 subscriptionId = ''
@@ -153,6 +165,8 @@ def getInstances():
                         mimetype='application/json')
     elif nc_mode == 'NGINX_INSTANCE_MANAGER':
         return Response(nim.nimInstances(fqdn=nc_fqdn, mode='JSON', proxy=proxyDict), mimetype='application/json')
+    elif nc_mode == 'NGINX_MANAGEMENT_SYSTEM':
+        return Response(nms.nmsInstances(mode='JSON'), mimetype='application/json')
     elif nc_mode == 'BIG_IQ':
         return Response(bigiq.bigIqInventory(mode='JSON'), mimetype='application/json')
 
@@ -165,6 +179,8 @@ def getMetrics():
         return nc.ncInstances(fqdn=nc_fqdn, username=nc_user, password=nc_pass, mode='PROMETHEUS', proxy=proxyDict)
     elif nc_mode == 'NGINX_INSTANCE_MANAGER':
         return nim.nimInstances(fqdn=nc_fqdn, mode='PROMETHEUS', proxy=proxyDict)
+    elif nc_mode == 'NGINX_MANAGEMENT_SYSTEM':
+        return nms.nmsInstances(mode='PROMETHEUS')
     elif nc_mode == 'BIG_IQ':
         return bigiq.bigIqInventory(mode='PROMETHEUS')
 
@@ -176,7 +192,7 @@ def not_found(error):
 
 if __name__ == '__main__':
 
-    if nc_mode != 'NGINX_CONTROLLER' and nc_mode != 'NGINX_INSTANCE_MANAGER' and nc_mode != 'BIG_IQ':
+    if nc_mode != 'NGINX_CONTROLLER' and nc_mode != 'NGINX_INSTANCE_MANAGER' and nc_mode != 'NGINX_MANAGEMENT_SYSTEM' and nc_mode != 'BIG_IQ':
         print('Invalid NGINX_CONTROLLER_TYPE')
     else:
         # optional HTTP(S) proxy
@@ -211,6 +227,8 @@ if __name__ == '__main__':
             print('Running BIG-IQ inventory refresh thread')
             inventoryThread = threading.Thread(target=bigiq.scheduledInventory)
             inventoryThread.start()
+        elif nc_mode == 'NGINX_MANAGEMENT_SYSTEM':
+            nms.init(fqdn=nc_fqdn, username=nc_user, password=nc_pass, nistApiKey=nist_apikey, proxy=proxyDict)
 
         if "STATS_PUSH_ENABLE" in os.environ:
             if os.environ['STATS_PUSH_ENABLE'] == 'true':

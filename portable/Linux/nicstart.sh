@@ -18,11 +18,18 @@
 #export NGINX_CONTROLLER_USERNAME="username@domain"
 #export NGINX_CONTROLLER_PASSWORD="thepassword"
 
-### Section to use when polling NGINX Instance Manager
+### Section to use when polling NGINX Instance Manager 1.x
 
 #export NGINX_CONTROLLER_TYPE=NGINX_INSTANCE_MANAGER
 #export NGINX_CONTROLLER_FQDN="http://127.0.0.1:11000"
 #export NGINX_CONTROLLER_USERNAME="username@domain"
+#export NGINX_CONTROLLER_PASSWORD="thepassword"
+
+### Section to use when polling NGINX Instance Manager 2.x
+
+#export NGINX_CONTROLLER_TYPE=NGINX_MANAGEMENT_SYSTEM
+#export NGINX_CONTROLLER_FQDN="https://ubuntu.ff.lan"
+#export NGINX_CONTROLLER_USERNAME="theusername"
 #export NGINX_CONTROLLER_PASSWORD="thepassword"
 
 ### Section to use when polling BIG-IQ

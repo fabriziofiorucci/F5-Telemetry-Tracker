@@ -18,11 +18,18 @@ rem set NGINX_CONTROLLER_FQDN=https://nginx-controller.ff.lan:443
 rem set NGINX_CONTROLLER_USERNAME=username@domain
 rem set NGINX_CONTROLLER_PASSWORD=thepassword
 
-rem ### Section to use when polling NGINX Instance Manager
+rem ### Section to use when polling NGINX Instance Manager 1.x
 
 rem set NGINX_CONTROLLER_TYPE=NGINX_INSTANCE_MANAGER
 rem set NGINX_CONTROLLER_FQDN=http://127.0.0.1:11000
 rem set NGINX_CONTROLLER_USERNAME=username@domain
+rem set NGINX_CONTROLLER_PASSWORD=thepassword
+
+rem ### Section to use when polling NGINX Instance Manager 2.x
+
+rem set NGINX_CONTROLLER_TYPE=NGINX_MANAGEMENT_SYSTEM
+rem set NGINX_CONTROLLER_FQDN=https://ubuntu.ff.lan
+rem set NGINX_CONTROLLER_USERNAME=theusername
 rem set NGINX_CONTROLLER_PASSWORD=thepassword
 
 rem ### Section to use when polling BIG-IQ
