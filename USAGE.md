@@ -62,7 +62,7 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
     "serial": ""
   },
   "instances": {
-    "nginx_plus_online": 0,
+    "nginx_plus_online": 1,
     "nginx_oss_online": 1
   },
   "details": [
@@ -83,6 +83,72 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
         "ngx_http_xslt_filter_module",
         "ngx_mail_module",
         "ngx_stream_module"
+      ],
+      "networkconfig": {
+        "networkInterfaces": [
+          {
+            "ipv4AddressList": [
+              {
+                "address": "127.0.0.1",
+                "netmask": "255.0.0.0",
+                "prefixLen": 8
+              }
+            ],
+            "ipv6AddressList": [
+              {
+                "address": "::1",
+                "netmask": "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff",
+                "prefixLen": 128
+              }
+            ],
+            "macAddress": "de:ad:be:ef:ff:25",
+            "name": "ens3"
+          },
+          {
+            "ipv4AddressList": [
+              {
+                "address": "192.168.1.25",
+                "netmask": "255.255.255.0",
+                "prefixLen": 24
+              }
+            ],
+            "ipv6AddressList": [
+              {
+                "address": "fe80::dcad:beff:feef:ff25",
+                "netmask": "ffff:ffff:ffff:ffff::",
+                "prefixLen": 64
+              }
+            ],
+            "macAddress": "de:ad:be:ef:ff:25",
+            "name": "ens3"
+          }
+        ]
+      },
+      "hostname": "devel",
+      "name": "devel",
+      "CVE": [
+        {}
+      ]
+    },
+    {
+      "instance_id": "98ebcece-3697-5d52-9806-51b15d7dfd78",
+      "osInfo": {
+        "name": "ubuntu",
+        "version": "5.4.0-90-generic",
+        "versionId": "20.04"
+      },
+      "containerized": "",
+      "type": "plus",
+      "version": "1.21.3",
+      "last_seen": "2022-01-06T22:40:03.243179608Z",
+      "createtime": "2022-01-03T13:17:44Z",
+      "modules": [
+        "ngx_http_app_protect_module-debug",
+        "ngx_http_app_protect_module",
+        "ngx_http_js_module-debug",
+        "ngx_http_js_module",
+        "ngx_stream_js_module-debug",
+        "ngx_stream_js_module"
       ],
       "networkconfig": {
         "networkInterfaces": [
