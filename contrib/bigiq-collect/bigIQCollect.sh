@@ -41,12 +41,12 @@ done
 
 echo "-> Reading device telemetry"
 ALL_TELEMETRY="
-bigip-cpu|cpu-usage|-1H
-bigip-cpu|cpu-usage|-1W
-bigip-cpu|cpu-usage|-1M
-bigip-memory|free-ram|-1H
-bigip-memory|free-ram|-1W
-bigip-memory|free-ram|-1M
+bigip-cpu|cpu-usage|-1H|5|MINUTES
+bigip-cpu|cpu-usage|-1W|3|HOURS
+bigip-cpu|cpu-usage|-1M|12|HOURS
+bigip-memory|free-ram|-1H|5|MINUTES
+bigip-memory|free-ram|-1W|3|HOURS
+bigip-memory|free-ram|-1M|12|HOURS
 "
 
 AUTH_TOKEN=`curl -ks -X POST 'https://127.0.0.1/mgmt/shared/authn/login' -H 'Content-Type: text/plain' -d '{"username": "'$BIGIQ_USERNAME'","password": "'$BIGIQ_PASSWORD'"}' | jq '.token.token' -r`
@@ -56,8 +56,10 @@ do
 	T_MODULE=`echo $T | awk -F\| '{print $1}'`
 	T_METRICSET=`echo $T | awk -F\| '{print $2}'`
 	T_TIMERANGE=`echo $T | awk -F\| '{print $3}'`
+	T_GRAN_DURATION=`echo $T | awk -F\| '{print $4}'`
+	T_GRAN_UNIT=`echo $T | awk -F\| '{print $5}'`
 
-	echo "- $T_MODULE / $T_METRICSET / $T_TIMERANGE"
+	echo "- $T_MODULE / $T_METRICSET / $T_TIMERANGE / $T_GRAN_DURATION / $T_GRAN_UNIT"
 
 	TELEMETRY_JSON='{
     "kind": "ap:query:stats:byEntities",
@@ -73,7 +75,11 @@ do
                     "metric": "avg-value-per-event"
             }
     },
-    "limit": 5
+    "timeGranularity": {
+      "duration": '$T_GRAN_DURATION',
+      "unit": "'$T_GRAN_UNIT'"
+    },
+    "limit": 1000
 }'
 
 	TELEMETRY_OUTPUT=`curl -ks -X POST https://127.0.0.1/mgmt/ap/query/v1/tenants/default/products/device/metric-query -H 'X-F5-Auth-Token: '$AUTH_TOKEN -H 'Content-Type: application/json' -d "$TELEMETRY_JSON"`
