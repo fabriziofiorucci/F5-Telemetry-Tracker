@@ -19,11 +19,6 @@ this = sys.modules[__name__]
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
-# NGINX dynamic modules
-nginxModules = {
-  "ngx_http_app_protect_module.so": "nap"
-}
-
 this.nms_fqdn=''
 this.nms_username=''
 this.nms_password=''
@@ -125,7 +120,7 @@ def nmsInstances(mode):
         detailsDict = {}
         detailsDict['instance_id'] = instance['uid']
         detailsDict['osInfo'] = systemDetails['osRelease']
-        detailsDict['containerized'] = ""
+        detailsDict['hypervisor'] = systemDetails['processor'][0]['hypervisor']
         if instanceDetails['build']['nginxPlus'] == False:
           detailsDict['type'] = "oss"
         else:

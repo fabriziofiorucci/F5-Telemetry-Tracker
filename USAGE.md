@@ -73,7 +73,7 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
         "version": "5.4.0-90-generic",
         "versionId": "20.04"
       },
-      "containerized": "",
+      "hypervisor": "kvm",
       "type": "oss",
       "version": "1.18.0",
       "last_seen": "2021-12-21T23:42:45.961293545Z",
@@ -137,7 +137,7 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
         "version": "5.4.0-90-generic",
         "versionId": "20.04"
       },
-      "containerized": "",
+      "hypervisor": "container",
       "type": "plus",
       "version": "1.21.3",
       "last_seen": "2022-01-06T22:40:03.243179608Z",

@@ -118,7 +118,7 @@ def nmsInstances(mode):
         detailsDict = {}
         detailsDict['instance_id'] = instance['uid']
         detailsDict['osInfo'] = systemDetails['osRelease']
-        detailsDict['containerized'] = ""
+        detailsDict['hypervisor'] = systemDetails['processor'][0]['hypervisor']
         if instanceDetails['build']['nginxPlus'] == False:
           detailsDict['type'] = "oss"
         else:
