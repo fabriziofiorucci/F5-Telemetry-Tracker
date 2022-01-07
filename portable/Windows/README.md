@@ -16,6 +16,7 @@ Steps to (re)build:
 ```
 pip install flask
 pip install requests
+pip install zstandard
 ```
 
 - Package the source files in `/portable/src`

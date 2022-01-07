@@ -329,7 +329,7 @@ def bigIqInventory(mode):
 
 
 # Builds BIG-IQ telemetry request body
-def _getTelemetryRequestBody(module,metricSet,timeRange):
+def _getTelemetryRequestBody(module,metricSet,timeRange,granDuration,granUnit):
 
   tr = {}
   tr['from'] = timeRange
@@ -340,12 +340,18 @@ def _getTelemetryRequestBody(module,metricSet,timeRange):
   aggregations[metricSet+'$avg-value-per-event']['metricSet'] = metricSet
   aggregations[metricSet+'$avg-value-per-event']['metric'] = "avg-value-per-event"
 
+  timeGranularity = {}
+  timeGranularity['duration'] = granDuration
+  timeGranularity['unit'] = granUnit
+
   body = {}
   body['kind'] = "ap:query:stats:byEntities"
   body['module'] = module
   body['dimension'] = "hostname"
   body['timeRange'] = tr
   body['aggregations'] = aggregations
+  body['timeGranularity'] = timeGranularity
+  body['limit'] = 1000
 
   return body
 
@@ -354,20 +360,19 @@ def bigIqTelemetry(mode):
   telemetryURI = "/mgmt/ap/query/v1/tenants/default/products/device/metric-query"
 
   allStats = [
-    { "module":"bigip-cpu","metricSet":"cpu-usage","timeRange":"-1H" },
-    { "module":"bigip-cpu","metricSet":"cpu-usage","timeRange":"-1W" },
-    { "module":"bigip-cpu","metricSet":"cpu-usage","timeRange":"-1M" },
-    { "module":"bigip-memory","metricSet":"free-ram","timeRange":"-1H" },
-    { "module":"bigip-memory","metricSet":"free-ram","timeRange":"-1W" },
-    { "module":"bigip-memory","metricSet":"free-ram","timeRange":"-1M" }
+    { "module":"bigip-cpu","metricSet":"cpu-usage","timeRange":"-1H","granDuration":5,"granUnit":"MINUTES" },
+    { "module":"bigip-cpu","metricSet":"cpu-usage","timeRange":"-1W","granDuration":3,"granUnit":"HOURS" },
+    { "module":"bigip-cpu","metricSet":"cpu-usage","timeRange":"-1M","granDuration":12,"granUnit":"HOURS" },
+    { "module":"bigip-memory","metricSet":"free-ram","timeRange":"-1H","granDuration":5,"granUnit":"MINUTES" },
+    { "module":"bigip-memory","metricSet":"free-ram","timeRange":"-1W","granDuration":3,"granUnit":"HOURS" },
+    { "module":"bigip-memory","metricSet":"free-ram","timeRange":"-1M","granDuration":12,"granUnit":"HOURS" }
   ]
 
   telemetryBody={}
 
   if mode == 'JSON':
     for stat in allStats:
-      res,body = bigIQcallRESTURI(method = "POST", uri = telemetryURI, body = _getTelemetryRequestBody(module=stat['module'],metricSet=stat['metricSet'],timeRange=stat['timeRange']) )
-
+      res,body = bigIQcallRESTURI(method = "POST", uri = telemetryURI, body = _getTelemetryRequestBody(module=stat['module'],metricSet=stat['metricSet'],timeRange=stat['timeRange'],granDuration=stat['granDuration'],granUnit=stat['granUnit']) )
       if res == 200:
         for r in body['result']['result']: 
           telHostname = r['hostname']
