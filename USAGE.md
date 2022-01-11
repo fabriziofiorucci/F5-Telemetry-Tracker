@@ -2,6 +2,8 @@
 
 ## REST API mode
 
+For `/instances` and `/counter/instances` endpoints if the request includes the `Accept-Encoding: gzip` header the response will be compressed
+
 To get instance statistics in JSON format:
 
 NGINX Instance Manager 1.x
@@ -702,27 +704,47 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
     {
       "bigip1.f5.ff.lan": {
         "cpu-usage": {
-          "-1H": 4.611763869013105,
-          "-1W": 4.859152033462287,
-          "-1M": 4.165137052536011
+          "-1H": {
+            "aggregate": 5.6210192305142765,
+            "datapoints": [
+              {
+                "ts": 1641897300,
+                "value": 5.740425419807434
+              },
+              {
+                "ts": 1641897600,
+                "value": 5.316933965682983
+              }
+            ]
+          }
+          "-1W": {
+            [...]
+          }
+          "-1M": {
+            [...]
+          }
         },
         "free-ram": {
-          "-1H": 9355243529.411764,
-          "-1W": 9372458241.590214,
-          "-1M": 9359400000.0
+          [...]
+        },
+        "server-connections": {
+          [...]
+        },
+        "client-bytes-in": {
+          [...]
+        },
+        "client-bytes-out": {
+          [...]
+        },
+        "server-bytes-in": {
+          [...]
+        },
+        "server-bytes-out": {
+          [...]
         }
       },
       "bigip2.f5.ff.lan": {
-        "cpu-usage": {
-          "-1H": 6.664462372034538,
-          "-1W": 6.885606513630529,
-          "-1M": 6.02909779548645
-        },
-        "free-ram": {
-          "-1H": 7000567226.890757,
-          "-1W": 7017898746.17737,
-          "-1M": 7000200000.0
-        }
+        [...]
       }
     }
   ]

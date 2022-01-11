@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 import uvicorn
-from fastapi import FastAPI, Response
+from fastapi import FastAPI, Response, Request
 from fastapi.responses import JSONResponse,StreamingResponse
 import os
 import sys
@@ -15,7 +15,7 @@ import smtplib
 import mimetypes
 import urllib3.exceptions
 import base64
-from requests import Request, Session
+import gzip
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from email.message import EmailMessage
 
@@ -159,7 +159,7 @@ def scheduledEmail(email_server, email_server_port, email_server_type, email_aut
 # Returns stats in json format
 @app.get("/instances")
 @app.get("/counter/instances")
-def getInstances():
+def getInstances(request: Request):
     if nc_mode == 'NGINX_CONTROLLER':
         reply,code = nc.ncInstances(fqdn=nc_fqdn, username=nc_user, password=nc_pass, mode='JSON', proxy=proxyDict)
     elif nc_mode == 'NGINX_INSTANCE_MANAGER':
@@ -169,7 +169,18 @@ def getInstances():
     elif nc_mode == 'BIG_IQ':
         reply,code = bigiq.bigIqInventory(mode='JSON')
 
-    return JSONResponse(content=reply,status_code=code)
+    # gzip responses supported if the client sends header "Accept-Encoding: gzip"
+    responseSent = False
+
+    if "Accept-Encoding" in request.headers:
+        if request.headers['Accept-Encoding'] == 'gzip':
+            deflatedReply = gzip.compress(json.dumps(reply).encode('utf-8'))
+            responseSent = True
+            return Response(content=deflatedReply,media_type="application/json",headers={ 'Content-Encoding': 'gzip' })
+
+    if responseSent == False:
+        return JSONResponse(content=reply,status_code=code)
+
 
 # Returns stats in prometheus format
 @app.get("/metrics")

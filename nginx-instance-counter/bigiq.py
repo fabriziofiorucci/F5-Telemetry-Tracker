@@ -102,7 +102,6 @@ def scheduledInventory():
 
 # Reporting
 def xlsReport(instancesJson):
-  #iJson=json.loads(instancesJson)
   iJson=instancesJson
 
   #print("-- Importing JSON")
@@ -460,8 +459,8 @@ def bigIqInventory(mode):
   return output,200
 
 
-# Builds BIG-IQ telemetry request body
-def _getTelemetryRequestBody(module,metricSet,timeRange,granDuration,granUnit):
+# Builds BIG-IQ telemetry request body by entities
+def _getTelemetryRequestBodyByEntities(module,metricSet,metric,timeRange,granDuration,granUnit):
 
   tr = {}
   tr['from'] = timeRange
@@ -470,7 +469,7 @@ def _getTelemetryRequestBody(module,metricSet,timeRange,granDuration,granUnit):
   aggregations = {}
   aggregations[metricSet+'$avg-value-per-event'] = {}
   aggregations[metricSet+'$avg-value-per-event']['metricSet'] = metricSet
-  aggregations[metricSet+'$avg-value-per-event']['metric'] = "avg-value-per-event"
+  aggregations[metricSet+'$avg-value-per-event']['metric'] = metric
 
   timeGranularity = {}
   timeGranularity['duration'] = granDuration
@@ -487,24 +486,74 @@ def _getTelemetryRequestBody(module,metricSet,timeRange,granDuration,granUnit):
 
   return body
 
+
+# Builds BIG-IQ telemetry request body by time
+def _getTelemetryRequestBodyByTime(module,metricSet,metric,timeRange,granDuration,granUnit,hostname):
+
+  tr = {}
+  tr['from'] = timeRange
+  tr['to'] = "now"
+
+  aggregations = {}
+  aggregations[metricSet+'$avg-value-per-event'] = {}
+  aggregations[metricSet+'$avg-value-per-event']['metricSet'] = metricSet
+  aggregations[metricSet+'$avg-value-per-event']['metric'] = metric
+
+  timeGranularity = {}
+  timeGranularity['duration'] = granDuration
+  timeGranularity['unit'] = granUnit
+
+  dimensionFilter = {}
+  dimensionFilter['type'] = "eq"
+  dimensionFilter['dimension'] = "hostname"
+  dimensionFilter['value'] = hostname
+
+  body = {}
+  body['kind'] = "ap:query:stats:byTime"
+  body['module'] = module
+  body['dimension'] = "hostname"
+  body['timeRange'] = tr
+  body['aggregations'] = aggregations
+  body['timeGranularity'] = timeGranularity
+  body['dimensionFilter'] = dimensionFilter
+  body['limit'] = 1000
+
+  return body
+
+
 # Returns TMOS instances telemetry
 def bigIqTelemetry(mode):
   telemetryURI = "/mgmt/ap/query/v1/tenants/default/products/device/metric-query"
 
   allStats = [
-    { "module":"bigip-cpu","metricSet":"cpu-usage","timeRange":"-1H","granDuration":5,"granUnit":"MINUTES" },
-    { "module":"bigip-cpu","metricSet":"cpu-usage","timeRange":"-1W","granDuration":3,"granUnit":"HOURS" },
-    { "module":"bigip-cpu","metricSet":"cpu-usage","timeRange":"-1M","granDuration":12,"granUnit":"HOURS" },
-    { "module":"bigip-memory","metricSet":"free-ram","timeRange":"-1H","granDuration":5,"granUnit":"MINUTES" },
-    { "module":"bigip-memory","metricSet":"free-ram","timeRange":"-1W","granDuration":3,"granUnit":"HOURS" },
-    { "module":"bigip-memory","metricSet":"free-ram","timeRange":"-1M","granDuration":12,"granUnit":"HOURS" }
+    { "module":"bigip-cpu","metricSet":"cpu-usage","metric":"avg-value-per-event","timeRange":"-1H","granDuration":5,"granUnit":"MINUTES" },
+    { "module":"bigip-cpu","metricSet":"cpu-usage","metric":"avg-value-per-event","timeRange":"-1W","granDuration":3,"granUnit":"HOURS" },
+    { "module":"bigip-cpu","metricSet":"cpu-usage","metric":"avg-value-per-event","timeRange":"-30D","granDuration":12,"granUnit":"HOURS" },
+    { "module":"bigip-memory","metricSet":"free-ram","metric":"avg-value-per-event","timeRange":"-1H","granDuration":5,"granUnit":"MINUTES" },
+    { "module":"bigip-memory","metricSet":"free-ram","metric":"avg-value-per-event","timeRange":"-1W","granDuration":3,"granUnit":"HOURS" },
+    { "module":"bigip-memory","metricSet":"free-ram","metric":"avg-value-per-event","timeRange":"-30D","granDuration":12,"granUnit":"HOURS" },
+    { "module":"bigip-traffic-summary","metricSet":"server-connections","metric":"avg-value-per-sec","timeRange":"-1H","granDuration":5,"granUnit":"MINUTES" },
+    { "module":"bigip-traffic-summary","metricSet":"server-connections","metric":"avg-value-per-sec","timeRange":"-1W","granDuration":3,"granUnit":"HOURS" },
+    { "module":"bigip-traffic-summary","metricSet":"server-connections","metric":"avg-value-per-sec","timeRange":"-30D","granDuration":12,"granUnit":"HOURS" },
+    { "module":"bigip-traffic-summary","metricSet":"client-bytes-in","metric":"avg-value-per-sec","timeRange":"-1H","granDuration":5,"granUnit":"MINUTES" },
+    { "module":"bigip-traffic-summary","metricSet":"client-bytes-in","metric":"avg-value-per-sec","timeRange":"-1W","granDuration":3,"granUnit":"HOURS" },
+    { "module":"bigip-traffic-summary","metricSet":"client-bytes-in","metric":"avg-value-per-sec","timeRange":"-30D","granDuration":12,"granUnit":"HOURS" },
+    { "module":"bigip-traffic-summary","metricSet":"client-bytes-out","metric":"avg-value-per-sec","timeRange":"-1H","granDuration":5,"granUnit":"MINUTES" },
+    { "module":"bigip-traffic-summary","metricSet":"client-bytes-out","metric":"avg-value-per-sec","timeRange":"-1W","granDuration":3,"granUnit":"HOURS" },
+    { "module":"bigip-traffic-summary","metricSet":"client-bytes-out","metric":"avg-value-per-sec","timeRange":"-30D","granDuration":12,"granUnit":"HOURS" },
+    { "module":"bigip-traffic-summary","metricSet":"server-bytes-in","metric":"avg-value-per-sec","timeRange":"-1H","granDuration":5,"granUnit":"MINUTES" },
+    { "module":"bigip-traffic-summary","metricSet":"server-bytes-in","metric":"avg-value-per-sec","timeRange":"-1W","granDuration":3,"granUnit":"HOURS" },
+    { "module":"bigip-traffic-summary","metricSet":"server-bytes-in","metric":"avg-value-per-sec","timeRange":"-30D","granDuration":12,"granUnit":"HOURS" },
+    { "module":"bigip-traffic-summary","metricSet":"server-bytes-out","metric":"avg-value-per-sec","timeRange":"-1H","granDuration":5,"granUnit":"MINUTES" },
+    { "module":"bigip-traffic-summary","metricSet":"server-bytes-out","metric":"avg-value-per-sec","timeRange":"-1W","granDuration":3,"granUnit":"HOURS" },
+    { "module":"bigip-traffic-summary","metricSet":"server-bytes-out","metric":"avg-value-per-sec","timeRange":"-30D","granDuration":12,"granUnit":"HOURS" }
   ]
 
   telemetryBody={}
 
   if mode == 'JSON':
     for stat in allStats:
-      res,body = bigIQcallRESTURI(method = "POST", uri = telemetryURI, body = _getTelemetryRequestBody(module=stat['module'],metricSet=stat['metricSet'],timeRange=stat['timeRange'],granDuration=stat['granDuration'],granUnit=stat['granUnit']) )
+      res,body = bigIQcallRESTURI(method = "POST", uri = telemetryURI, body = _getTelemetryRequestBodyByEntities(module=stat['module'],metricSet=stat['metricSet'],metric=stat['metric'],timeRange=stat['timeRange'],granDuration=stat['granDuration'],granUnit=stat['granUnit']) )
 
       if res == 200:
         for r in body['result']['result']: 
@@ -519,7 +568,21 @@ def bigIqTelemetry(mode):
           if telVarName not in telemetryBody[telHostname]:
             telemetryBody[telHostname][telVarName] = {}
 
-          telemetryBody[telHostname][telVarName][telTimeRange] = telVarValue
+          # Telemetry overall average
+          #telemetryBody[telHostname][telVarName][telTimeRange] = telVarValue
+          telemetryBody[telHostname][telVarName][telTimeRange] = {}
+          telemetryBody[telHostname][telVarName][telTimeRange]['aggregate'] = telVarValue
+          telemetryBody[telHostname][telVarName][telTimeRange]['datapoints'] = []
+
+          # Telemetry datapoints
+          res,bodyDataPoints = bigIQcallRESTURI(method = "POST", uri = telemetryURI, body = _getTelemetryRequestBodyByTime(module=stat['module'],metricSet=stat['metricSet'],metric=stat['metric'],timeRange=stat['timeRange'],granDuration=stat['granDuration'],granUnit=stat['granUnit'],hostname=telHostname) )
+          if res == 200:
+            for dp in bodyDataPoints['result']['result']:
+              datapoint = {}
+              datapoint['ts'] = dp['timeMillis']//1000
+              datapoint['value'] = dp[stat['metricSet']+'$avg-value-per-event']
+
+              telemetryBody[telHostname][telVarName][telTimeRange]['datapoints'].append(datapoint)
 
     return telemetryBody
   elif mode == 'PROMETHEUS' or mode == 'PUSHGATEWAY':
