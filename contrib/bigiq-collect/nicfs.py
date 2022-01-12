@@ -66,7 +66,23 @@ def getMachineIdResolver(machineId):
 def getDeviceMetric():
   content = request.get_json(silent=True)
 
-  return getFileContent("telemetry-"+content['module']+"-"+content['timeRange']['from']+".json")
+  filename=""
+
+  if "dimensionFilter" in content:
+    # Returning ap:query:stats:byTime telemetry datapoints
+    metricSet=""
+    for m in content['aggregations'].keys():
+      moduleAndMetric=m;
+
+    filename="telemetry-datapoints-"+content['dimensionFilter']['value']+"-"+content['module']+"-"+content['aggregations'][moduleAndMetric]['metricSet']+"-"+content['timeRange']['from']+".json"
+  else:
+    # Returning ap:query:stats:byEntities telemetry
+    metricSet=""
+    for m in content['aggregations'].keys():
+      moduleAndMetric=m;
+    filename="telemetry-"+content['module']+"-"+content['aggregations'][moduleAndMetric]['metricSet']+"-"+content['timeRange']['from']+".json"
+
+  return getFileContent(filename)
 
 @app.route('/mgmt/shared/authn/login', methods=['POST'])
 def bigiqLogin():

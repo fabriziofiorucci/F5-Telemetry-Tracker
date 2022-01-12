@@ -41,13 +41,30 @@ done
 
 echo "-> Reading device telemetry"
 ALL_TELEMETRY="
-bigip-cpu|cpu-usage|-1H|5|MINUTES
-bigip-cpu|cpu-usage|-1W|3|HOURS
-bigip-cpu|cpu-usage|-1M|12|HOURS
-bigip-memory|free-ram|-1H|5|MINUTES
-bigip-memory|free-ram|-1W|3|HOURS
-bigip-memory|free-ram|-1M|12|HOURS
+bigip-cpu|cpu-usage|avg-value-per-event|-1H|5|MINUTES
+bigip-cpu|cpu-usage|avg-value-per-event|-1W|3|HOURS
+bigip-cpu|cpu-usage|avg-value-per-event|-30D|12|HOURS
+bigip-memory|free-ram|avg-value-per-event|-1H|5|MINUTES
+bigip-memory|free-ram|avg-value-per-event|-1W|3|HOURS
+bigip-memory|free-ram|avg-value-per-event|-30D|12|HOURS
+bigip-traffic-summary|server-connections|avg-value-per-sec|-1H|5|MINUTES
+bigip-traffic-summary|server-connections|avg-value-per-sec|-1W|3|HOURS
+bigip-traffic-summary|server-connections|avg-value-per-sec|-30D|12|HOURS
+bigip-traffic-summary|client-bytes-in|avg-value-per-sec|-1H|5|MINUTES
+bigip-traffic-summary|client-bytes-in|avg-value-per-sec|-1W|3|HOURS
+bigip-traffic-summary|client-bytes-in|avg-value-per-sec|-30D|12|HOURS
+bigip-traffic-summary|client-bytes-out|avg-value-per-sec|-1H|5|MINUTES
+bigip-traffic-summary|client-bytes-out|avg-value-per-sec|-1W|3|HOURS
+bigip-traffic-summary|client-bytes-out|avg-value-per-sec|-30D|12|HOURS
+bigip-traffic-summary|server-bytes-in|avg-value-per-sec|-1H|5|MINUTES
+bigip-traffic-summary|server-bytes-in|avg-value-per-sec|-1W|3|HOURS
+bigip-traffic-summary|server-bytes-in|avg-value-per-sec|-30D|12|HOURS
+bigip-traffic-summary|server-bytes-out|avg-value-per-sec|-1H|5|MINUTES
+bigip-traffic-summary|server-bytes-out|avg-value-per-sec|-1W|3|HOURS
+bigip-traffic-summary|server-bytes-out|avg-value-per-sec|-30D|12|HOURS
 "
+
+ALL_HOSTNAMES=""
 
 AUTH_TOKEN=`curl -ks -X POST 'https://127.0.0.1/mgmt/shared/authn/login' -H 'Content-Type: text/plain' -d '{"username": "'$BIGIQ_USERNAME'","password": "'$BIGIQ_PASSWORD'"}' | jq '.token.token' -r`
 
@@ -55,11 +72,12 @@ for T in $ALL_TELEMETRY
 do
 	T_MODULE=`echo $T | awk -F\| '{print $1}'`
 	T_METRICSET=`echo $T | awk -F\| '{print $2}'`
-	T_TIMERANGE=`echo $T | awk -F\| '{print $3}'`
-	T_GRAN_DURATION=`echo $T | awk -F\| '{print $4}'`
-	T_GRAN_UNIT=`echo $T | awk -F\| '{print $5}'`
+	T_METRIC=`echo $T | awk -F\| '{print $3}'`
+	T_TIMERANGE=`echo $T | awk -F\| '{print $4}'`
+	T_GRAN_DURATION=`echo $T | awk -F\| '{print $5}'`
+	T_GRAN_UNIT=`echo $T | awk -F\| '{print $6}'`
 
-	echo "- $T_MODULE / $T_METRICSET / $T_TIMERANGE / $T_GRAN_DURATION / $T_GRAN_UNIT"
+	#echo "- $T_MODULE / $T_METRICSET / $T_METRIC / $T_TIMERANGE / $T_GRAN_DURATION / $T_GRAN_UNIT"
 
 	TELEMETRY_JSON='{
     "kind": "ap:query:stats:byEntities",
@@ -70,9 +88,9 @@ do
     },
     "dimension": "hostname",
     "aggregations": {
-            "'$T_METRICSET'$avg-value-per-event": {
+            "'$T_METRICSET'$'$T_METRIC'": {
                     "metricSet": "'$T_METRICSET'",
-                    "metric": "avg-value-per-event"
+                    "metric": "'$T_METRIC'"
             }
     },
     "timeGranularity": {
@@ -83,9 +101,69 @@ do
 }'
 
 	TELEMETRY_OUTPUT=`curl -ks -X POST https://127.0.0.1/mgmt/ap/query/v1/tenants/default/products/device/metric-query -H 'X-F5-Auth-Token: '$AUTH_TOKEN -H 'Content-Type: application/json' -d "$TELEMETRY_JSON"`
+        OUTFILE=$OUTPUTDIR/telemetry-$T_MODULE-$T_METRICSET-$T_TIMERANGE.json
 
-	echo $TELEMETRY_OUTPUT > $OUTPUTDIR/telemetry-$T_MODULE-$T_TIMERANGE.json
+	echo $TELEMETRY_OUTPUT > $OUTFILE
+
+	if [ "$ALL_HOSTNAMES" = "" ]
+	then
+		ALL_HOSTNAMES=`echo $TELEMETRY_OUTPUT |jq -r '.result.result[].hostname'`
+	fi
 done
+
+## Datapoints telemetry
+
+for TDP_HOSTNAME in $ALL_HOSTNAMES
+do
+
+echo "-> Reading device telemetry datapoints for $TDP_HOSTNAME"
+
+for TDP in $ALL_TELEMETRY
+do
+	TDP_MODULE=`echo $TDP | awk -F\| '{print $1}'`
+	TDP_METRICSET=`echo $TDP | awk -F\| '{print $2}'`
+	TDP_METRIC=`echo $TDP | awk -F\| '{print $3}'`
+	TDP_TIMERANGE=`echo $TDP | awk -F\| '{print $4}'`
+	TDP_GRAN_DURATION=`echo $TDP | awk -F\| '{print $5}'`
+	TDP_GRAN_UNIT=`echo $TDP | awk -F\| '{print $6}'`
+
+	#echo "- $TDP_HOSTNAME -> $TDP_MODULE / $TDP_METRICSET / $TDP_METRIC / $TDP_TIMERANGE / $TDP_GRAN_DURATION / $TDP_GRAN_UNIT"
+
+	TELEMETRY_DP_JSON='{
+    "kind": "ap:query:stats:byTime",
+    "module": "'$TDP_MODULE'",
+    "timeRange": {
+            "from": "'$TDP_TIMERANGE'",
+            "to": "now"
+    },
+    "dimension": "hostname",
+    "dimensionFilter": {
+            "type": "eq",
+            "dimension": "hostname",
+            "value": "'$TDP_HOSTNAME'"
+    },
+    "aggregations": {
+            "'$TDP_METRICSET'$'$TDP_METRIC'": {
+                    "metricSet": "'$TDP_METRICSET'",
+                    "metric": "'$TDP_METRIC'"
+            }
+    },
+    "timeGranularity": {
+      "duration": '$TDP_GRAN_DURATION',
+      "unit": "'$TDP_GRAN_UNIT'"
+    },
+    "limit": 1000
+}'
+
+	TELEMETRY_DP_OUTPUT=`curl -ks -X POST https://127.0.0.1/mgmt/ap/query/v1/tenants/default/products/device/metric-query -H 'X-F5-Auth-Token: '$AUTH_TOKEN -H 'Content-Type: application/json' -d "$TELEMETRY_DP_JSON"`
+        OUTFILE=$OUTPUTDIR/telemetry-datapoints-$TDP_HOSTNAME-$TDP_MODULE-$TDP_METRICSET-$TDP_TIMERANGE.json
+
+	echo $TELEMETRY_DP_OUTPUT > $OUTFILE
+done
+
+done
+
+### /Datapoints telemetry
 
 echo "-> Data collection completed, building tarfile"
 TARFILE=$OUTPUTROOT/`date +"%Y%m%d-%H%M"`-bigIQCollect.tgz

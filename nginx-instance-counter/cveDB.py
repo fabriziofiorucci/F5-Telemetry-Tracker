@@ -81,7 +81,7 @@ def __getFromNist(vendor,product="*",version="*"):
     if res.status_code == 200:
       this.cveCachedDB[cpeMatchString]=res.json()
 
-  return this.cveCachedDB[cpeMatchString];
+  return this.cveCachedDB[cpeMatchString]
 
 
 # Returns all CVE for the given F5 TMOS product/version
@@ -93,22 +93,22 @@ def getF5(product="*",version="*"):
     matchingProducts=tmosModules2NIST[product]
 
     for product in matchingProducts:
+      if 'result' in allCVE:
+        for cve in allCVE['result']['CVE_Items']:
+          allCPEMatches=cve['configurations']['nodes'][0]['cpe_match']
 
-      for cve in allCVE['result']['CVE_Items']:
-        allCPEMatches=cve['configurations']['nodes'][0]['cpe_match']
+          for cpeMatch in allCPEMatches:
+            if product in cpeMatch['cpe23Uri']:
+              # Found CVE match
+              cveId=cve['cve']['CVE_data_meta']['ID']
+              cveUrl=cve['cve']['references']['reference_data'][0]['url']
+              cveDesc=cve['cve']['description']['description_data'][0]['value']
+              cveBaseSeverity=cve['impact']['baseMetricV3']['cvssV3']['baseSeverity']
+              cveBaseScore=cve['impact']['baseMetricV3']['cvssV3']['baseScore']
+              cveExplScore=cve['impact']['baseMetricV2']['exploitabilityScore']
 
-        for cpeMatch in allCPEMatches:
-          if product in cpeMatch['cpe23Uri']:
-            # Found CVE match
-            cveId=cve['cve']['CVE_data_meta']['ID']
-            cveUrl=cve['cve']['references']['reference_data'][0]['url']
-            cveDesc=cve['cve']['description']['description_data'][0]['value']
-            cveBaseSeverity=cve['impact']['baseMetricV3']['cvssV3']['baseSeverity']
-            cveBaseScore=cve['impact']['baseMetricV3']['cvssV3']['baseScore']
-            cveExplScore=cve['impact']['baseMetricV2']['exploitabilityScore']
-
-            if cveId not in matchingCVE:
-              matchingCVE[cveId]={"id":cveId,"url":cveUrl,"description":cveDesc,"baseSeverity":cveBaseSeverity,"baseScore":cveBaseScore,"exploitabilityScore":cveExplScore}
+              if cveId not in matchingCVE:
+                matchingCVE[cveId]={"id":cveId,"url":cveUrl,"description":cveDesc,"baseSeverity":cveBaseSeverity,"baseScore":cveBaseScore,"exploitabilityScore":cveExplScore}
 
   return matchingCVE
 
