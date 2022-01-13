@@ -1,4 +1,4 @@
-# NGINX Instance Counter - Portable image for Linux
+# F5 Telemetry Tracker - Portable image for Linux
 
 Portable images have been built using [Nuitka](https://nuitka.net/) and can be downloaded from the [releases page](https://github.com/fabriziofiorucci/NGINX-InstanceCounter/releases)
 
@@ -31,7 +31,7 @@ mv app.bin ../Linux/NGINX-InstanceCounter.AppImage
 ```
 
 - Edit and use the provided `nicstart.sh` script to run the generated image
-- When the NGINX Instance Counter has started, it can be queried sending GET requests to:
+- When the F5 Telemetry Tracker has started, it can be queried sending GET requests to:
   - http://127.0.0.1:5000/instances or http://127.0.0.1:5000/counter/instances for JSON reporting.
   - http://127.0.0.1:5000/metrics or http://127.0.0.1:5000/counter/metrics for Prometheus metrics
 - Port 5000 is used by default, it can be customized setting NIC_PORT in `nicstart.sh`

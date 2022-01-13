@@ -1,4 +1,4 @@
-# NGINX Instance Counter
+# F5 Telemetry Tracker
 
 ## Description
 
@@ -36,18 +36,18 @@ Additional tools can be found [here](/contrib)
 
 ## Deployment modes
 
-Pull mode: Instance Counter fetches stats
+Pull mode: F5 Telemetry Tracker fetches stats
 
 <img src="./images/nginx-imagecounter-pull.jpg"/>
 
-Push mode: Instance Counter pushes stats to a remote data collection and visualization environment (suitable for distributed setups)
+Push mode: F5 Telemetry Tracker pushes stats to a remote data collection and visualization environment (suitable for distributed setups)
 
 <img src="./images/nginx-imagecounter-push.jpg"/>
 
 ## Prerequisites
 
 - Kubernetes or Openshift cluster
-- Private registry to push the NGINX Instance Counter image
+- Private registry to push the F5 Telemetry Tracker image
 - One of:
   - NGINX Controller 3.18, 3.18.2, apim-3.19.2
   - NGINX Instance Manager 1.0.1, 1.0.2, 1.0.3, 1.0.4, 2.0
@@ -59,7 +59,7 @@ Push mode: Instance Counter pushes stats to a remote data collection and visuali
 
 ## For Kubernetes/Openshift
 
-The NGINX Instance Counter image is available on Docker Hub as:
+The F5 Telemetry Tracker image is available on Docker Hub as:
 
 ```
 fiorucci/nginx-instance-counter:5.3
@@ -79,7 +79,7 @@ docker push PRIVATE_REGISTRY:PORT/nginx-instance-counter:5.3
 
 ## As a native python application
 
-NGINX Instance Counter requires:
+F5 Telemetry Tracker requires:
 
 - Any Linux distribution
 - Python 3 (tested on 3.9+)
@@ -89,7 +89,7 @@ NGINX Instance Counter requires:
 - [XLSX Writer](https://pypi.org/project/XlsxWriter/)
 - [Pandas](https://pandas.pydata.org/)
 
-nginx-instance-counter/nicstart.sh is a sample script to run NGINX Instance Counter from bash
+nginx-instance-counter/nicstart.sh is a sample script to run F5 Telemetry Tracker from bash
 
 ## As a portable application
 
@@ -117,8 +117,8 @@ Edit `1.instancecounter.yaml` to customize:
 
 | Variable  | Description |
 | ------------- |-------------|
-| NIC_ADDRESS | optional IP address NGINX Instance Counter should listen on. Default is 0.0.0.0 |
-| NIC_PORT| optional TCP port NGINX Instance Counter should listen on. Default is 5000
+| NIC_ADDRESS | optional IP address F5 Telemetry Tracker should listen on. Default is 0.0.0.0 |
+| NIC_PORT| optional TCP port F5 Telemetry Tracker should listen on. Default is 5000
 | HTTP_PROXY| to be set if HTTP proxy must be used to connect to NGINX Controller, NGINX Instance Manager or BIG-IQ
 | HTTPS_PROXY| to be set if HTTPS proxy must be used to connect to NGINX Controller, NGINX Instance Manager or BIG-IQ
 | NIST_API_KEY| API Key for full NIST NVD CVE tracking (get your key at https://nvd.nist.gov/developers/request-an-api-key)

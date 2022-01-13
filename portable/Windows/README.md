@@ -1,4 +1,4 @@
-# NGINX Instance Counter - Portable image for Windows
+# F5 Telemetry Tracker - Portable image for Windows
 
 Portable images have been built using [Nuitka](https://nuitka.net/) and can be downloaded from the [releases page](https://github.com/fabriziofiorucci/NGINX-InstanceCounter/releases)
 
@@ -33,7 +33,7 @@ python -m nuitka --onefile --mingw64 app.py
 
 <img src="/portable/Windows/images/portable-windows.1.jpg"/>
 
-- When the NGINX Instance Counter has started, it can be queried sending a GET request to:
+- When the F5 Telemetry Tracker has started, it can be queried sending a GET request to:
   - http://127.0.0.1:5000/instances or http://127.0.0.1:5000/counter/instances for JSON reporting.
   - http://127.0.0.1:5000/metrics or http://127.0.0.1:5000/counter/metrics for Prometheus metrics 
 
