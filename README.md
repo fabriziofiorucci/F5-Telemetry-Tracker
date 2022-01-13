@@ -2,7 +2,7 @@
 
 ## Description
 
-This tool helps tracking NGINX Plus instances managed by NGINX Controller and NGINX Instance Manager, and BIG-IP instances managed by BIG-IQ
+This tool helps tracking NGINX Plus instances managed by NGINX Controller and NGINX Instance Manager, and TMOS (BIG-IP, VIPRION, VE) instances managed by BIG-IQ
 
 It has been tested against:
 
