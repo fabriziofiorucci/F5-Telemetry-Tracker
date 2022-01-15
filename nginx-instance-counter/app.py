@@ -1,12 +1,12 @@
 #!/usr/bin/python3
 
-import uvicorn
 from fastapi import FastAPI, Response, Request
 from fastapi.responses import JSONResponse,StreamingResponse
 import os
 import sys
 import ssl
 import json
+import uvicorn
 import sched, time, datetime
 import requests
 import time
@@ -41,7 +41,7 @@ def scheduledPush(url, username, password, interval, pushmode):
 
     pushgatewayUrl = url + "/metrics/job/nginx-instance-counter"
 
-    while (counter >= 0):
+    while counter >= 0:
         try:
             if nc_mode == 'NGINX_CONTROLLER':
                 if pushmode == 'CUSTOM':

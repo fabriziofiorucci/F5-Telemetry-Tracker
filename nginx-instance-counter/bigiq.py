@@ -264,8 +264,9 @@ def bigIQgetInventory():
         #   "link": "https://localhost/mgmt/cm/device/reports/device-inventory/8982ed9f-1870-4483-96c2-9fb024a2a5b6/results",
         #   "isSubcollection": true
         # }
-        latestResultsReference = item['resultsReference']['link'].split('/')[8]
-        latestUpdate = item['lastUpdateMicros']
+        if 'resultsReference' in item:
+          latestResultsReference = item['resultsReference']['link'].split('/')[8]
+          latestUpdate = item['lastUpdateMicros']
 
     if latestUpdate == 0:
        return 204,'{}'
@@ -321,7 +322,10 @@ def bigIqInventory(mode):
         if mode == 'JSON':
           # Gets TMOS registration key and serial number for the current BIG-IP device
           inventoryData = {}
-          inventoryData['inventoryTimestamp'] = inventoryDetails['lastUpdateMicros']//1000
+
+          # Check for failed inventory
+          if 'lastUpdateMicros' in inventoryDetails:
+            inventoryData['inventoryTimestamp'] = inventoryDetails['lastUpdateMicros']//1000
 
           platformType=''
 
@@ -329,38 +333,42 @@ def bigIqInventory(mode):
             inventoryData['inventoryStatus']="partial"
           else:
             machineIdFound=False
-            for invDevice in inventoryDetails['items']:
-              if invDevice['infoState']['machineId'] == item['machineId']:
-                machineIdFound=True
-                if "errors" in invDevice['infoState']:
-                  # BIG-IP unreachable, inventory incomplete
-                  inventoryData['inventoryStatus']="partial"
-                else:
-                  # Get platform name and SKU
-                  platformCode=invDevice['infoState']['platform']
-                  platformInsights={}
-                  if platformCode in hwPlatforms:
-                    platformDetails=hwPlatforms[platformCode]
-                    platformType=platformDetails.split('|')[0]
-                    platformSKU=platformDetails.split('|')[1]
 
-                    if platformSKU in hwSKUGrandTotals:
-                      hwSKUGrandTotals[platformSKU] += 1
-                    else:
-                      hwSKUGrandTotals[platformSKU] = 1
+            # Check for failed inventory
+            if 'items' in inventoryDetails:
+              for invDevice in inventoryDetails['items']:
+                if invDevice['infoState']['machineId'] == item['machineId']:
+                  machineIdFound=True
+                  if "errors" in invDevice['infoState']:
+                    # BIG-IP unreachable, inventory incomplete
+                    inventoryData['inventoryStatus']="partial"
+                  else:
+                    # Get platform name and SKU
+                    platformCode=invDevice['infoState']['platform']
+                    platformInsights={}
+                    if platformCode in hwPlatforms:
+                      platformDetails=hwPlatforms[platformCode]
+                      platformType=platformDetails.split('|')[0]
+                      platformSKU=platformDetails.split('|')[1]
 
-                    platformInsights['type']=platformType
-                    platformInsights['sku']=platformSKU
+                      if platformSKU in hwSKUGrandTotals:
+                        hwSKUGrandTotals[platformSKU] += 1
+                      else:
+                        hwSKUGrandTotals[platformSKU] = 1
 
-                  platformInsights['code']=platformCode
+                      platformInsights['type']=platformType
+                      platformInsights['sku']=platformSKU
 
-                  inventoryData['inventoryStatus'] = "full"
-                  inventoryData['registrationKey'] = invDevice['infoState']['license']['registrationKey']
-                  inventoryData['chassisSerialNumber'] = invDevice['infoState']['chassisSerialNumber'].strip()
-                  inventoryData['platform'] = platformInsights
+                    platformInsights['code']=platformCode
 
-                  if 'licenseEndDateTime' in invDevice['infoState']['license']:
-                    inventoryData['licenseEndDateTime']=invDevice['infoState']['license']['licenseEndDateTime']
+                    inventoryData['inventoryStatus'] = "full"
+                    inventoryData['registrationKey'] = invDevice['infoState']['license']['registrationKey']
+                    inventoryData['activeModules'] = invDevice['infoState']['license']['activeModules']
+                    inventoryData['chassisSerialNumber'] = invDevice['infoState']['chassisSerialNumber'].strip()
+                    inventoryData['platform'] = platformInsights
+
+                    if 'licenseEndDateTime' in invDevice['infoState']['license']:
+                      inventoryData['licenseEndDateTime']=invDevice['infoState']['license']['licenseEndDateTime']
 
             if machineIdFound == False:
               inventoryData['inventoryStatus']="partial"

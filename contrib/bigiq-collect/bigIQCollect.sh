@@ -29,6 +29,14 @@ restcurl -u $BIGIQ_USERNAME:$BIGIQ_PASSWORD /mgmt/cm/device/tasks/device-invento
 
 echo "-> Reading device inventory details"
 INV_ID=`restcurl -u $BIGIQ_USERNAME:$BIGIQ_PASSWORD /mgmt/cm/device/tasks/device-inventory| jq -r 'select(.items[].status=="FINISHED")|.items[0].resultsReference.link' | head -n1 | awk -F \/ '{print $9}'`
+if [ "$INV_ID" == "" ]
+then
+	INV_ID=`restcurl -u $BIGIQ_USERNAME:$BIGIQ_PASSWORD /mgmt/cm/device/tasks/device-inventory| jq -r 'select(.items[].status=="FAILED")|.items[0].resultsReference.link' | head -n1 | awk -F \/ '{print $9}'`
+fi
+
+if [ ! "$INV_ID" = "" ]
+then
+
 restcurl -u $BIGIQ_USERNAME:$BIGIQ_PASSWORD /mgmt/cm/device/reports/device-inventory/$INV_ID/results > $OUTPUTDIR/4.bigIQCollect.json
 
 MACHINE_IDS=`cat $OUTPUTDIR/4.bigIQCollect.json | jq -r '.items[].infoState.machineId'`
@@ -107,7 +115,7 @@ do
 
 	if [ "$ALL_HOSTNAMES" = "" ]
 	then
-		ALL_HOSTNAMES=`echo $TELEMETRY_OUTPUT |jq -r '.result.result[].hostname'`
+		ALL_HOSTNAMES=`echo $TELEMETRY_OUTPUT |jq -r '.result.result[].hostname' 2>/dev/null`
 	fi
 done
 
@@ -164,6 +172,8 @@ done
 done
 
 ### /Datapoints telemetry
+
+fi
 
 echo "-> Data collection completed, building tarfile"
 TARFILE=$OUTPUTROOT/`date +"%Y%m%d-%H%M"`-bigIQCollect.tgz
