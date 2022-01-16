@@ -6,14 +6,42 @@
 # bash /tmp/bigIQCollect.sh username password
 #
 
-if [ "$2" = "" ]
+BANNER="F5 Telemetry Tracker - https://github.com/fabriziofiorucci/F5-Telemetry-Tracker\n\n
+$0 [options]\n\n
+-h\t\t- This help\n
+-i\t\t- Interactive mode\n
+-u [username]\t- BIG-IQ username (batch mode)\n
+-p [password]\t- BIG-IQ password (batch mode)\n\n
+Interactive mode:\t$0 -i\n
+Batch mode:\t\t$0 -u [username] -p [password]\n
+"
+
+while getopts 'hiu:p:' OPTION
+do
+	case "$OPTION" in
+		h)
+			echo -e $BANNER
+			exit
+		;;
+		i)
+			read -p "Username: " BIGIQ_USERNAME
+			read -sp "Password: " BIGIQ_PASSWORD
+			echo
+		;;
+		u)
+			BIGIQ_USERNAME=$OPTARG
+		;;
+		p)
+			BIGIQ_PASSWORD=$OPTARG
+		;;
+	esac
+done
+
+if [ "$1" = "" ] || [ "$BIGIQ_USERNAME" = "" ] || [ "$BIGIQ_PASSWORD" = "" ]
 then
-	echo "$0 [username] [password]"
+	echo -e $BANNER
 	exit
 fi
-
-BIGIQ_USERNAME=$1
-BIGIQ_PASSWORD=$2
 
 OUTPUTROOT=/tmp
 OUTPUTDIR=`mktemp -d`

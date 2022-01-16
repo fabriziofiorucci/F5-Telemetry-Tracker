@@ -1,6 +1,6 @@
 # F5 Telemetry Tracker - Portable image for Linux
 
-Portable images have been built using [Nuitka](https://nuitka.net/) and can be downloaded from the [releases page](https://github.com/fabriziofiorucci/NGINX-InstanceCounter/releases)
+Portable images have been built using [Nuitka](https://nuitka.net/) and can be downloaded from the [releases page](https://github.com/fabriziofiorucci/F5-Telemetry-Tracker/releases)
 
 Supported control planes:
 
@@ -24,15 +24,15 @@ pip install requests
 python3 -m nuitka --onefile app.py
 ```
 
-- Rename `app.bin` to `NGINX-InstanceCounter.AppImage` and move it to /portable/Linux
+- Rename `app.bin` to `F5-Telemetry-Tracker.AppImage` and move it to /portable/Linux
 
 ```
-mv app.bin ../Linux/NGINX-InstanceCounter.AppImage
+mv app.bin ../Linux/F5-Telemetry-Tracker.AppImage
 ```
 
-- Edit and use the provided `nicstart.sh` script to run the generated image
+- Edit and use the provided `f5tt.sh` script to run the generated image
 - When the F5 Telemetry Tracker has started, it can be queried sending GET requests to:
-  - http://127.0.0.1:5000/instances or http://127.0.0.1:5000/counter/instances for JSON reporting.
-  - http://127.0.0.1:5000/metrics or http://127.0.0.1:5000/counter/metrics for Prometheus metrics
-- Port 5000 is used by default, it can be customized setting NIC_PORT in `nicstart.sh`
-- For full NIST NVD CVE tracking, get a REST API key at https://nvd.nist.gov/developers/request-an-api-key and configure it in `nicstart.sh`
+  - http://127.0.0.1:5000/instances or http://127.0.0.1:5000/f5tt/instances for JSON reporting.
+  - http://127.0.0.1:5000/metrics or http://127.0.0.1:5000/f5tt/metrics for Prometheus metrics
+- Port 5000 is used by default, it can be customized setting F5TT_PORT in `f5tt.sh`
+- For full NIST NVD CVE tracking, get a REST API key at https://nvd.nist.gov/developers/request-an-api-key and configure it in `f5tt.sh`

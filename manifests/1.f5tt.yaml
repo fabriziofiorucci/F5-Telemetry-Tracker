@@ -1,30 +1,30 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: nginx-instance-counter
-  namespace: nginx-instance-counter
+  name: f5tt
+  namespace: f5tt
   labels:
-    app: nginx-instance-counter
+    app: f5tt
 spec:
   selector:
     matchLabels:
-      app: nginx-instance-counter
+      app: f5tt
   replicas: 1
   template:
     metadata:
       labels:
-        app: nginx-instance-counter
+        app: f5tt
     spec:
       containers:
-      - name: nginx-instance-counter
-        image: fiorucci/nginx-instance-counter:5.3
+      - name: f5tt
+        image: fiorucci/f5-telemetry-tracker:1.0
         ports:
         - containerPort: 5000
         env:
           ### Optional listen address and port
-          #- name: NIC_ADDRESS
+          #- name: F5TT_ADDRESS
           #  value: 0.0.0.0
-          #- name: NIC_PORT
+          #- name: F5TT_PORT
           #  value: 5000
 
           ### Optional HTTP(S) Proxy
@@ -132,41 +132,41 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: nginx-instance-counter
-  namespace: nginx-instance-counter
+  name: f5tt
+  namespace: f5tt
   labels:
-    app: nginx-instance-counter
+    app: f5tt
 spec:
   ports:
   - name: http
     port: 5000
   selector:
-    app: nginx-instance-counter
+    app: f5tt
   type: ClusterIP
 
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: nginx-instance-counter
-  namespace: nginx-instance-counter
+  name: f5tt
+  namespace: f5tt
   annotations:
     nginx.org/proxy-connect-timeout: "30s"
     nginx.org/proxy-read-timeout: "20s"
     nginx.org/client-max-body-size: "4m"
     nginx.com/health-checks: "true"
   labels:
-    app: nginx-instance-counter
+    app: f5tt
 spec:
   ingressClassName: nginx
   rules:
-    - host: counter.nginx.ff.lan
+    - host: f5tt.ff.lan
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: nginx-instance-counter
+                name: f5tt
                 port:
                   number: 5000

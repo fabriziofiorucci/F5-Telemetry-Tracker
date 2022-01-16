@@ -1,14 +1,14 @@
 #!/bin/bash
 
 ### Optional listen address and port
-#export NIC_ADDRESS=0.0.0.0
-#export NIC_PORT=5000
+#export F5TT_ADDRESS=0.0.0.0
+#export F5TT_PORT=5000
 
 ### Optional HTTP(S) proxy
 #export HTTP_PROXY="http(s)://username:password@proxy_ip:port"
 #export HTTPS_PROXY="http(s)://username:password@proxy_ip:port"
 
-### Optional NIST API Key for full CVE tracking (https://nvd.nist.gov/developers/request-an-api-key)
+### Optional NIST API Key for CVE tracking (https://nvd.nist.gov/developers/request-an-api-key)
 #export NIST_API_KEY=xxxxxxxx
 
 ### Section to use when polling NGINX Controller
@@ -43,7 +43,7 @@
 
 #export STATS_PUSH_ENABLE="true"
 #export STATS_PUSH_MODE=NGINX_PUSH
-#export STATS_PUSH_URL="http://pushgateway.nginx.ff.lan"
+#export STATS_PUSH_URL="http://pushgateway.f5tt.ff.lan"
 # STATS_PUSH_INTERVAL in seconds
 #export STATS_PUSH_INTERVAL=10
 #export STATS_PUSH_USERNAME="authusername"
@@ -74,4 +74,5 @@
 #export EMAIL_AUTH_USER="username@domain"
 #export EMAIL_AUTH_PASS="thepassword"
 
-python3 app.py
+
+./F5-Telemetry-Tracker.AppImage

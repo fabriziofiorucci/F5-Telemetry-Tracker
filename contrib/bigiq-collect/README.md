@@ -3,7 +3,7 @@
 ## Description
 
 The bigIQCollect.sh script must be copied and run on a BIG-IQ Centralized Manager instance. It will collect raw JSON files and package them into a single .tgz file:
-the .tgz file can then be processed offline by the Instance Counter to generate the final JSON file
+the .tgz file can then be processed offline by F5 Telemetry Tracker to generate the final JSON file
 
 sampledata.tgz is provided for testing purposes
 
@@ -18,13 +18,34 @@ bigIQCollect.sh                              100% 1611   789.7KB/s   00:00
 $ 
 ```
 
-- SSH to your BIG-IQ CM instance and run the collection script using "admin" as the authentication username and its password
+- SSH to your BIG-IQ CM instance and run the collection script with no parameters to display the help banner
+
+```
+$ ssh root@bigiq.f5   
+(root@bigiq.f5) Password: 
+Last login: Fri Nov 19 00:00:05 2021 from 192.168.1.18
+[root@bigiq:Active:Standalone] config # chmod +x /tmp/bigIQCollect.sh 
+[root@bigiq:Active:Standalone] config # /tmp/bigIQCollect.sh 
+F5 Telemetry Tracker - https://github.com/fabriziofiorucci/F5-Telemetry-Tracker
+
+ ./bigIQCollect.sh [options]
+
+ -h             - This help
+ -i             - Interactive mode
+ -u [username]  - BIG-IQ username (batch mode)
+ -p [password]  - BIG-IQ password (batch mode)
+
+ Interactive mode:      ./bigIQCollect.sh -i
+ Batch mode:            ./bigIQCollect.sh -u [username] -p [password]
+```
+
+- On BIG-IQ CM run the collection script using "admin" as the authentication username and its password
 
 ```
 $ ssh root@bigiq.f5
 (root@bigiq.f5) Password: 
 Last login: Fri Nov 19 00:00:05 2021 from 192.168.1.18
-[root@bigiq:Active:Standalone] config # . /tmp/bigIQCollect.sh admin the-admin-password
+[root@bigiq:Active:Standalone] config # . /tmp/bigIQCollect.sh -u admin -p the-admin-password
 -> Reading device list
 -> Reading system provisioning
 -> Reading device inventory
@@ -51,13 +72,13 @@ $ scp root@bigiq.f5:/tmp/20220113-0005-bigIQCollect.tgz .
 $ 
 ```
 
-- Start the Instance Counter and the additional fileserver script to process the tgz file and generate the target JSON file
+- Start F5 Telemetry Tracker and the additional fileserver script to process the tgz file and generate the target JSON file
 
 ```
-$ ./nicfsStart.sh 20220113-0005-bigIQCollect.tgz
+$ ./f5ttFsStart.sh 20220113-0005-bigIQCollect.tgz
 /tmp/tmp.ekuupTf6nD
 Using JSON directory [ /tmp/tmp.ekuupTf6nD ]
- * Serving Flask app 'nicfs' (lazy loading)
+ * Serving Flask app 'f5ttfs' (lazy loading)
  * Environment: production
    WARNING: This is a development server. Do not use it in a production deployment.
    Use a production WSGI server instead.
@@ -80,7 +101,7 @@ Running REST API/Prometheus metrics server
 192.168.1.18 - - [19/Nov/2021 00:03:32] "POST /mgmt/cm/device/tasks/device-inventory HTTP/1.1" 405 -
 ```
 
-- Query the Instance Counter from another terminal session to get the target JSON file
+- Query F5 Telemetry Tracker from another terminal session to get the target JSON file
 
 Uncompressed output:
 

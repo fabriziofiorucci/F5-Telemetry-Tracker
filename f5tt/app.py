@@ -39,7 +39,7 @@ proxyDict = {}
 def scheduledPush(url, username, password, interval, pushmode):
     counter = 0
 
-    pushgatewayUrl = url + "/metrics/job/nginx-instance-counter"
+    pushgatewayUrl = url + "/metrics/job/f5tt"
 
     while counter >= 0:
         try:
@@ -158,7 +158,7 @@ def scheduledEmail(email_server, email_server_port, email_server_type, email_aut
 
 # Returns stats in json format
 @app.get("/instances")
-@app.get("/counter/instances")
+@app.get("/f5tt/instances")
 def getInstances(request: Request):
     if nc_mode == 'NGINX_CONTROLLER':
         reply,code = nc.ncInstances(fqdn=nc_fqdn, username=nc_user, password=nc_pass, mode='JSON', proxy=proxyDict)
@@ -184,7 +184,7 @@ def getInstances(request: Request):
 
 # Returns stats in prometheus format
 @app.get("/metrics")
-@app.get("/counter/metrics")
+@app.get("/f5tt/metrics")
 def getMetrics():
     if nc_mode == 'NGINX_CONTROLLER':
         reply,code = nc.ncInstances(fqdn=nc_fqdn, username=nc_user, password=nc_pass, mode='PROMETHEUS', proxy=proxyDict)
@@ -199,7 +199,7 @@ def getMetrics():
 
 
 @app.get("/reporting/{reportingType}")
-@app.get("/counter/reporting/{reportingType}")
+@app.get("/f5tt/reporting/{reportingType}")
 def getReporting(reportingType: str):
     if nc_mode == 'BIG_IQ':
         if reportingType == 'xls':
@@ -319,11 +319,11 @@ if __name__ == '__main__':
         # REST API / prometheus metrics server
         print('Running REST API/Prometheus metrics server')
 
-        nicPort = 5000
-        nicAddress = "0.0.0.0"
-        if "NIC_PORT" in os.environ:
-            nicPort = os.environ['NIC_PORT']
-        if "NIC_ADDRESS" in os.environ:
-            nicAddress = os.environ['NIC_ADDRESS']
+        f5ttPort = 5000
+        f5ttAddress = "0.0.0.0"
+        if "F5TT_PORT" in os.environ:
+            f5ttPort = os.environ['F5TT_PORT']
+        if "F5TT_ADDRESS" in os.environ:
+            f5ttAddress = os.environ['F5tt_ADDRESS']
 
-        uvicorn.run("app:app", host=nicAddress, port=nicPort)
+        uvicorn.run("app:app", host=f5ttAddress, port=f5ttPort)

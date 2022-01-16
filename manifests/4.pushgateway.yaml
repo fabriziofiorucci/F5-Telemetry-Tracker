@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: pushgateway
-  namespace: nginx-instance-counter
+  namespace: f5tt
   labels:
     app: pushgateway
 spec:
@@ -26,7 +26,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: pushgateway
-  namespace: nginx-instance-counter
+  namespace: f5tt
   labels:
     app: pushgateway
 spec:
@@ -40,7 +40,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: pushgateway
-  namespace: nginx-instance-counter
+  namespace: f5tt
   annotations:
     nginx.org/proxy-connect-timeout: "30s"
     nginx.org/proxy-read-timeout: "20s"
@@ -53,7 +53,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: pushgateway.nginx.ff.lan
+    - host: pushgateway.f5tt.ff.lan
       http:
         paths:
           - path: /

@@ -2,14 +2,14 @@
 
 ## REST API mode
 
-For `/instances` and `/counter/instances` endpoints if the request includes the `Accept-Encoding: gzip` header the response will be compressed
+For `/instances` and `/f5tt/instances` endpoints if the request includes the `Accept-Encoding: gzip` header the response will be compressed
 
 To get instance statistics in JSON format:
 
 NGINX Instance Manager 1.x
 
 ```
-$ curl -s http://counter.nginx.ff.lan/instances | jq
+$ curl -s http://f5tt.ff.lan/instances | jq
 {
   "subscription": {
     "id": "NGX-Subscription-1-TRL-XXXXXX",
@@ -55,7 +55,7 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
 NGINX Instance Manager 2.x
 
 ```
-$ curl -s http://counter.nginx.ff.lan/instances | jq 
+$ curl -s http://f5tt.ff.lan/instances | jq 
 {
   "subscription": {
     "id": "NGX-Subscription-1-TRL-XXXXXX",
@@ -205,7 +205,7 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
 NGINX Controller
 
 ```
-$ curl -s http://counter.nginx.ff.lan/instances | jq 
+$ curl -s http://f5tt.ff.lan/instances | jq 
 {
   "subscription": {
     "id": "XYZ",
@@ -426,7 +426,7 @@ $ curl -s http://counter.nginx.ff.lan/instances | jq
 BIG-IQ
 
 ```
-$ curl -s http://counter.nginx.ff.lan/instances | jq
+$ curl -s http://f5tt.ff.lan/instances | jq
 {
   "instances": [
     {
@@ -756,7 +756,7 @@ Prometheus endpoint:
 Pulling from NGINX Instance Manager
 
 ```
-$ curl -s http://counter.nginx.ff.lan/metrics
+$ curl -s http://f5tt.ff.lan/metrics
 # HELP nginx_oss_online_instances Online NGINX OSS instances
 # TYPE nginx_oss_online_instances gauge
 nginx_oss_online_instances{subscription="NGX-Subscription-1-TRL-064788",instanceType="INSTANCE_MANAGER",instanceVersion="1.0.2",instanceSerial="6232847160738694"} 1
@@ -768,7 +768,7 @@ nginx_plus_online_instances{subscription="NGX-Subscription-1-TRL-064788",instanc
 Pulling from NGINX Controller
 
 ```
-$ curl -s http://counter.nginx.ff.lan/metrics
+$ curl -s http://f5tt.ff.lan/metrics
 # HELP nginx_plus_online_instances Online NGINX Plus instances
 # TYPE nginx_plus_online_instances gauge
 nginx_plus_online_instances{subscription="NGX-Subscription-1-TRL-046027",instanceType="NGINX Controller",instanceVersion="3.18.2",location="test"} 0
@@ -786,7 +786,7 @@ nginx_plus_offline_instances{subscription="NGX-Subscription-1-TRL-046027",instan
 Pulling from BIG-IQ
 
 ```
-$ curl -s https://counter.nginx.ff.lan/metrics
+$ curl -s https://f5tt.ff.lan/metrics
 # HELP bigip_online_instances Online BIG-IP instances
 # TYPE bigip_online_instances gauge
 bigip_online_instances{instanceType="BIG-IQ",bigiq_url="https://10.155.153.208:443"} 2
@@ -847,7 +847,7 @@ Authorization: Basic YWE6YmI=
 A dynamically updated report in xls format can be downloaded by accessing either:
 
 - `/reporting/xls`
-- `/counter/reporting/xls`
+- `/f5tt/reporting/xls`
 
 This is currently available when querying BIG-IQ
 

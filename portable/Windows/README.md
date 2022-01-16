@@ -1,6 +1,6 @@
 # F5 Telemetry Tracker - Portable image for Windows
 
-Portable images have been built using [Nuitka](https://nuitka.net/) and can be downloaded from the [releases page](https://github.com/fabriziofiorucci/NGINX-InstanceCounter/releases)
+Portable images have been built using [Nuitka](https://nuitka.net/) and can be downloaded from the [releases page](https://github.com/fabriziofiorucci/F5-Telemetry-Tracker/releases)
 
 Supported control planes:
 
@@ -25,19 +25,19 @@ pip install zstandard
 python -m nuitka --onefile --mingw64 app.py
 ```
 
-- Rename `app.exe` to `NGINX-InstanceCounter.exe` and move it to /portable/Linux
+- Rename `app.exe` to `F5-Telemetry-Tracker.exe` and move it to /portable/Linux
 
-- Edit and use the provided `nicstart.bat` script to run the generated image
+- Edit and use the provided `f5tt.bat` script to run the generated image
 
-- Upon startup Windows will ask to allow traffic from the image to NGINX Instance Manager, NGINX Controller or BIG-IQ: all traffic is sent to NIM/NC/BIG-IQ management IP address and port (configurabile from `nicstart.bat`)
+- Upon startup Windows will ask to allow traffic from the image to NGINX Instance Manager, NGINX Controller or BIG-IQ: all traffic is sent to NIM/NC/BIG-IQ management IP address and port (configurabile from `f5tt.bat`)
 
 <img src="/portable/Windows/images/portable-windows.1.jpg"/>
 
 - When the F5 Telemetry Tracker has started, it can be queried sending a GET request to:
-  - http://127.0.0.1:5000/instances or http://127.0.0.1:5000/counter/instances for JSON reporting.
-  - http://127.0.0.1:5000/metrics or http://127.0.0.1:5000/counter/metrics for Prometheus metrics 
+  - http://127.0.0.1:5000/instances or http://127.0.0.1:5000/f5tt/instances for JSON reporting.
+  - http://127.0.0.1:5000/metrics or http://127.0.0.1:5000/f5tt/metrics for Prometheus metrics 
 
-- Port 5000 is used by default, it can be customized setting NIC_PORT in `nicstart.bat`
-- For full NIST NVD CVE tracking, get a REST API key at https://nvd.nist.gov/developers/request-an-api-key and configure it in `nicstart.bat`
+- Port 5000 is used by default, it can be customized setting F5TT_PORT in `f5tt.bat`
+- For full NIST NVD CVE tracking, get a REST API key at https://nvd.nist.gov/developers/request-an-api-key and configure it in `f5tt.bat`
 
 <img src="/portable/Windows/images/portable-windows.2.jpg"/>

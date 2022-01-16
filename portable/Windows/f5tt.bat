@@ -1,8 +1,8 @@
 @echo off
 
 rem ### Optional listen address and port
-rem set NIC_ADDRESS=0.0.0.0
-rem set NIC_PORT=5000
+rem set F5TT_ADDRESS=0.0.0.0
+rem set F5TT_PORT=5000
 
 rem ### Optional HTTP(S) proxy
 rem set HTTP_PROXY=http(s)://username:password@proxy_ip:port
@@ -43,7 +43,7 @@ rem ### Section to use when using push in pushgateway mode (basic auth username/
 
 rem set STATS_PUSH_ENABLE=true
 rem set STATS_PUSH_MODE=NGINX_PUSH
-rem set STATS_PUSH_URL=http://pushgateway.nginx.ff.lan
+rem set STATS_PUSH_URL=http://pushgateway.f5tt.ff.lan
 rem ### STATS_PUSH_INTERVAL in seconds
 rem set STATS_PUSH_INTERVAL=10
 rem set STATS_PUSH_USERNAME=authusername
@@ -74,4 +74,4 @@ rem ### Optional for SMTP authentication
 rem set EMAIL_AUTH_USER=username@domain
 rem set EMAIL_AUTH_PASS=thepassword
 
-NGINX-InstanceCounter.exe
+F5-Telemetry-Tracker.exe

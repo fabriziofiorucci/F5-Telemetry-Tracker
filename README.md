@@ -13,10 +13,10 @@ It has been tested against:
 Communication to NGINX Controller / NGINX Instance Manager / BIG-IQ is based on REST API, current features are:
 
 - REST API mode
-  - `/instances` and `/counter/instances` - return JSON output - If the request includes the `Accept-Encoding: gzip` header the response will be compressed
-  - `/metrics` and `/counter/metrics` - return Prometheus compliant output
+  - `/instances` and `/f5tt/instances` - return JSON output - If the request includes the `Accept-Encoding: gzip` header the response will be compressed
+  - `/metrics` and `/f5tt/metrics` - return Prometheus compliant output
 - High level reporting
-  - `/reporting/xls` and `/counter/reporting/xls` - return a reporting spreadsheet in xls format (currently supported for BIG-IQ, when running as native python code and docker image only)
+  - `/reporting/xls` and `/f5tt/reporting/xls` - return a reporting spreadsheet in xls format (currently supported for BIG-IQ, when running as native python code and docker image only)
 - Push mode
   - POSTs instance statistics to a user-defined HTTP(S) URL (STATS_PUSH_MODE: CUSTOM)
   - Pushes instance statistics to pushgateway (STATS_PUSH_MODE: NGINX_PUSH)
@@ -62,19 +62,19 @@ Push mode: F5 Telemetry Tracker pushes stats to a remote data collection and vis
 The F5 Telemetry Tracker image is available on Docker Hub as:
 
 ```
-fiorucci/nginx-instance-counter:5.3
+fiorucci/f5-telemetry-tracker:1.0
 ```
 
-The 1.instancecounter.yaml file references that by default.
+The 1.f5tt.yaml file references that by default.
 
 If you need to build and push NGINX your own image to a private registry:
 
 ```
-git clone fabriziofiorucci/NGINX-InstanceCounter
-cd NGINX-InstanceCounter/nginx-instance-counter
+git clone fabriziofiorucci/F5-Telemetry-Tracker
+cd F5-Telemetry-Tracker/f5tt
 
-docker build --no-cache -t PRIVATE_REGISTRY:PORT/nginx-instance-counter:5.3 .
-docker push PRIVATE_REGISTRY:PORT/nginx-instance-counter:5.3
+docker build --no-cache -t PRIVATE_REGISTRY:PORT/f5-telemetry-tracker:1.0 .
+docker push PRIVATE_REGISTRY:PORT/f5-telemetry-tracker:1.0
 ```
 
 ## As a native python application
@@ -89,7 +89,7 @@ F5 Telemetry Tracker requires:
 - [XLSX Writer](https://pypi.org/project/XlsxWriter/)
 - [Pandas](https://pandas.pydata.org/)
 
-nginx-instance-counter/nicstart.sh is a sample script to run F5 Telemetry Tracker from bash
+f5tt/f5tt.sh is a sample script to run F5 Telemetry Tracker from bash
 
 ## As a portable application
 
@@ -106,10 +106,10 @@ See the [BIG-IQ Collection script](/contrib/bigiq-collect)
 ## For Kubernetes/Openshift
 
 ```
-cd NGINX-InstanceCounter/manifests
+cd F5-Telemetry-Tracker/manifests
 ```
 
-Edit `1.instancecounter.yaml` to customize:
+Edit `1.f5tt.yaml` to customize:
 
 - image name:
   - To be set to your private registry image (only if not using the image available on Docker Hub)
@@ -117,8 +117,8 @@ Edit `1.instancecounter.yaml` to customize:
 
 | Variable  | Description |
 | ------------- |-------------|
-| NIC_ADDRESS | optional IP address F5 Telemetry Tracker should listen on. Default is 0.0.0.0 |
-| NIC_PORT| optional TCP port F5 Telemetry Tracker should listen on. Default is 5000
+| F5TT_ADDRESS | optional IP address F5 Telemetry Tracker should listen on. Default is 0.0.0.0 |
+| F5TT_PORT| optional TCP port F5 Telemetry Tracker should listen on. Default is 5000
 | HTTP_PROXY| to be set if HTTP proxy must be used to connect to NGINX Controller, NGINX Instance Manager or BIG-IQ
 | HTTPS_PROXY| to be set if HTTPS proxy must be used to connect to NGINX Controller, NGINX Instance Manager or BIG-IQ
 | NIST_API_KEY| API Key for full NIST NVD CVE tracking (get your key at https://nvd.nist.gov/developers/request-an-api-key)
@@ -143,13 +143,13 @@ Edit `1.instancecounter.yaml` to customize:
 | EMAIL_RECIPIENT| the recipient email address |
 
 - Ingress host:
-  - By default it is set to counter.nginx.ff.lan
+  - By default it is set to f5tt.ff.lan
 
 For standalone operations (ie. REST API + optional push to custom URL):
 
 ```
 kubectl apply -f 0.ns.yaml
-kubectl apply -f 1.instancecounter.yaml
+kubectl apply -f 1.f5tt.yaml
 ```
 
 To push statistics to pushgateway also apply:
@@ -164,19 +164,19 @@ By default `2.prometheus.yaml` is configured for push mode, it must be edited de
 
 To setup visualization:
 
-- Grafana shall be configured with a Prometheus datasource using by default http://prometheus.nginx.ff.lan
-- Import the `contrib/grafana/NGINX-InstanceCounter-dashboard.json` sample dashboard in Grafana
+- Grafana shall be configured with a Prometheus datasource using by default http://prometheus.f5tt.ff.lan
+- Import the `contrib/grafana/F5-Telemetry-Tracker.json` sample dashboard in Grafana
 
 Service names created by default as Ingress resources are:
 
-- counter.nginx.ff.lan - REST API and Prometheus scraping endpoint
-- pushgateway.nginx.ff.lan - Pushgateway web GUI
-- prometheus.nginx.ff.lan - Prometheus web GUI
-- grafana.nginx.ff.lan - Grafana visualization web GUI
+- f5tt.ff.lan - REST API and Prometheus scraping endpoint
+- pushgateway.f5tt.ff.lan - Pushgateway web GUI
+- prometheus.f5tt.ff.lan - Prometheus web GUI
+- grafana.f5tt.ff.lan - Grafana visualization web GUI
 
 ## As a native python application
 
-Edit nginx-instance-counter/nicstart.sh and run it
+Edit f5tt/f5tt.sh and run it
 
 ## Using F5 Support solutions
 

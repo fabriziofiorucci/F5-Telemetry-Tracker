@@ -13,6 +13,7 @@ WORKDIR /deployment
 COPY app.py .
 COPY nc.py .
 COPY nim.py .
+COPY nms.py .
 COPY bigiq.py .
 COPY cveDB.py .
 

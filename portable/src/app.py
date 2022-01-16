@@ -37,7 +37,7 @@ nc_pass = os.environ['NGINX_CONTROLLER_PASSWORD']
 def scheduledPush(url, username, password, interval, pushmode):
     counter = 0
 
-    pushgatewayUrl = url + "/metrics/job/nginx-instance-counter"
+    pushgatewayUrl = url + "/metrics/job/f5tt"
 
     while (counter >= 0):
         try:
@@ -158,7 +158,7 @@ def scheduledEmail(email_server, email_server_port, email_server_type, email_aut
 
 # Returns stats in json format
 @app.route('/instances', methods=['GET'])
-@app.route('/counter/instances', methods=['GET'])
+@app.route('/f5tt/instances', methods=['GET'])
 def getInstances():
     if nc_mode == 'NGINX_CONTROLLER':
         return Response(nc.ncInstances(fqdn=nc_fqdn, username=nc_user, password=nc_pass, mode='JSON', proxy=proxyDict),
@@ -173,7 +173,7 @@ def getInstances():
 
 # Returns stats in prometheus format
 @app.route('/metrics', methods=['GET'])
-@app.route('/counter/metrics', methods=['GET'])
+@app.route('/f5tt/metrics', methods=['GET'])
 def getMetrics():
     if nc_mode == 'NGINX_CONTROLLER':
         return nc.ncInstances(fqdn=nc_fqdn, username=nc_user, password=nc_pass, mode='PROMETHEUS', proxy=proxyDict)
@@ -283,11 +283,11 @@ if __name__ == '__main__':
         # REST API / prometheus metrics server
         print('Running REST API/Prometheus metrics server')
 
-        nicPort = 5000
-        nicAddress = "0.0.0.0"
-        if "NIC_PORT" in os.environ:
-            nicPort = os.environ['NIC_PORT']
-        if "NIC_ADDRESS" in os.environ:
-            nicAddress = os.environ['NIC_ADDRESS']
+        f5ttPort = 5000
+        f5ttAddress = "0.0.0.0"
+        if "F5TT_PORT" in os.environ:
+            f5ttPort = os.environ['F5TT_PORT']
+        if "F5TT_ADDRESS" in os.environ:
+            f5ttAddress = os.environ['F5TT_ADDRESS']
 
-        app.run(host=nicAddress, port=nicPort)
+        app.run(host=f5ttAddress, port=f5ttPort)
