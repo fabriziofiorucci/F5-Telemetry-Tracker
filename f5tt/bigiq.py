@@ -344,27 +344,31 @@ def bigIqInventory(mode):
                     inventoryData['inventoryStatus']="partial"
                   else:
                     # Get platform name and SKU
-                    platformCode=invDevice['infoState']['platform']
-                    platformInsights={}
-                    if platformCode in hwPlatforms:
-                      platformDetails=hwPlatforms[platformCode]
-                      platformType=platformDetails.split('|')[0]
-                      platformSKU=platformDetails.split('|')[1]
+                    if 'platform' in invDevice['infoState']:
+                      platformCode=invDevice['infoState']['platform']
+                      platformInsights={}
+                      if platformCode in hwPlatforms:
+                        platformDetails=hwPlatforms[platformCode]
+                        platformType=platformDetails.split('|')[0]
+                        platformSKU=platformDetails.split('|')[1]
 
-                      if platformSKU in hwSKUGrandTotals:
-                        hwSKUGrandTotals[platformSKU] += 1
-                      else:
-                        hwSKUGrandTotals[platformSKU] = 1
+                        if platformSKU in hwSKUGrandTotals:
+                          hwSKUGrandTotals[platformSKU] += 1
+                        else:
+                          hwSKUGrandTotals[platformSKU] = 1
 
-                      platformInsights['type']=platformType
-                      platformInsights['sku']=platformSKU
+                        platformInsights['type']=platformType
+                        platformInsights['sku']=platformSKU
 
                     platformInsights['code']=platformCode
 
                     inventoryData['inventoryStatus'] = "full"
                     inventoryData['registrationKey'] = invDevice['infoState']['license']['registrationKey']
                     inventoryData['activeModules'] = invDevice['infoState']['license']['activeModules']
-                    inventoryData['chassisSerialNumber'] = invDevice['infoState']['chassisSerialNumber'].strip()
+                    if 'chassisSerialNumber' in invDevice['infoState']:
+                      inventoryData['chassisSerialNumber'] = invDevice['infoState']['chassisSerialNumber'].strip()
+                    else:
+                      inventoryData['chassisSerialNumber'] = ""
                     inventoryData['platform'] = platformInsights
 
                     if 'licenseEndDateTime' in invDevice['infoState']['license']:
