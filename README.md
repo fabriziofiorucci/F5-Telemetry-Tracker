@@ -62,7 +62,7 @@ Push mode: F5 Telemetry Tracker pushes stats to a remote data collection and vis
 The F5 Telemetry Tracker image is available on Docker Hub as:
 
 ```
-fiorucci/f5-telemetry-tracker:1.0
+fiorucci/f5-telemetry-tracker:1.1
 ```
 
 The 1.f5tt.yaml file references that by default.
@@ -73,8 +73,8 @@ If you need to build and push NGINX your own image to a private registry:
 git clone fabriziofiorucci/F5-Telemetry-Tracker
 cd F5-Telemetry-Tracker/f5tt
 
-docker build --no-cache -t PRIVATE_REGISTRY:PORT/f5-telemetry-tracker:1.0 .
-docker push PRIVATE_REGISTRY:PORT/f5-telemetry-tracker:1.0
+docker build --no-cache -t PRIVATE_REGISTRY:PORT/f5-telemetry-tracker:1.1 .
+docker push PRIVATE_REGISTRY:PORT/f5-telemetry-tracker:1.1
 ```
 
 ## As a native python application
@@ -143,7 +143,7 @@ Edit `1.f5tt.yaml` to customize:
 | EMAIL_RECIPIENT| the recipient email address |
 
 - Ingress host:
-  - By default it is set to f5tt.ff.lan
+  - By default it is set to `f5tt.ff.lan`
 
 For standalone operations (ie. REST API + optional push to custom URL):
 
@@ -169,21 +169,21 @@ To setup visualization:
 
 Service names created by default as Ingress resources are:
 
-- f5tt.ff.lan - REST API and Prometheus scraping endpoint
-- pushgateway.f5tt.ff.lan - Pushgateway web GUI
-- prometheus.f5tt.ff.lan - Prometheus web GUI
-- grafana.f5tt.ff.lan - Grafana visualization web GUI
+- `f5tt.ff.lan` - REST API and Prometheus scraping endpoint
+- `pushgateway.f5tt.ff.lan` - Pushgateway web GUI
+- `prometheus.f5tt.ff.lan` - Prometheus web GUI
+- `grafana.f5tt.ff.lan` - Grafana visualization web GUI
 
 ## As a native python application
 
-Edit f5tt/f5tt.sh and run it
+Edit `f5tt/f5tt.sh` and run it
 
 ## Using F5 Support solutions
 
 See F5 Support solutions:
 
-- K83394355: How to count the number of NGINX instances with NGINX Instance Manager - https://support.f5.com/csp/article/K83394355
-- K45028541: How to count the number of NGINX instances with NGINX Controller - https://support.f5.com/csp/article/K45028541
+- K83394355: How to count the number of NGINX instances with F5 Telemetry Tracker on NGINX Instance Manager - https://support.f5.com/csp/article/K83394355
+- K45028541: How to count the number of NGINX instances with F5 Telemetry Tracker on NGINX Controller - https://support.f5.com/csp/article/K45028541
 
 # Usage
 

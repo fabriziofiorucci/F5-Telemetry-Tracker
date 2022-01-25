@@ -747,6 +747,21 @@ $ curl -s http://f5tt.ff.lan/instances | jq
         [...]
       }
     }
+  ],
+  "utilityBilling": [
+    {
+      "product": "big-iq",
+      "version": "8.1.0.2.0.0.36",
+      "reportType": "pool usage",
+      "poolType": "CLPv2",
+      "regkey": "XXXXX-XXXXXX-XXX-XXXXXXX-XXXXXXX",
+      "poolRegkey": "XXXXX-XXXXXX-XXX-XXXXXXX-XXXXXXX",
+      "poolName": "Lab License Pool",
+      "periodStarted": "2022-01-25T10:59:02Z",
+      "periodEnded": "2022-01-25T11:08:10Z",
+      "records": []
+    },
+    [...]
   ]
 }
 ```

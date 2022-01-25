@@ -276,9 +276,29 @@ def bigIQgetInventory():
     return res,body
 
 
+# Returns all utility licenses
+def bigIQGetLicenses():
+  return bigIQcallRESTURI(method = "GET",uri = "/mgmt/cm/device/licensing/pool/utility/licenses", body = "", params = { '$select': 'regKey,status' })
+
+
+# Create billing report request
+def bigIQCreateBillingReport(regKey):
+  return bigIQcallRESTURI(method = "POST", uri = "/mgmt/cm/device/tasks/licensing/utility-billing-reports", body = {'regKey': regKey, 'submissionMethod': 'Automatic' } )
+
+
+# Get billing report status
+def bigIQCheckBillingReport(reportId):
+  return bigIQcallRESTURI(method = "GET", uri = "/mgmt/cm/device/tasks/licensing/utility-billing-reports/"+reportId, body = "" )
+
+
+# Fetch billing report
+def bigIQFetchBillingReport(reportFile):
+  return bigIQcallRESTURI(method = "GET", uri = "/mgmt/cm/device/licensing/license-reports-download/"+reportFile, body = "" )
+
+
 # Invokes the given BIG-IQ REST API method
 # The uri must start with '/'
-def bigIQcallRESTURI(method,uri,body):
+def bigIQcallRESTURI(method,uri,body,params=""):
   # Get authorization token
   authRes = requests.request("POST", this.bigiq_fqdn+"/mgmt/shared/authn/login", json = {'username': this.bigiq_username, 'password': this.bigiq_password}, verify=False, proxies=this.bigiq_proxy)
 
@@ -287,7 +307,7 @@ def bigIQcallRESTURI(method,uri,body):
   authToken = authRes.json()['token']['token']
 
   # Invokes the BIG-IQ REST API method
-  res = requests.request(method, this.bigiq_fqdn+uri, headers = { 'X-F5-Auth-Token': authToken }, json = body, verify=False, proxies=this.bigiq_proxy)
+  res = requests.request(method, this.bigiq_fqdn+uri, headers = { 'X-F5-Auth-Token': authToken }, json = body, verify=False, proxies=this.bigiq_proxy, params=params)
 
   data = {}
   if res.status_code == 200 or res.status_code == 202:
@@ -464,6 +484,7 @@ def bigIqInventory(mode):
     output['details'] = wholeInventory
     output['telemetry'] = []
     output['telemetry'] = bigIqTelemetry(mode)
+    output['utilityBilling'] = bigIQCollectUtilityBilling()
 
   elif mode == 'PROMETHEUS' or mode == 'PUSHGATEWAY':
     if mode == 'PROMETHEUS':
@@ -617,3 +638,51 @@ def bigIqTelemetry(mode):
     print("PROMETHEUS/PUSHGATEWAY")
   else:
     return telemetryBody
+
+
+# Collect utility billing report
+def bigIQCollectUtilityBilling():
+  utilityBillingReport=[]
+
+  res,allLicenses = bigIQGetLicenses()
+  if res != 200:
+    return res,utilityBillingReport.json()
+
+  if 'items' not in allLicenses:
+    return 200,utilityBillingReport
+
+  # Utility billing report generation for all licenses
+  for i in allLicenses['items']:
+    report = {}
+    regKey = i['regKey']
+
+    # Default report in case of errors
+    report['poolRegkey'] = regKey
+
+    # Utility billing report generation request
+    res,reportRequest = bigIQCreateBillingReport(regKey)
+
+    if res == 202:
+      retries = 3
+
+      while retries > 0:
+        retries -= 1
+        reportId = reportRequest['selfLink'].split("/")[-1]
+        time.sleep(2)
+
+        # Report availability check
+        res,r = bigIQCheckBillingReport(reportId)
+
+        if res == 200:
+          if r['status'] == "FINISHED":
+            reportFile = r['reportUri'].split("/")[-1]
+            res,theReport = bigIQFetchBillingReport(reportFile)
+            retries = 0
+
+            if res == 200:
+              report = theReport
+
+    # Utility billing report appended
+    utilityBillingReport.append(report)
+
+  return utilityBillingReport
