@@ -6,6 +6,8 @@ The `f5tt-bigiq-docker.sh` script can be used to run F5TT as a container on a BI
 
 BIG-IQ CM 8.1 must be able to pull docker images from docker hub.
 
+If BIG-IQ CM is airgapped (no access to the Internet) [these steps](/contrib/bigiq-docker/AIRGAPPED.md) must be followed
+
 ## Installation
 
 - Copy (scp) `f5tt-bigiq-docker.sh` from to BIG-IQ CM 8.1 instance, under /tmp/
