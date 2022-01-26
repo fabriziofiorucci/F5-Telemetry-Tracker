@@ -7,11 +7,15 @@
 #
 
 BANNER="F5 Telemetry Tracker - https://github.com/fabriziofiorucci/F5-Telemetry-Tracker\n\n
+This tool collects usage tracking data from BIG-IQ for offline postprocessing.\n\n
+=== Usage:\n\n
 $0 [options]\n\n
+=== Options:\n\n
 -h\t\t- This help\n
 -i\t\t- Interactive mode\n
 -u [username]\t- BIG-IQ username (batch mode)\n
 -p [password]\t- BIG-IQ password (batch mode)\n\n
+=== Examples:\n\n
 Interactive mode:\t$0 -i\n
 Batch mode:\t\t$0 -u [username] -p [password]\n
 "
