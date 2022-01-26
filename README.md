@@ -97,9 +97,9 @@ f5tt/f5tt.sh is a sample script to run F5 Telemetry Tracker from bash
 - [AppImage for Linux](/portable/Linux)
 - [AppImage for Windows 10](/portable/Windows)
 
-## Offline BIG-IQ mode
+## Additional modes of operation
 
-See the [BIG-IQ Collection script](/contrib/bigiq-collect)
+See the [contrib section](/contrib/)
 
 # How to deploy
 
