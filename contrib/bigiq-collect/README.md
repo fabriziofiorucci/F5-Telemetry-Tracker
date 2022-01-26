@@ -45,7 +45,9 @@ F5 Telemetry Tracker - https://github.com/fabriziofiorucci/F5-Telemetry-Tracker
 $ ssh root@bigiq.f5
 (root@bigiq.f5) Password: 
 Last login: Fri Nov 19 00:00:05 2021 from 192.168.1.18
-[root@bigiq:Active:Standalone] config # . /tmp/bigIQCollect.sh -u admin -p the-admin-password
+[root@bigiq:Active:Standalone] config # . /tmp/bigIQCollect.sh -i
+Username: admin
+Password: 
 -> Reading device list
 -> Reading system provisioning
 -> Reading device inventory
@@ -55,8 +57,10 @@ Last login: Fri Nov 19 00:00:05 2021 from 192.168.1.18
 -> Reading device telemetry
 -> Reading device telemetry datapoints for bigip1.f5.ff.lan
 -> Reading device telemetry datapoints for bigip2.f5.ff.lan
+-> Collecting utility billing for regkey XXXXX-YYYYY-ZZZZZ-TTTTT-OWQAQCD
+-> Collecting utility billing for regkey XXXXX-YYYYY-ZZZZZ-TTTTT-NFTJLBM
 -> Data collection completed, building tarfile
--> All done, copy /tmp/20220113-0005-bigIQCollect.tgz to your local host using scp
+-> All done, copy /tmp/20220126-0121-bigIQCollect.tgz to your local host using scp
 [root@bigiq:Active:Standalone] config # exit
 logout
 Connection to bigiq.f5 closed.
