@@ -61,7 +61,7 @@ F5 Telemetry Tracker - https://github.com/fabriziofiorucci/F5-Telemetry-Tracker
 
 ## Usage - manual mode
 
-- Start F5 Telemetry Tracker on BIG-IQ CM:
+- Start F5 Telemetry Tracker on BIG-IQ CM. Enter BIG-IQ admin username and the password
 
 ```
 [root@bigiq:Active:Standalone] config # /tmp/f5tt-bigiq-docker.sh -s
@@ -77,13 +77,13 @@ Uncompressed output:
 
 ```
 $ curl http://192.168.1.71:5000/instances
-{"instances":[{"bigip":2,"hwTotals":[{"F5-VE":2}],"swTotals":[{"H-VE-AFM":1,"H-VE-AWF":1,"H-VE-LTM":2,"H-VE-APM":1,"H-VE-DNS":1}]}],"details":[{"inventoryTimestamp":1641986071513,"inventoryStatus":"full"[...]
+{"instances":[{"bigip":2,"hwTotals":[{"F5-VE":2}],"swTotals":[{"H-VE-AFM":1,"H-VE-AWF":1,"H-VE-LTM":2,"H-VE-APM":1,"H-VE-DNS":1}]}],"details":[{"inventoryTimestamp":1641986071513,"inventoryStatus":"full"[...]}
 ```
 
 Compressed output:
 
 ```
-curl -s -H "Accept-Encoding: gzip" http://192.168.1.71:5000/instances --output output-json.gz
+$ curl -s -H "Accept-Encoding: gzip" http://192.168.1.71:5000/instances --output output-json.gz
 ```
 
 - Stop F5 Telemetry Tracker:
@@ -96,7 +96,7 @@ F5 Telemetry Tracker stopped
 
 ## Usage - all-in-one mode
 
-- Start F5 Telemetry Tracker on BIG-IQ CM in all-in-one mode:
+- Start F5 Telemetry Tracker on BIG-IQ CM in all-in-one mode. Enter BIG-IQ admin username and the password
 
 ```
 [root@bigiq:Active:Standalone] config # /tmp/f5tt-bigiq-docker.sh -a

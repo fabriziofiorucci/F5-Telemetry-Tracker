@@ -91,12 +91,6 @@ F5 Telemetry Tracker requires:
 
 f5tt/f5tt.sh is a sample script to run F5 Telemetry Tracker from bash
 
-## As a portable application
-
-- [All portable images](/portable)
-- [AppImage for Linux](/portable/Linux)
-- [AppImage for Windows 10](/portable/Windows)
-
 ## Additional modes of operation
 
 See the [contrib section](/contrib/)

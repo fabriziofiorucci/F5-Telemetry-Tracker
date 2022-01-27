@@ -25,9 +25,8 @@ app = Flask(__name__)
 # https://bigiq.f5.ff.lan/mgmt/cm/system/machineid-resolver/aabcaca7-6986-4d0b-b9fe-b72e3473144e
 #
 
-def getFileContent(filename):
+def getFileContent(filename,retCode=200):
   json=''
-  retCode=200
 
   try:
     with open(jsonDir+"/"+filename,"r") as f:
@@ -61,6 +60,23 @@ def getDeviceInventoryResults(inventoryId):
 @app.route('/mgmt/cm/system/machineid-resolver/<string:machineId>', methods=['GET'])
 def getMachineIdResolver(machineId):
   return getFileContent("machineid-resolver-"+machineId+".json")
+
+@app.route('/mgmt/cm/device/licensing/pool/utility/licenses', methods=['GET'])
+def getBillingLicenses():
+  return getFileContent("utilitybilling-licenses.json")
+
+@app.route('/mgmt/cm/device/tasks/licensing/utility-billing-reports', methods=['POST'])
+def postsCreateBillingReport():
+  return getFileContent("utilitybilling-createreport-"+request.json['regKey']+".json",retCode=202)
+
+@app.route('/mgmt/cm/device/tasks/licensing/utility-billing-reports/<string:reportId>', methods=['GET'])
+def getCheckBillingReport(reportId):
+  return getFileContent("utilitybilling-reportstatus-"+reportId+".json")
+
+@app.route('/mgmt/cm/device/licensing/license-reports-download/<string:reportFile>', methods=['GET'])
+def getDownloadBillingReport(reportFile):
+  return getFileContent("utilitybilling-billingreport-"+reportFile)
+
 
 @app.route('/mgmt/ap/query/v1/tenants/default/products/device/metric-query', methods=['POST'])
 def getDeviceMetric():

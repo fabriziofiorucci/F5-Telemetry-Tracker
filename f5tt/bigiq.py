@@ -674,9 +674,13 @@ def bigIQCollectUtilityBilling():
         res,r = bigIQCheckBillingReport(reportId)
 
         if res == 200:
-          if r['status'] == "FINISHED":
-            reportFile = r['reportUri'].split("/")[-1]
-            res,theReport = bigIQFetchBillingReport(reportFile)
+          if r['status'] == "FINISHED" or r['status'] == "FAILED":
+            if 'reportUri' in r:
+              reportFile = r['reportUri'].split("/")[-1]
+              res,theReport = bigIQFetchBillingReport(reportFile)
+            else:
+              res = 404
+
             retries = 0
 
             if res == 200:
