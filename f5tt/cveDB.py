@@ -6,6 +6,7 @@ import requests
 import time
 import urllib3.exceptions
 from requests import Request, Session
+from requests import ReadTimeout, ConnectTimeout, HTTPError, Timeout, ConnectionError
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
@@ -76,10 +77,12 @@ def __getFromNist(vendor,product="*",version="*"):
 
     p = s.prepare_request(req)
     s.proxies = proxy
-    res = s.send(p,verify=False)
-
-    if res.status_code == 200:
-      this.cveCachedDB[cpeMatchString]=res.json()
+    try:
+      res = s.send(p,verify=False)
+      if res.status_code == 200:
+        this.cveCachedDB[cpeMatchString]=res.json()
+    except (ConnectTimeout, HTTPError, ReadTimeout, Timeout, ConnectionError):
+        this.cveCachedDB[cpeMatchString]={}
 
   return this.cveCachedDB[cpeMatchString]
 

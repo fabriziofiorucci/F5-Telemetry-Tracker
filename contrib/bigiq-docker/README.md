@@ -149,7 +149,7 @@ Password:
 -> F5 Telemetry Tracker started on http://192.168.1.71:5000
 -> Collecting report...
 -> JSON report generated, copy /tmp/20220128-1907-instances.json to your local host using scp
-F5 Telemetry Tracker stopped
+-> F5 Telemetry Tracker stopped
 [root@bigiq:Active:Standalone] config #
 ```
 

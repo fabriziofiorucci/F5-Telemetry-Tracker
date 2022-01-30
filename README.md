@@ -62,7 +62,7 @@ Push mode: F5 Telemetry Tracker pushes stats to a remote data collection and vis
 The F5 Telemetry Tracker image is available on Docker Hub as:
 
 ```
-fiorucci/f5-telemetry-tracker:1.1
+fiorucci/f5-telemetry-tracker:latest
 ```
 
 The 1.f5tt.yaml file references that by default.
@@ -73,8 +73,8 @@ If you need to build and push NGINX your own image to a private registry:
 git clone fabriziofiorucci/F5-Telemetry-Tracker
 cd F5-Telemetry-Tracker/f5tt
 
-docker build --no-cache -t PRIVATE_REGISTRY:PORT/f5-telemetry-tracker:1.1 .
-docker push PRIVATE_REGISTRY:PORT/f5-telemetry-tracker:1.1
+docker build --no-cache -t PRIVATE_REGISTRY:PORT/f5-telemetry-tracker:latest .
+docker push PRIVATE_REGISTRY:PORT/f5-telemetry-tracker:latest
 ```
 
 ## As a native python application
