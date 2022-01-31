@@ -115,7 +115,7 @@ Loaded image: fiorucci/f5-telemetry-tracker:latest
 [root@bigiq:Active:Standalone] config #
 ```
 
-- Query F5 Telemetry Tracker from another system to get the JSON file. F5 Telemetry Tracking must be queried from a different system
+- Query F5 Telemetry Tracker from another system to get the JSON file. **F5 Telemetry Tracking must be queried from a different system**
 
 Uncompressed output:
 
