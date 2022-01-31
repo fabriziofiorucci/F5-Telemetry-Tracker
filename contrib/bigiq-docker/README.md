@@ -32,12 +32,13 @@ f5tt-bigiq-docker.sh                         100% 2440     4.7MB/s   00:00
 $ 
 ```
 
-- SSH to the BIG-IQ CM instance and run the script with no parameters to display the help banner
+- SSH to the BIG-IQ CM instance, set the execution attribute and run the script with no parameters to display the help banner
 
 ```
 $ ssh root@bigiq.f5
 Password: 
 Last login: Wed Jan 26 16:44:26 2022 from 192.168.1.26
+[root@bigiq:Active:Standalone] config # chmod +x /tmp/f5tt-bigiq-docker.sh 
 [root@bigiq:Active:Standalone] config # /tmp/f5tt-bigiq-docker.sh 
 $ ./f5tt-bigiq-docker.sh 
 F5 Telemetry Tracker - https://github.com/fabriziofiorucci/F5-Telemetry-Tracker
@@ -114,7 +115,7 @@ Loaded image: fiorucci/f5-telemetry-tracker:latest
 [root@bigiq:Active:Standalone] config #
 ```
 
-- Query F5 Telemetry Tracker from another system to get the JSON file
+- Query F5 Telemetry Tracker from another system to get the JSON file. F5 Telemetry Tracking must be queried from a different system
 
 Uncompressed output:
 
