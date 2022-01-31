@@ -8,7 +8,7 @@ The `f5tt-bigiq-docker.sh` script can be used to run F5TT as a container on a BI
 
 ### Optional steps
 
-*** Required only if BIG-IQ CM can't connect to the Internet to pull docker images from Docker Hub ***
+**Required only if BIG-IQ CM can't connect to the Internet to pull docker images from Docker Hub**
 
 - Download the latest docker image tar.gz file from [releases](https://github.com/fabriziofiorucci/F5-Telemetry-Tracker/releases) to your local host
 - Filename is `` F5-Telemetry-Tracker-X.Y.tar.gz ``
