@@ -74,12 +74,14 @@ def nmsInstances(mode):
   instanceType=license['currentStatus']['state']['currentInstance']['features'][0]['id']
   instanceVersion=license['currentStatus']['state']['currentInstance']['version']
   instanceSerial=license['currentStatus']['state']['currentInstance']['id']
-  totalManaged=len(system['items'])
+  totalManaged=0
 
   plusManaged=0
   for i in system['items']:
-    if i['nginxInstances'][0]['build']['nginxPlus'] == True:
-      plusManaged+=1
+    for instance in i['nginxInstances']:
+      totalManaged+=1
+      if instance['build']['nginxPlus'] == True:
+        plusManaged+=1
 
   output=''
 
@@ -110,9 +112,11 @@ def nmsInstances(mode):
 
       for instance in i['nginxInstances']:
         # Fetch instance details
-        status,instanceDetails = nmsRESTCall(method='GET',uri='/api/platform/v1/systems/'+systemId+'/instances/'+instance['uid'])
+        instanceUID = instance['uid']
+
+        status,instanceDetails = nmsRESTCall(method='GET',uri='/api/platform/v1/systems/'+systemId+'/instances/'+instanceUID)
         if status != 200:
-          return {'error': 'fetching instance details failed for '+systemId+' / '+instance['uid']},status
+          return {'error': 'fetching instance details failed for '+systemId+' / '+instanceUID},status
 
         # Fetch CVEs
         allCVE=cveDB.getNGINX(version=instanceDetails['build']['version'])
@@ -136,7 +140,7 @@ def nmsInstances(mode):
         detailsDict['CVE'] = []
         detailsDict['CVE'].append(allCVE)
 
-      output['details'].append(detailsDict)
+        output['details'].append(detailsDict)
 
   elif mode == 'PROMETHEUS' or mode == 'PUSHGATEWAY':
     if mode == 'PROMETHEUS':
