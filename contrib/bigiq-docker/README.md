@@ -32,7 +32,7 @@ f5tt-bigiq-docker.sh                         100% 2440     4.7MB/s   00:00
 $ 
 ```
 
-- SSH to the BIG-IQ CM instance, set the execution attribute and run the script with no parameters to display the help banner
+- SSH **as root** to the BIG-IQ CM instance, set the execution attribute and run the script with no parameters to display the help banner
 
 ```
 $ ssh root@bigiq.f5
