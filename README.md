@@ -50,7 +50,7 @@ Push mode: F5 Telemetry Tracker pushes stats to a remote data collection and vis
 - Private registry to push the F5 Telemetry Tracker image
 - One of:
   - NGINX Controller 3.18, 3.18.2, apim-3.19.2
-  - NGINX Instance Manager 1.0.1, 1.0.2, 1.0.3, 1.0.4, 2.0
+  - NGINX Instance Manager 1.0.1, 1.0.2, 1.0.3, 1.0.4, 2.0, 2.0.1
   - BIG-IQ 8.1.0, 8.1.0.2
 - SMTP server if automated email reporting is used
 - NIST NVD REST API Key for full CVE tracking (https://nvd.nist.gov/developers/request-an-api-key)
