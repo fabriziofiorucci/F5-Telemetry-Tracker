@@ -41,46 +41,46 @@ spec:
 
           # Example for NGINX Controller
 
-          - name: NGINX_CONTROLLER_TYPE
+          - name: DATAPLANE_TYPE
             value: NGINX_CONTROLLER
-          - name: NGINX_CONTROLLER_FQDN
+          - name: DATAPLANE_FQDN
             value: "https://nginx-controller.ff.lan:443"
-          - name: NGINX_CONTROLLER_USERNAME
+          - name: DATAPLANE_USERNAME
             value: "username@domain"
-          - name: NGINX_CONTROLLER_PASSWORD
+          - name: DATAPLANE_PASSWORD
             value: "thepassword"
 
           # Example for NGINX Instance Manager 1.x
 
-          #- name: NGINX_CONTROLLER_TYPE
+          #- name: DATAPLANE_TYPE
           #  value: NGINX_INSTANCE_MANAGER
-          #- name: NGINX_CONTROLLER_FQDN
+          #- name: DATAPLANE_FQDN
           #  value: "http://nim.ff.lan:11000"
-          #- name: NGINX_CONTROLLER_USERNAME
+          #- name: DATAPLANE_USERNAME
           #  value: "username@domain"
-          #- name: NGINX_CONTROLLER_PASSWORD
+          #- name: DATAPLANE_PASSWORD
           #  value: "thepassword"
 
           # Example for NGINX Instance Manager 2.x
 
-          #- name: NGINX_CONTROLLER_TYPE
+          #- name: DATAPLANE_TYPE
           #  value: NGINX_MANAGEMENT_SYSTEM
-          #- name: NGINX_CONTROLLER_FQDN
+          #- name: DATAPLANE_FQDN
           #  value: "https://nim.ff.lan"
-          #- name: NGINX_CONTROLLER_USERNAME
+          #- name: DATAPLANE_USERNAME
           #  value: "username@domain"
-          #- name: NGINX_CONTROLLER_PASSWORD
+          #- name: DATAPLANE_PASSWORD
           #  value: "thepassword"
 
           # Example for BIG-IQ
 
-          #- name: NGINX_CONTROLLER_TYPE
+          #- name: DATAPLANE_TYPE
           #  value: BIG_IQ
-          #- name: NGINX_CONTROLLER_FQDN
+          #- name: DATAPLANE_FQDN
           #  value: "https://bigiq"
-          #- name: NGINX_CONTROLLER_USERNAME
+          #- name: DATAPLANE_USERNAME
           #  value: "admin"
-          #- name: NGINX_CONTROLLER_PASSWORD
+          #- name: DATAPLANE_PASSWORD
           #  value: "admin"
 
           ### Push mode - push interval in seconds

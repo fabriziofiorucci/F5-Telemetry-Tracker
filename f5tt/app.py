@@ -29,10 +29,10 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 app = FastAPI()
 
-nc_mode = os.environ['NGINX_CONTROLLER_TYPE']
-nc_fqdn = os.environ['NGINX_CONTROLLER_FQDN']
-nc_user = os.environ['NGINX_CONTROLLER_USERNAME']
-nc_pass = os.environ['NGINX_CONTROLLER_PASSWORD']
+nc_mode = os.environ['DATAPLANE_TYPE']
+nc_fqdn = os.environ['DATAPLANE_FQDN']
+nc_user = os.environ['DATAPLANE_USERNAME']
+nc_pass = os.environ['DATAPLANE_PASSWORD']
 proxyDict = {}
 
 # Scheduler for automated statistics push / call home
@@ -229,7 +229,7 @@ def not_found(uri: str):
 if __name__ == '__main__':
 
     if nc_mode != 'NGINX_CONTROLLER' and nc_mode != 'NGINX_INSTANCE_MANAGER' and nc_mode != 'NGINX_MANAGEMENT_SYSTEM' and nc_mode != 'BIG_IQ':
-        print('Invalid NGINX_CONTROLLER_TYPE')
+        print('Invalid DATAPLANE_TYPE')
     else:
         # optional HTTP(S) proxy
         if "HTTP_PROXY" in os.environ:

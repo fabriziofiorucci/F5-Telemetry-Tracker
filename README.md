@@ -116,10 +116,10 @@ Edit `1.f5tt.yaml` to customize:
 | HTTP_PROXY| to be set if HTTP proxy must be used to connect to NGINX Controller, NGINX Instance Manager or BIG-IQ
 | HTTPS_PROXY| to be set if HTTPS proxy must be used to connect to NGINX Controller, NGINX Instance Manager or BIG-IQ
 | NIST_API_KEY| API Key for full NIST NVD CVE tracking (get your key at https://nvd.nist.gov/developers/request-an-api-key)
-| NGINX_CONTROLLER_TYPE| can be NGINX_CONTROLLER, NGINX_INSTANCE_MANAGER (NIM 1.x), NGINX_MANAGEMENT_SYSTEM (NIM 2.x) or BIG_IQ
-| NGINX_CONTROLLER_FQDN| the FQDN of your NGINX Controller / NGINX Instance Manager 1.x-2.x / BIG-IQ instance| format must be http[s]://FQDN:port
-| NGINX_CONTROLLER_USERNAME| the username for authentication
-| NGINX_CONTROLLER_PASSWORD| the password for authentication
+| DATAPLANE_TYPE| can be NGINX_CONTROLLER, NGINX_INSTANCE_MANAGER (NIM 1.x), NGINX_MANAGEMENT_SYSTEM (NIM 2.x) or BIG_IQ
+| DATAPLANE_FQDN| the FQDN of your NGINX Controller / NGINX Instance Manager 1.x-2.x / BIG-IQ instance| format must be http[s]://FQDN:port
+| DATAPLANE_USERNAME| the username for authentication
+| DATAPLANE_PASSWORD| the password for authentication
 | STATS_PUSH_ENABLE | if set to "true" push mode is enabled, disabled if set to "false" |
 | STATS_PUSH_MODE | either CUSTOM or NGINX_PUSH, to push (HTTP POST) JSON to custom URL and to push metrics to pushgateway, respectively |
 | STATS_PUSH_URL | the URL where to push statistics |

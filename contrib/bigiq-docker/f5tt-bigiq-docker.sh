@@ -160,10 +160,10 @@ case $MODE in
 		echo "-> Starting F5 Telemetry Tracker, please stand by..."
 		docker run -d --name f5tt \
 		-p 5000:5000 \
-		-e NGINX_CONTROLLER_TYPE=BIG_IQ \
-		-e NGINX_CONTROLLER_FQDN="https://$DOCKER_IP" \
-		-e NGINX_CONTROLLER_USERNAME=$BIGIQ_USERNAME \
-		-e NGINX_CONTROLLER_PASSWORD=$BIGIQ_PASSWORD \
+		-e DATAPLANE_TYPE=BIG_IQ \
+		-e DATAPLANE_FQDN="https://$DOCKER_IP" \
+		-e DATAPLANE_USERNAME=$BIGIQ_USERNAME \
+		-e DATAPLANE_PASSWORD=$BIGIQ_PASSWORD \
 		fiorucci/f5-telemetry-tracker:latest 2>/dev/null >/dev/null
 
 		MGMT_IP=`ip add show mgmt | grep inet\  | awk '{print $2}' | awk -F\/ '{print $1}'`
