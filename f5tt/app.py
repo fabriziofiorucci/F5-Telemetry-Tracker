@@ -46,22 +46,22 @@ def scheduledPush(url, username, password, interval, pushmode):
             if nc_mode == 'NGINX_CONTROLLER':
                 if pushmode == 'CUSTOM':
                     payload,code = nc.ncInstances(fqdn=nc_fqdn, username=nc_user, password=nc_pass, mode='JSON', proxy=proxyDict)
-                elif pushmode == 'NGINX_PUSH':
+                elif pushmode == 'PUSHGATEWAY':
                     payload,code = nc.ncInstances(fqdn=nc_fqdn, username=nc_user, password=nc_pass, mode='PUSHGATEWAY', proxy=proxyDict)
             elif nc_mode == 'NGINX_INSTANCE_MANAGER':
                 if pushmode == 'CUSTOM':
                     payload,code = nim.nimInstances(fqdn=nc_fqdn, mode='JSON', proxy=proxyDict)
-                elif pushmode == 'NGINX_PUSH':
+                elif pushmode == 'PUSHGATEWAY':
                     payload,code = nim.nimInstances(fqdn=nc_fqdn, mode='PUSHGATEWAY', proxy=proxyDict)
             elif nc_mode == 'NGINX_MANAGEMENT_SYSTEM':
                 if pushmode == 'CUSTOM':
                     payload = nms.nmsInstances(mode='JSON')
-                elif pushmode == 'NGINX_PUSH':
+                elif pushmode == 'PUSHGATEWAY':
                     payload = nms.nmsInstances(mode='PUSHGATEWAY')
             elif nc_mode == 'BIG_IQ':
                 if pushmode == 'CUSTOM':
                     payload,code = bigiq.bigIqInventory(mode='JSON')
-                elif pushmode == 'NGINX_PUSH':
+                elif pushmode == 'PUSHGATEWAY':
                     payload,code = bigiq.bigIqInventory(mode='PUSHGATEWAY')
 
             try:
@@ -70,7 +70,7 @@ def scheduledPush(url, username, password, interval, pushmode):
                         # Push json to custom URL
                         r = requests.post(url, data=json.dumps(payload), headers={'Content-Type': 'application/json'}, timeout=10,
                                           proxies=proxyDict)
-                    elif pushmode == 'NGINX_PUSH':
+                    elif pushmode == 'PUSHGATEWAY':
                         # Push to pushgateway
                         r = requests.post(pushgatewayUrl, data=payload, timeout=10, proxies=proxyDict)
                 else:
@@ -78,7 +78,7 @@ def scheduledPush(url, username, password, interval, pushmode):
                         # Push json to custom URL with basic auth
                         r = requests.post(url, auth=(username, password), data=json.dumps(payload),
                                           headers={'Content-Type': 'application/json'}, timeout=10, proxies=proxyDict)
-                    elif pushmode == 'NGINX_PUSH':
+                    elif pushmode == 'PUSHGATEWAY':
                         # Push to pushgateway
                         r = requests.post(pushgatewayUrl, auth=(username, password), data=payload, timeout=10,
                                           proxies=proxyDict)
@@ -270,7 +270,7 @@ if __name__ == '__main__':
             if os.environ['STATS_PUSH_ENABLE'] == 'true':
                 stats_push_mode = os.environ['STATS_PUSH_MODE']
 
-                if stats_push_mode != 'NGINX_PUSH' and stats_push_mode != 'CUSTOM':
+                if stats_push_mode != 'PUSHGATEWAY' and stats_push_mode != 'CUSTOM':
                     print('Invalid STATS_PUSH_MODE')
                 else:
                     stats_push_url = os.environ['STATS_PUSH_URL']

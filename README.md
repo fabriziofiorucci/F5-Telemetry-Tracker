@@ -19,7 +19,7 @@ Communication to NGINX Controller / NGINX Instance Manager / BIG-IQ is based on 
   - `/reporting/xls` and `/f5tt/reporting/xls` - return a reporting spreadsheet in xls format (currently supported for BIG-IQ, when running as native python code and docker image only)
 - Push mode
   - POSTs instance statistics to a user-defined HTTP(S) URL (STATS_PUSH_MODE: CUSTOM)
-  - Pushes instance statistics to pushgateway (STATS_PUSH_MODE: NGINX_PUSH)
+  - Pushes instance statistics to pushgateway (STATS_PUSH_MODE: PUSHGATEWAY)
   - Basic authentication support
   - Configurable push interval (in seconds)
 - Automated e-mail reporting
@@ -121,7 +121,7 @@ Edit `1.f5tt.yaml` to customize:
 | DATAPLANE_USERNAME| the username for authentication
 | DATAPLANE_PASSWORD| the password for authentication
 | STATS_PUSH_ENABLE | if set to "true" push mode is enabled, disabled if set to "false" |
-| STATS_PUSH_MODE | either CUSTOM or NGINX_PUSH, to push (HTTP POST) JSON to custom URL and to push metrics to pushgateway, respectively |
+| STATS_PUSH_MODE | either CUSTOM or PUSHGATEWAY, to push (HTTP POST) JSON to custom URL and to push metrics to pushgateway, respectively |
 | STATS_PUSH_URL | the URL where to push statistics |
 | STATS_PUSH_INTERVAL | the interval in seconds between two consecutive push |
 | STATS_PUSH_USERNAME | (optional) the username for POST Basic Authentication |

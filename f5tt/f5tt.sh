@@ -42,7 +42,7 @@
 ### Section to use when using push in pushgateway mode (basic auth username/password are optional)
 
 #export STATS_PUSH_ENABLE="true"
-#export STATS_PUSH_MODE=NGINX_PUSH
+#export STATS_PUSH_MODE=PUSHGATEWAY
 #export STATS_PUSH_URL="http://pushgateway.nginx.ff.lan"
 # STATS_PUSH_INTERVAL in seconds
 #export STATS_PUSH_INTERVAL=10

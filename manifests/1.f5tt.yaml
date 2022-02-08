@@ -87,8 +87,7 @@ spec:
           #- name: STATS_PUSH_ENABLE
           #  value: "true"
           #- name: STATS_PUSH_MODE
-          #  value: CUSTOM
-          #  value: NGINX_PUSH
+          #  value: PUSHGATEWAY
           #- name: STATS_PUSH_URL
           #  value: "http://pushgateway.nginx.ff.lan"
           #- name: STATS_PUSH_INTERVAL
