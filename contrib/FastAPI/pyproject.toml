@@ -1,0 +1,49 @@
+[tool.poetry]
+name = "app"
+version = "0.1.0"
+description = "App to track F5 Telemetry entities"
+authors = ["Srinivasa <s.kanduru@f5.com>"]
+
+
+# packages = [
+#     { include = "f5telemetry" },
+# ]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+fastapi = "*"
+uvicorn = "*"
+python-dotenv = "^0.19.2"
+pytest-asyncio = "^0.17.2"
+prometheusrock = "*"
+pandas = "^1.4.0"
+
+[tool.poetry.dev-dependencies]
+# asyncio_mode = "auto"
+pytest = "^6.2"
+pytest-cov = "*"
+pytest-mock = "*"
+mypy = "*"
+freezegun = "^1.1.0"
+black = "^21.5b1"
+requests = "*"
+asynctest = "^0.13.0"
+aiohttp = "^3.8.1"
+
+[tool.poetry.scripts]
+f5tt = "app.api.main:start"
+
+[tool.pytest.ini_options]
+log_cli = true
+log_cli_level = "INFO"
+log_cli_format = "%(asctime)s [%(levelname)8s] %(message)s (%(filename)s:%(lineno)s)"
+log_cli_date_format = "%Y-%m-%d %H:%M:%S"
+addopts = "-p tests.env_vars"
+testpaths = [
+    "tests",
+]
+
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

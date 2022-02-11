@@ -33,6 +33,9 @@ Communication to NGINX Controller / NGINX Instance Manager / BIG-IQ is based on 
 ## Additional tools
 
 Additional tools can be found [here](/contrib)
+FastAPI backend with integrated agent can also be found in [contrib](/contrib).
+For more details on how to use FastAPI backend go to that directory contrib/FastAPI
+and run it from there.
 
 ## Deployment modes
 
