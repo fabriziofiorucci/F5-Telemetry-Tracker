@@ -90,19 +90,14 @@ def init(fqdn,username,password,proxy,nistApiKey):
 
 
 # Thread for scheduled inventory generation
-def scheduledInventory(parent):
+def scheduledInventory():
   while True:
-    wait_time = 86400
     # Starts inventory generation task
     # https://clouddocs.f5.com/products/big-iq/mgmt-api/v8.1.0/HowToSamples/bigiq_public_api_wf/t_export_device_inventory.html?highlight=inventory
     print(datetime.datetime.now(),"Requesting BIG-IQ inventory refresh")
     res,body = bigIQcallRESTURI(method = "POST", uri = "/mgmt/cm/device/tasks/device-inventory", body = {'devicesQueryUri': 'https://localhost/mgmt/shared/resolver/device-groups/cm-bigip-allBigIpDevices/devices'} )
 
-    if wait_time:
-        if not parent.ok_to_run():
-            break
-        time.sleep(2)
-        wait_time -= 2
+    time.sleep(86400)
 
 
 # Reporting

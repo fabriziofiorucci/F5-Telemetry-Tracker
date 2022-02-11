@@ -35,23 +35,8 @@ nc_user = os.environ['DATAPLANE_USERNAME']
 nc_pass = os.environ['DATAPLANE_PASSWORD']
 proxyDict = {}
 
-class Job(threading.Thread):
-    def __init__(self, target, args):
-        args = (self,) +  args
-        super(Job, self).__init__(target = target, args = args)
-        self.shutdown_flag = threading.Event()
-
-    def start(self):
-        super(Job, self).start()
-
-    def ok_to_run(self):
-        return not self.shutdown_flag.is_set()
-
-    def shutdown(self):
-        self.shutdown_flag.set()
-
 # Scheduler for automated statistics push / call home
-def scheduledPush(parent, url, username, password, interval, pushmode):
+def scheduledPush(url, username, password, interval, pushmode):
     counter = 0
 
     pushgatewayUrl = url + "/metrics/job/f5tt"
@@ -109,12 +94,10 @@ def scheduledPush(parent, url, username, password, interval, pushmode):
         counter = counter + 1
 
         time.sleep(interval)
-        if not parent.ok_to_run():
-           break
 
 
 # Scheduler for automated email reporting
-def scheduledEmail(parent, email_server, email_server_port, email_server_type, email_auth_user, email_auth_pass, email_sender,
+def scheduledEmail(email_server, email_server_port, email_server_type, email_auth_user, email_auth_pass, email_sender,
                    email_recipient, email_interval):
     while True:
         try:
@@ -171,8 +154,6 @@ def scheduledEmail(parent, email_server, email_server_port, email_server_type, e
             print(datetime.datetime.now(), 'Sending email stats to',email_recipient,'failed:', sys.exc_info())
 
         time.sleep(email_interval)
-        if not parent.ok_to_run():
-           break
 
 
 # Returns stats in json format
@@ -280,9 +261,8 @@ if __name__ == '__main__':
         if nc_mode == 'BIG_IQ':
             bigiq.init(fqdn=nc_fqdn, username=nc_user, password=nc_pass, nistApiKey=nist_apikey, proxy=proxyDict)
             print('Running BIG-IQ inventory refresh thread')
-            agent_thread = Job(target = bigiq.scheduledInventory)
-            agent_threads.append(agent_thread)
-            agent_thread.start()
+            inventoryThread = threading.Thread(target=bigiq.scheduledInventory)
+            inventoryThread.start()
         elif nc_mode == 'NGINX_MANAGEMENT_SYSTEM':
             nms.init(fqdn=nc_fqdn, username=nc_user, password=nc_pass, nistApiKey=nist_apikey, proxy=proxyDict)
 
@@ -309,11 +289,9 @@ if __name__ == '__main__':
                     print('Pushing stats to', stats_push_url, 'every', stats_push_interval, 'seconds')
 
                     print('Running push thread')
-                    args = (stats_push_url, stats_push_username,
-                         stats_push_password, stats_push_interval, stats_push_mode)
-                    agent_thread = Job(target = bigiq.scheduledPush, args = args)
-                    agent_threads.append(agent_thread)
-                    agent_thread.start()
+                    pushThread = threading.Thread(target=scheduledPush, args=(
+                    stats_push_url, stats_push_username, stats_push_password, stats_push_interval, stats_push_mode))
+                    pushThread.start()
 
         if "EMAIL_ENABLED" in os.environ:
             if os.environ['EMAIL_ENABLED'] == 'true':
@@ -333,12 +311,10 @@ if __name__ == '__main__':
 
                 print('Email reporting to', email_recipient, 'every', email_interval, 'days')
                 print('Running push thread')
-                args = (email_server, email_server_port, email_server_type,
-                        email_auth_user, email_auth_pass, email_sender,
-                        email_recipient, email_interval * 60)
-                agent_thread = Job(target = bigiq.scheduledEmail, args = args)
-                agent_threads.append(agent_thread)
-                agent_thread.start()
+                emailThread = threading.Thread(target=scheduledEmail, args=(
+                email_server, email_server_port, email_server_type, email_auth_user, email_auth_pass, email_sender,
+                email_recipient, email_interval * 60))
+                emailThread.start()
 
         # REST API / prometheus metrics server
         print('Running REST API/Prometheus metrics server')

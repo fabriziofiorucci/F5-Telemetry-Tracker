@@ -96,7 +96,7 @@ def getF5(product="*",version="*"):
     matchingProducts=tmosModules2NIST[product]
 
     for product in matchingProducts:
-      if hasattr(allCVE, 'result'):
+      if 'result' in allCVE:
         for cve in allCVE['result']['CVE_Items']:
           allCPEMatches=cve['configurations']['nodes'][0]['cpe_match']
 
@@ -121,21 +121,20 @@ def getNGINX(version="*"):
   allCVE = __getFromNist(vendor="nginx",version=version)
   matchingCVE={}
 
-  if hasattr(allCVE, 'result'):
-    for cve in allCVE['result']['CVE_Items']:
-      allCPEMatches=cve['configurations']['nodes'][0]['cpe_match']
+  for cve in allCVE['result']['CVE_Items']:
+    allCPEMatches=cve['configurations']['nodes'][0]['cpe_match']
 
-      for cpeMatch in allCPEMatches:
-        # Found CVE match
-        cveId=cve['cve']['CVE_data_meta']['ID']
-        cveUrl=cve['cve']['references']['reference_data'][0]['url']
-        cveDesc=cve['cve']['description']['description_data'][0]['value']
-        cveBaseSeverity=cve['impact']['baseMetricV3']['cvssV3']['baseSeverity']
-        cveBaseScore=cve['impact']['baseMetricV3']['cvssV3']['baseScore']
-        cveExplScore=cve['impact']['baseMetricV2']['exploitabilityScore']
+    for cpeMatch in allCPEMatches:
+      # Found CVE match
+      cveId=cve['cve']['CVE_data_meta']['ID']
+      cveUrl=cve['cve']['references']['reference_data'][0]['url']
+      cveDesc=cve['cve']['description']['description_data'][0]['value']
+      cveBaseSeverity=cve['impact']['baseMetricV3']['cvssV3']['baseSeverity']
+      cveBaseScore=cve['impact']['baseMetricV3']['cvssV3']['baseScore']
+      cveExplScore=cve['impact']['baseMetricV2']['exploitabilityScore']
 
-        if cveId not in matchingCVE:
-          matchingCVE[cveId]={"id":cveId,"url":cveUrl,"description":cveDesc,"baseSeverity":cveBaseSeverity,"baseScore":cveBaseScore,"exploitabilityScore":cveExplScore}
+      if cveId not in matchingCVE:
+        matchingCVE[cveId]={"id":cveId,"url":cveUrl,"description":cveDesc,"baseSeverity":cveBaseSeverity,"baseScore":cveBaseScore,"exploitabilityScore":cveExplScore}
 
   cveF5 = getF5(product="nginx",version=version)
 
