@@ -8,8 +8,8 @@ import os, sys
 import threading
 import signal
 
-f5tt_dir = os.path.abspath('../../f5tt')
-sys.path.append(f5tt_dir)
+agents_dir = os.path.abspath("app/core/agents")
+sys.path.append(agents_dir)
 from bigiq import init as bigiq_init, bigIqInventory, scheduledInventory
 from nms import init as nms_init, nmsInstances
 from nim import nimInstances
