@@ -11,17 +11,20 @@ To run the code:
    poetry run f5tt   #
 
     Now the curl commands can be run against the endpoints and notifiers
-  
+```
    1.A POST for Requesting a report:
        curl -X POST -H 'content-type: application/json' -d '{"report_type": "report1"}' localhost:6000/api/v1/reporting/report1
    2. Get for instance and metrics
        curl -X GET localhost:6000/api/v1/instances
    3. This endpoint is replied by the prometheus middleware 
        curl -X GET localhost:6000/api/v1/metrics
+```
 
    Testing:
-    poetry run pytests  OR
-    pytest 
+```
+poetry run pytests  OR
+pytest 
+```
 
 Set APP_MODE="mock" for mock testing i.e. for testing.
 
