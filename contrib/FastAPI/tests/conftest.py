@@ -5,7 +5,7 @@ import asynctest
 import asyncio
 import aiohttp
 import uvicorn
-from app.conf import F5TelemetryConfig
+from app.conf import F5TelemetryConfig, nc_mode
 from app.api.main import bootstrap, app_settings
 
 

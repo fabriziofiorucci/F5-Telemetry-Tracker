@@ -3,7 +3,10 @@
 import pytest
 import os, signal
 from fastapi.testclient import TestClient
-from .conftest import AppServer, app_settings
+from .conftest import AppServer, app_settings, nc_mode
+
+agent_mode = app_settings.app_nc_config.nc_mode
+
 
 app = AppServer()
 client = TestClient(app.app_ctx)
@@ -52,9 +55,13 @@ def test_reporting_root():
 
 def test_reporting_root():
     response = client.post('/api/v1/counter/reporting/report1', json = {"report_type": "report1"})
-    assert response.status_code == 200
-    if app_settings.app_mode == "mock":
-        assert 'subscription' in str(response.content)
+    if agent_mode == nc_mode.BIG_IQ.value:
+        code = 200
+        if app_settings.app_mode == "mock":
+            assert 'subscription' in str(response.content)
+    else:
+        code = 404
+    assert response.status_code == code
 
 def test_prometheus_metrics():
     response = client.get('/api/v1/metrics')
