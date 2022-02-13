@@ -33,9 +33,12 @@ Communication to NGINX Controller / NGINX Instance Manager / BIG-IQ is based on 
 ## Additional tools
 
 Additional tools can be found [here](/contrib)
-FastAPI backend with integrated agent can also be found in [contrib](/contrib).
-For more details on how to use FastAPI backend go to that directory contrib/FastAPI
-and run it from there.
+
+- [BIG-IQ Collector](/contrib/bigiq-collect) - Offline BIG-IQ inventory processing
+- [F5TT on BIG-IQ Docker](/contrib/bigiq-docker) - Run F5TT onboard BIG-IQ CM virtual machine
+- [Report Generator](/contrib/report-generator) - Offline report generator
+- [Grafana](/contrib/grafana) - Sample Grafana dashboard
+- [FastAPI](/contrib/FastAPI) - FastAPI backend with integrated agent
 
 ## Deployment modes
 
