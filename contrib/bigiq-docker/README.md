@@ -21,7 +21,7 @@ F5-Telemetry-Tracker-1.1.tar.gz                    100%  271MB  82.7MB/s   00:03
 $
 ```
 
-### Mandatory steps
+### Required steps
 
 - Copy (scp) `f5tt-bigiq-docker.sh` from to BIG-IQ CM 8.1 instance, under /tmp/
 
