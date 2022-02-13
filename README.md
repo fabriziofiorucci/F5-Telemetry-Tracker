@@ -101,7 +101,7 @@ See the [contrib section](/contrib/)
 - [BIG-IQ Collector](/contrib/bigiq-collect) - Offline BIG-IQ inventory processing
 - [F5TT on BIG-IQ Docker](/contrib/bigiq-docker) - Run F5TT onboard BIG-IQ CM virtual machine
 - [Report Generator](/contrib/report-generator) - Offline report generator
-- [Sample Grafana dashboard](/contrib/grafana)
+- [Grafana](/contrib/grafana) - Sample Grafana dashboard
 - [FastAPI](/contrib/FastAPI) - FastAPI backend with integrated agent
 
 # How to deploy
