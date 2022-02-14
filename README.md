@@ -17,11 +17,12 @@ Communication to NGINX Controller / NGINX Instance Manager / BIG-IQ is based on 
   - `/metrics` and `/f5tt/metrics` - return Prometheus compliant output
 - High level reporting
   - `/reporting/xls` and `/f5tt/reporting/xls` - return a reporting spreadsheet in xls format (currently supported for BIG-IQ, when running as native python code and docker image only)
-- Push mode
+- JSON Telemetry mode
   - POSTs instance statistics to a user-defined HTTP(S) URL (STATS_PUSH_MODE: CUSTOM)
-  - Pushes instance statistics to pushgateway (STATS_PUSH_MODE: PUSHGATEWAY)
   - Basic authentication support
   - Configurable push interval (in seconds)
+- Grafana visualization mode
+  - Pushes instance statistics to pushgateway (STATS_PUSH_MODE: PUSHGATEWAY)
 - Automated e-mail reporting
   - Sends an email containing the report JSON file as an attachment named nginx_report.json for NGINX Instance Manager and NGINX Controller, and bigip_report.json for BIG-IQ
   - Support for plaintext SMTP, STARTTLS, SMTP over TLS, SMTP authentication, custom SMTP port
@@ -42,13 +43,41 @@ Additional tools can be found [here](/contrib)
 
 ## Deployment modes
 
-Pull mode: F5 Telemetry Tracker fetches stats
+JSON telemetry mode
 
-<img src="./images/nginx-imagecounter-pull.jpg"/>
+```mermaid
+sequenceDiagram
+    participant Control Plane
+    participant F5 Telemetry Tracker
+    participant Third party collector
+    participant REST API client
 
-Push mode: F5 Telemetry Tracker pushes stats to a remote data collection and visualization environment (suitable for distributed setups)
+    loop Telemetry aggregation
+      F5 Telemetry Tracker->>Control Plane: REST API polling
+      F5 Telemetry Tracker->>F5 Telemetry Tracker: Raw data aggregation
+    end
+    F5 Telemetry Tracker->>Third party collector: Push JSON reporting data
+    REST API client->>F5 Telemetry Tracker: Fetch JSON reporting data
+```
 
-<img src="./images/nginx-imagecounter-push.jpg"/>
+Grafana visualization mode
+
+```mermaid
+sequenceDiagram
+    participant Control Plane
+    participant F5 Telemetry Tracker
+    participant Pushgateway
+    participant Prometheus
+    participant Grafana
+
+    loop Telemetry aggregation
+      F5 Telemetry Tracker->>Control Plane: REST API polling
+      F5 Telemetry Tracker->>F5 Telemetry Tracker: Raw data aggregation
+    end
+    F5 Telemetry Tracker->>Pushgateway: Push telemetry
+    Prometheus->>Pushgateway: Scrape telemetry
+    Grafana->>Prometheus: Visualization
+```
 
 ## Prerequisites
 
