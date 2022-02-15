@@ -51,6 +51,7 @@ sequenceDiagram
     participant F5 Telemetry Tracker
     participant Third party collector
     participant REST API client
+    participant Email server
 
     loop Telemetry aggregation
       F5 Telemetry Tracker->>Control Plane: REST API polling
@@ -58,6 +59,7 @@ sequenceDiagram
     end
     F5 Telemetry Tracker->>Third party collector: Push JSON reporting data
     REST API client->>F5 Telemetry Tracker: Fetch JSON reporting data
+    F5 Telemetry Tracker->>Email server: Email with attached JSON reporting data
 ```
 
 Grafana visualization mode
