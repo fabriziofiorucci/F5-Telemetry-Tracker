@@ -328,172 +328,194 @@ def bigIqInventory(mode):
 
   output=''
 
-  if mode == 'JSON':
-    # Gets TMOS modules provisioning state for all devices
-    rcode,provisioningDetails = bigIQInstanceProvisioning()
-    rcode2,inventoryDetails = bigIQgetInventory()
+  # Gets TMOS modules provisioning state for all devices
+  rcode,provisioningDetails = bigIQInstanceProvisioning()
+  rcode2,inventoryDetails = bigIQgetInventory()
 
-    hwSKUGrandTotals={}
-    swSKUGrandTotals={}
-    wholeInventory=[]
+  hwSKUGrandTotals={}
+  swSKUGrandTotals={}
+  wholeInventory=[]
 
-    if "items" in details:
-      for item in details['items']:
-        if mode == 'JSON':
-          # Gets TMOS registration key and serial number for the current BIG-IP device
-          inventoryData = {}
+  if "items" in details:
+    for item in details['items']:
+      # Gets TMOS registration key and serial number for the current BIG-IP device
+      inventoryData = {}
 
-          # Check for failed inventory
-          if 'lastUpdateMicros' in inventoryDetails:
-            inventoryData['inventoryTimestamp'] = inventoryDetails['lastUpdateMicros']//1000
+      # Check for failed inventory
+      if 'lastUpdateMicros' in inventoryDetails:
+        inventoryData['inventoryTimestamp'] = inventoryDetails['lastUpdateMicros']//1000
 
-          platformType=''
+      platformType=''
 
-          if rcode2 == 204:
-            inventoryData['inventoryStatus']="partial"
-          else:
-            machineIdFound=False
+      if rcode2 == 204:
+        inventoryData['inventoryStatus']="partial"
+      else:
+        machineIdFound=False
 
-            # Check for failed inventory
-            if 'items' in inventoryDetails:
-              for invDevice in inventoryDetails['items']:
-                if invDevice['infoState']['machineId'] == item['machineId']:
-                  machineIdFound=True
-                  if "errors" in invDevice['infoState']:
-                    # BIG-IP unreachable, inventory incomplete
-                    inventoryData['inventoryStatus']="partial"
-                  else:
-                    # Get platform name and SKU
-                    if 'platform' in invDevice['infoState']:
-                      platformCode=invDevice['infoState']['platform']
-                      platformInsights={}
-                      if platformCode in hwPlatforms:
-                        platformDetails=hwPlatforms[platformCode]
-                        platformType=platformDetails.split('|')[0]
-                        platformSKU=platformDetails.split('|')[1]
+        # Check for failed inventory
+        if 'items' in inventoryDetails:
+          for invDevice in inventoryDetails['items']:
+            if invDevice['infoState']['machineId'] == item['machineId']:
+              machineIdFound=True
+              if "errors" in invDevice['infoState']:
+                # BIG-IP unreachable, inventory incomplete
+                inventoryData['inventoryStatus']="partial"
+              else:
+                # Get platform name and SKU
+                if 'platform' in invDevice['infoState']:
+                  platformCode=invDevice['infoState']['platform']
+                  platformInsights={}
+                  if platformCode in hwPlatforms:
+                    platformDetails=hwPlatforms[platformCode]
+                    platformType=platformDetails.split('|')[0]
+                    platformSKU=platformDetails.split('|')[1]
 
-                        if platformSKU in hwSKUGrandTotals:
-                          hwSKUGrandTotals[platformSKU] += 1
-                        else:
-                          hwSKUGrandTotals[platformSKU] = 1
-
-                        platformInsights['type']=platformType
-                        platformInsights['sku']=platformSKU
-
-                    platformInsights['code']=platformCode
-
-                    inventoryData['inventoryStatus'] = "full"
-                    inventoryData['registrationKey'] = invDevice['infoState']['license']['registrationKey']
-                    inventoryData['activeModules'] = invDevice['infoState']['license']['activeModules']
-                    if 'chassisSerialNumber' in invDevice['infoState']:
-                      inventoryData['chassisSerialNumber'] = invDevice['infoState']['chassisSerialNumber'].strip()
+                    if platformSKU in hwSKUGrandTotals:
+                      hwSKUGrandTotals[platformSKU] += 1
                     else:
-                      inventoryData['chassisSerialNumber'] = ""
-                    inventoryData['platform'] = platformInsights
+                      hwSKUGrandTotals[platformSKU] = 1
 
-                    if 'licenseEndDateTime' in invDevice['infoState']['license']:
-                      inventoryData['licenseEndDateTime']=invDevice['infoState']['license']['licenseEndDateTime']
+                    platformInsights['type']=platformType
+                    platformInsights['sku']=platformSKU
 
-            if machineIdFound == False:
-              inventoryData['inventoryStatus']="partial"
+                platformInsights['code']=platformCode
 
-          # Gets TMOS modules provisioning for the current BIG-IP device
-          # https://support.f5.com/csp/article/K4309
-          provModules = {}
-          provModules['provisionedModules']=[]
+                inventoryData['inventoryStatus'] = "full"
+                inventoryData['registrationKey'] = invDevice['infoState']['license']['registrationKey']
+                inventoryData['activeModules'] = invDevice['infoState']['license']['activeModules']
+                if 'chassisSerialNumber' in invDevice['infoState']:
+                  inventoryData['chassisSerialNumber'] = invDevice['infoState']['chassisSerialNumber'].strip()
+                else:
+                  inventoryData['chassisSerialNumber'] = ""
+                inventoryData['platform'] = platformInsights
 
-          foundCVEs={}
+                if 'licenseEndDateTime' in invDevice['infoState']['license']:
+                  inventoryData['licenseEndDateTime']=invDevice['infoState']['license']['licenseEndDateTime']
 
-          for prov in provisioningDetails['items']:
-            if prov['deviceReference']['machineId'] == item['machineId']:
+        if machineIdFound == False:
+          inventoryData['inventoryStatus']="partial"
 
-              # Retrieving relevant SKUs and platform types
-              moduleProvisioningLevel=''
+      # Gets TMOS modules provisioning for the current BIG-IP device
+      # https://support.f5.com/csp/article/K4309
+      provModules = {}
+      provModules['provisionedModules']=[]
 
-              if prov['name'] in swModules:
-                moduleName = swModules[prov['name']]
+      foundCVEs={}
+
+      for prov in provisioningDetails['items']:
+        if prov['deviceReference']['machineId'] == item['machineId']:
+
+          # Retrieving relevant SKUs and platform types
+          moduleProvisioningLevel=''
+
+          if prov['name'] in swModules:
+            moduleName = swModules[prov['name']]
+          else:
+            moduleName = ''
+
+          if platformType == '' or moduleName == '':
+            moduleSKU = ''
+          else:
+            moduleSKU = "H-"+platformType+"-"+moduleName
+            moduleProvisioningLevel=prov['level']
+
+            if moduleProvisioningLevel != 'none':
+              # CVE tracking
+              allCVE=cveDB.getF5(product=prov['name'],version=item['version'])
+              foundCVEs.update(allCVE)
+
+              if moduleSKU in swSKUGrandTotals:
+                swSKUGrandTotals[moduleSKU] += 1
               else:
-                moduleName = ''
+                swSKUGrandTotals[moduleSKU] = 1
 
-              if platformType == '' or moduleName == '':
-                moduleSKU = ''
-              else:
-                moduleSKU = "H-"+platformType+"-"+moduleName
-                moduleProvisioningLevel=prov['level']
+          thisModule = {}
+          thisModule['module']=prov['name']
+          thisModule['level']=moduleProvisioningLevel
+          thisModule['sku']=moduleSKU
 
-                if moduleProvisioningLevel != 'none':
-                  # CVE tracking
-                  allCVE=cveDB.getF5(product=prov['name'],version=item['version'])
-                  foundCVEs.update(allCVE)
+          provModules['provisionedModules'].append(thisModule)
 
-                  if moduleSKU in swSKUGrandTotals:
-                    swSKUGrandTotals[moduleSKU] += 1
-                  else:
-                    swSKUGrandTotals[moduleSKU] = 1
+      # Gets TMOS licensed modules for the current BIG-IP device
+      retcode,instanceDetails = bigIQInstanceDetails(item['machineId'])
 
-              thisModule = {}
-              thisModule['module']=prov['name']
-              thisModule['level']=moduleProvisioningLevel
-              thisModule['sku']=moduleSKU
+      if retcode == 200:
+        if instanceDetails != '':
+          licensedModules = instanceDetails['properties']['cm:gui:module']
 
-              provModules['provisionedModules'].append(thisModule)
+          platformMarketingName=''
+          if 'platformMarketingName' in item:
+            platformMarketingName=item['platformMarketingName']
 
-          # Gets TMOS licensed modules for the current BIG-IP device
-          retcode,instanceDetails = bigIQInstanceDetails(item['machineId'])
+          inventoryData['hostname']=item['hostname']
+          inventoryData['address']=item['address']
+          inventoryData['product']=item['product']
+          inventoryData['version']=item['version']
+          inventoryData['edition']=item['edition']
+          inventoryData['build']=item['build']
+          inventoryData['isVirtual']=item['isVirtual']
+          inventoryData['isClustered']=item['isClustered']
+          inventoryData['platformMarketingName']=platformMarketingName
+          inventoryData['restFrameworkVersion']=item['restFrameworkVersion']
+          inventoryData['licensedModules']=licensedModules
+          inventoryData['provisionedModules']=provModules['provisionedModules']
+          inventoryData['CVE']=[]
+          inventoryData['CVE'].append(foundCVEs)
 
-          if retcode == 200:
-            if instanceDetails != '':
-              licensedModules = instanceDetails['properties']['cm:gui:module']
+          wholeInventory.append(inventoryData)
 
-              platformMarketingName=''
-              if 'platformMarketingName' in item:
-                platformMarketingName=item['platformMarketingName']
+  # Full JSON creation
 
-              inventoryData['hostname']=item['hostname']
-              inventoryData['address']=item['address']
-              inventoryData['product']=item['product']
-              inventoryData['version']=item['version']
-              inventoryData['edition']=item['edition']
-              inventoryData['build']=item['build']
-              inventoryData['isVirtual']=item['isVirtual']
-              inventoryData['isClustered']=item['isClustered']
-              inventoryData['platformMarketingName']=platformMarketingName
-              inventoryData['restFrameworkVersion']=item['restFrameworkVersion']
-              inventoryData['licensedModules']=licensedModules
-              inventoryData['provisionedModules']=provModules['provisionedModules']
-              inventoryData['CVE']=[]
-              inventoryData['CVE'].append(foundCVEs)
+  instancesDict = {}
+  if "items" in details:
+    instancesDict['bigip']=len(details['items'])
+  else:
+    instancesDict['bigip']=0
+  instancesDict['hwTotals'] = []
+  instancesDict['hwTotals'].append(hwSKUGrandTotals)
+  instancesDict['swTotals'] = []
+  instancesDict['swTotals'].append(swSKUGrandTotals)
 
-              wholeInventory.append(inventoryData)
+  output = {}
+  output['instances'] = []
+  output['instances'].append(instancesDict)
+  output['details'] = wholeInventory
+  output['telemetry'] = []
+  output['telemetry'] = bigIqTelemetry(mode)
+  output['utilityBilling'] = bigIQCollectUtilityBilling()
 
-    # Full JSON creation
+  # JSON mode
+  if mode == 'JSON':
+    return output,200
 
-    instancesDict={}
-    if "items" in details:
-      instancesDict['bigip']=len(details['items'])
+  # PROMETHEUS or PUSHGATEWAY mode
+  metricsOutput = ''
+  metricsOutput += '# HELP bigip_online_instances Online BIG-IP instances\n# TYPE bigip_online_instances gauge\n' if (mode == 'PROMETHEUS') else ''
+  metricsOutput += 'bigip_online_instances{dataplane_type="BIG-IQ",dataplane_url="'+bigiq_fqdn+'"} '+str(output['instances'][0]['bigip'])+'\n'
+
+  # Hardware totals
+  metricsOutput += '# HELP bigip_hwTotals Total hardware devices count\n# TYPE bigip_hwtotals gauge\n' if (mode == 'PROMETHEUS') else ''
+  for hwT in output['instances'][0]['hwTotals'][0]:
+    metricsOutput += 'bigip_hwtotals{dataplane_type="BIG-IQ",dataplane_url="'+bigiq_fqdn+'",bigip_sku="'+hwT+'"} '+str(output['instances'][0]['hwTotals'][0][hwT])+'\n'
+
+  # Software totals
+  metricsOutput += '# HELP bigip_swTotals Total software modules count\n# TYPE bigip_swtotals gauge\n' if (mode == 'PROMETHEUS') else ''
+  for swT in output['instances'][0]['swTotals'][0]:
+    metricsOutput += 'bigip_swtotals{dataplane_type="BIG-IQ",dataplane_url="'+bigiq_fqdn+'",bigip_module="'+swT+'"} '+str(output['instances'][0]['swTotals'][0][swT])+'\n'
+
+  # TMOS releases
+  tmosRel = {}
+  for d in output['details']:
+    if d['version'] in tmosRel:
+      tmosRel[d['version']] += 1
     else:
-      instancesDict['bigip']=0
-    instancesDict['hwTotals'] = []
-    instancesDict['hwTotals'].append(hwSKUGrandTotals)
-    instancesDict['swTotals'] = []
-    instancesDict['swTotals'].append(swSKUGrandTotals)
+      tmosRel[d['version']] = 1
 
-    output = {}
-    output['instances'] = []
-    output['instances'].append(instancesDict)
-    output['details'] = wholeInventory
-    output['telemetry'] = []
-    output['telemetry'] = bigIqTelemetry(mode)
-    output['utilityBilling'] = bigIQCollectUtilityBilling()
+  metricsOutput += '# HELP bigip_tmos_releases TMOS releases count\n# TYPE bigip_tmos_releases gauge\n' if (mode == 'PROMETHEUS') else ''
+  for v in tmosRel:
+    metricsOutput += 'bigip_tmos_releases{dataplane_type="BIG-IQ",dataplane_url="'+bigiq_fqdn+'",tmos_release="'+v+'"} '+str(tmosRel[v])+'\n'
 
-  elif mode == 'PROMETHEUS' or mode == 'PUSHGATEWAY':
-    if mode == 'PROMETHEUS':
-      output = '# HELP bigip_online_instances Online BIG-IP instances\n'
-      output = output + '# TYPE bigip_online_instances gauge\n'
-
-    output = output + 'bigip_online_instances{instanceType="BIG-IQ",bigiq_url="'+bigiq_fqdn+'"} '+str(len(details['items']))+'\n'
-
-  return output,200
+  return metricsOutput,200
 
 
 # Builds BIG-IQ telemetry request body by entities

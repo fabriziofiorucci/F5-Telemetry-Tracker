@@ -804,7 +804,21 @@ Pulling from BIG-IQ
 $ curl -s https://f5tt.ff.lan/metrics
 # HELP bigip_online_instances Online BIG-IP instances
 # TYPE bigip_online_instances gauge
-bigip_online_instances{instanceType="BIG-IQ",bigiq_url="https://10.155.153.208:443"} 2
+bigip_online_instances{dataplane_type="BIG-IQ",dataplane_url="https://bigiq.f5.ff.lan"} 2
+# HELP bigip_hwTotals Total hardware devices count
+# TYPE bigip_hwtotals gauge
+bigip_hwtotals{dataplane_type="BIG-IQ",dataplane_url="https://bigiq.f5.ff.lan",bigip_sku="F5-VE"} 2
+# HELP bigip_swTotals Total software modules count
+# TYPE bigip_swtotals gauge
+bigip_swtotals{dataplane_type="BIG-IQ",dataplane_url="https://bigiq.f5.ff.lan",bigip_module="H-VE-AWF"} 1
+bigip_swtotals{dataplane_type="BIG-IQ",dataplane_url="https://bigiq.f5.ff.lan",bigip_module="H-VE-LTM"} 2
+bigip_swtotals{dataplane_type="BIG-IQ",dataplane_url="https://bigiq.f5.ff.lan",bigip_module="H-VE-AFM"} 1
+bigip_swtotals{dataplane_type="BIG-IQ",dataplane_url="https://bigiq.f5.ff.lan",bigip_module="H-VE-APM"} 1
+bigip_swtotals{dataplane_type="BIG-IQ",dataplane_url="https://bigiq.f5.ff.lan",bigip_module="H-VE-DNS"} 1
+bigip_swtotals{dataplane_type="BIG-IQ",dataplane_url="https://bigiq.f5.ff.lan",bigip_module="H-VE-CGNAT"} 1
+# HELP bigip_tmos_releases TMOS releases count
+# TYPE bigip_tmos_releases gauge
+bigip_tmos_releases{dataplane_type="BIG-IQ",dataplane_url="https://bigiq.f5.ff.lan",tmos_release="16.1.0"} 2
 ```
 
 ## Push mode to custom URL
