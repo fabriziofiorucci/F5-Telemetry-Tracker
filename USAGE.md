@@ -883,9 +883,7 @@ This is currently available when querying BIG-IQ
 
 # Visualization
 
-<img src="./images/grafana.1.jpg"/>
-
-<img src="./images/grafana.2.jpg"/>
+See [Grafana](/contrib/grafana)
 
 
 # Sample report e-mail
