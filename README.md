@@ -222,6 +222,7 @@ See F5 Support solutions:
 - K83394355: How to count the number of NGINX instances with F5 Telemetry Tracker on NGINX Instance Manager - https://support.f5.com/csp/article/K83394355
 - K45028541: How to count the number of NGINX instances with F5 Telemetry Tracker on NGINX Controller - https://support.f5.com/csp/article/K45028541
 - K29144504: How to install and use (Offline) F5 Telemetry collection Script on BIG-IQ - https://support.f5.com/csp/article/K29144504
+- K94129313: How to install and use Docker F5 Telemetry collection script - https://support.f5.com/csp/article/K94129313
 
 # Usage
 
