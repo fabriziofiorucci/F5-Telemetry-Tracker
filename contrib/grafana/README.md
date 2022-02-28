@@ -10,5 +10,3 @@
 <img src="/contrib/grafana/grafana-nim.jpg"/>
 
 <img src="/contrib/grafana/grafana-nc.jpg"/>
-
-

@@ -503,17 +503,31 @@ def bigIqInventory(mode):
   for swT in output['instances'][0]['swTotals'][0]:
     metricsOutput += 'bigip_swtotals{dataplane_type="BIG-IQ",dataplane_url="'+bigiq_fqdn+'",bigip_module="'+swT+'"} '+str(output['instances'][0]['swTotals'][0][swT])+'\n'
 
-  # TMOS releases
+  # TMOS releases and CVE
   tmosRel = {}
+  cves = {}
   for d in output['details']:
     if d['version'] in tmosRel:
       tmosRel[d['version']] += 1
     else:
       tmosRel[d['version']] = 1
 
+    for c in d['CVE'][0]:
+      if c in cves:
+        cves[c] += 1
+      else:
+        cves[c] = 1
+
+  # TMOS releases
   metricsOutput += '# HELP bigip_tmos_releases TMOS releases count\n# TYPE bigip_tmos_releases gauge\n' if (mode == 'PROMETHEUS') else ''
   for v in tmosRel:
     metricsOutput += 'bigip_tmos_releases{dataplane_type="BIG-IQ",dataplane_url="'+bigiq_fqdn+'",tmos_release="'+v+'"} '+str(tmosRel[v])+'\n'
+
+  # CVE totals
+  metricsOutput += '# HELP bigip_tmos_cve TMOS CVE count\n# TYPE bigip_tmos_cve gauge\n' if (mode == 'PROMETHEUS') else ''
+  for c in cves:
+    metricsOutput += 'bigip_tmos_cve{dataplane_type="BIG-IQ",dataplane_url="'+bigiq_fqdn+'",tmos_cve="'+c+'"} '+str(cves[c])+'\n'
+
 
   return metricsOutput,200
 
