@@ -2,6 +2,7 @@
 
 from fastapi import FastAPI, Response, Request
 from fastapi.responses import JSONResponse,StreamingResponse
+from typing import Optional
 import os
 import sys
 import ssl
@@ -159,7 +160,7 @@ def scheduledEmail(email_server, email_server_port, email_server_type, email_aut
 # Returns stats in json format
 @app.get("/instances")
 @app.get("/f5tt/instances")
-def getInstances(request: Request):
+def getInstances(request: Request,type: Optional[str] = None):
     if nc_mode == 'NGINX_CONTROLLER':
         reply,code = nc.ncInstances(fqdn=nc_fqdn, username=nc_user, password=nc_pass, mode='JSON', proxy=proxyDict)
     elif nc_mode == 'NGINX_INSTANCE_MANAGER':
@@ -167,7 +168,13 @@ def getInstances(request: Request):
     elif nc_mode == 'NGINX_MANAGEMENT_SYSTEM':
         reply,code = nms.nmsInstances(mode='JSON')
     elif nc_mode == 'BIG_IQ':
-        reply,code = bigiq.bigIqInventory(mode='JSON')
+        if type == None:
+          reply,code = bigiq.bigIqInventory(mode='JSON')
+        elif type == 'CVE':
+          reply,code = bigiq.bigIqCVEjson()
+        else:
+          reply = {}
+          code = 404
 
     # gzip responses supported if the client sends header "Accept-Encoding: gzip"
     responseSent = False

@@ -532,6 +532,29 @@ def bigIqInventory(mode):
   return metricsOutput,200
 
 
+# Returns the CVE-centric JSON
+def bigIqCVEjson():
+  fullJSON,retcode = bigIqInventory(mode='JSON')
+  cveJSON = {}
+
+  for d in fullJSON['details']:
+    bigipHostname = d['hostname']
+    bigipVersion = d['version']
+
+    for cve in d['CVE'][0]:
+      if cve not in cveJSON:
+        cveJSON[cve] = d['CVE'][0][cve]
+        cveJSON[cve]['devices'] = []
+
+      deviceJSON = {}
+      deviceJSON['hostname'] = bigipHostname
+      deviceJSON['version'] = bigipVersion
+
+      cveJSON[cve]['devices'].append(deviceJSON)
+
+  return cveJSON,200
+
+
 # Builds BIG-IQ telemetry request body by entities
 def _getTelemetryRequestBodyByEntities(module,metricSet,metric,timeRange,granDuration,granUnit):
 
@@ -682,10 +705,10 @@ def bigIQCollectUtilityBilling():
 
   res,allLicenses = bigIQGetLicenses()
   if res != 200:
-    return res,utilityBillingReport.json()
+    return utilityBillingReport
 
   if 'items' not in allLicenses:
-    return 200,utilityBillingReport
+    return utilityBillingReport
 
   # Utility billing report generation for all licenses
   for i in allLicenses['items']:

@@ -89,8 +89,12 @@ def __getFromNist(vendor,product="*",version="*"):
 
 # Returns all CVE for the given F5 TMOS product/version
 def getF5(product="*",version="*"):
-  allCVE = __getFromNist(vendor="f5",version=version)
   matchingCVE={}
+
+  try:
+    allCVE = __getFromNist(vendor="f5",version=version)
+  except:
+    return matchingCVE
 
   if product in tmosModules2NIST:
     matchingProducts=tmosModules2NIST[product]

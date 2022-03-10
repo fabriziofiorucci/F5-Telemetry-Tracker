@@ -425,6 +425,10 @@ $ curl -s http://f5tt.ff.lan/instances | jq
 
 BIG-IQ
 
+the `type` query string parameter can be used to retrieve a logical view of the full JSON file:
+
+- To retrieve a CVE-centric JSON: `curl -s http://f5tt.ff.lan/instances?type=CVE | jq`
+
 ```
 $ curl -s http://f5tt.ff.lan/instances | jq
 {
