@@ -220,6 +220,8 @@ fi
 
 ### Utility billing collection
 
+AUTH_TOKEN=`curl -ks -X POST 'https://127.0.0.1/mgmt/shared/authn/login' -H 'Content-Type: text/plain' -d '{"username": "'$BIGIQ_USERNAME'","password": "'$BIGIQ_PASSWORD'"}' | jq '.token.token' -r`
+
 UTB_ALLLICENSES=`curl -ks -X GET "https://127.0.0.1/mgmt/cm/device/licensing/pool/utility/licenses?$select=regKey,status" -H 'X-F5-Auth-Token: '$AUTH_TOKEN`
 echo $UTB_ALLLICENSES > $OUTPUTDIR/utilitybilling-licenses.json
 
