@@ -60,10 +60,21 @@ echo "-> Reading device inventory"
 restcurl -u $BIGIQ_USERNAME:$BIGIQ_PASSWORD /mgmt/cm/device/tasks/device-inventory > $OUTPUTDIR/3.bigIQCollect.json
 
 echo "-> Reading device inventory details"
-INV_ID=`restcurl -u $BIGIQ_USERNAME:$BIGIQ_PASSWORD /mgmt/cm/device/tasks/device-inventory| jq -r 'select(.items[].status=="FINISHED")|.items[0].resultsReference.link' | head -n1 | awk -F \/ '{print $9}'`
+INVENTORIES=`restcurl -u $BIGIQ_USERNAME:$BIGIQ_PASSWORD /mgmt/cm/device/tasks/device-inventory`
+INVENTORIES_LEN=`echo $INVENTORIES | jq '.items|length'`
+
+echo "-> Found $INVENTORIES_LEN inventories"
+
+if [ $INVENTORIES_LEN = 0 ]
+then
+	echo "Error: no inventory found - Please refer to https://support.f5.com/csp/article/K29144504 for more details"
+	exit
+fi
+
+INV_ID=`echo $INVENTORIES | jq -r 'select(.items[].status=="FINISHED")|.items[0].resultsReference.link' | head -n1 | awk -F \/ '{print $9}'`
 if [ "$INV_ID" == "" ]
 then
-	INV_ID=`restcurl -u $BIGIQ_USERNAME:$BIGIQ_PASSWORD /mgmt/cm/device/tasks/device-inventory| jq -r 'select(.items[].status=="FAILED")|.items[0].resultsReference.link' | head -n1 | awk -F \/ '{print $9}'`
+	INV_ID=`restcurl -u $BIGIQ_USERNAME:$BIGIQ_PASSWORD /mgmt/cm/device/tasks/device-inventory | jq -r 'select(.items[].status=="FAILED")|.items[0].resultsReference.link' | head -n1 | awk -F \/ '{print $9}'`
 fi
 
 if [ ! "$INV_ID" = "" ]
