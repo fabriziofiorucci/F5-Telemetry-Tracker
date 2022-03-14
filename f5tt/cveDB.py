@@ -92,7 +92,7 @@ def getF5(product="*",version="*"):
   matchingCVE={}
 
   try:
-    allCVE = __getFromNist(vendor="f5",version=version)
+    allCVE = __getFromNist(vendor="f5",product=product,version=version)
   except:
     return matchingCVE
 
@@ -122,7 +122,7 @@ def getF5(product="*",version="*"):
 
 # Returns all CVE for the given F5 TMOS product/version
 def getNGINX(version="*"):
-  allCVE = __getFromNist(vendor="nginx",version=version)
+  allCVE = __getFromNist(vendor="f5",product="nginx",version=version)
   matchingCVE={}
 
   for cve in allCVE['result']['CVE_Items']:

@@ -156,3 +156,26 @@ def nmsInstances(mode):
     output = output + 'nginx_plus_online_instances{subscription="'+subscriptionId+'",instanceType="'+instanceType+'",instanceVersion="'+instanceVersion+'",instanceSerial="'+instanceSerial+'"} '+str(plusManaged)+'\n'
 
   return output,200
+
+
+# Returns the CVE-centric JSON
+def nmsCVEjson():
+  fullJSON,retcode = nmsInstances(mode='JSON')
+  cveJSON = {}
+
+  for d in fullJSON['details']:
+    nginxHostname = d['hostname']
+    nginxVersion = d['version']
+
+    for cve in d['CVE'][0]:
+      if cve not in cveJSON:
+        cveJSON[cve] = d['CVE'][0][cve]
+        cveJSON[cve]['devices'] = []
+
+      deviceJSON = {}
+      deviceJSON['hostname'] = nginxHostname
+      deviceJSON['version'] = nginxVersion
+
+      cveJSON[cve]['devices'].append(deviceJSON)
+
+  return cveJSON,200

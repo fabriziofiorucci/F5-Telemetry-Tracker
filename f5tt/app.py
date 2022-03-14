@@ -166,7 +166,10 @@ def getInstances(request: Request,type: Optional[str] = None):
     elif nc_mode == 'NGINX_INSTANCE_MANAGER':
         reply,code = nim.nimInstances(fqdn=nc_fqdn, mode='JSON', proxy=proxyDict)
     elif nc_mode == 'NGINX_MANAGEMENT_SYSTEM':
-        reply,code = nms.nmsInstances(mode='JSON')
+        if type == None:
+          reply,code = nms.nmsInstances(mode='JSON')
+        elif type == 'CVE':
+          reply,code = nms.nmsCVEjson()
     elif nc_mode == 'BIG_IQ':
         if type == None:
           reply,code = bigiq.bigIqInventory(mode='JSON')

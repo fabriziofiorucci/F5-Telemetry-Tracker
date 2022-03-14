@@ -528,7 +528,6 @@ def bigIqInventory(mode):
   for c in cves:
     metricsOutput += 'bigip_tmos_cve{dataplane_type="BIG-IQ",dataplane_url="'+bigiq_fqdn+'",tmos_cve="'+c+'"} '+str(cves[c])+'\n'
 
-
   return metricsOutput,200
 
 

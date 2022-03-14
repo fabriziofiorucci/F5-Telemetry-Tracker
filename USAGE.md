@@ -54,6 +54,11 @@ $ curl -s http://f5tt.ff.lan/instances | jq
 
 NGINX Instance Manager 2.x
 
+the `type` query string parameter can be used to retrieve a logical view of the full JSON file:
+
+- Retrieve the standard full JSON: `curl -s http://f5tt.ff.lan/instances | jq`
+- Retrieve a CVE-centric JSON: `curl -s http://f5tt.ff.lan/instances?type=CVE | jq`
+
 ```
 $ curl -s http://f5tt.ff.lan/instances | jq 
 {

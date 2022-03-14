@@ -28,8 +28,8 @@ Communication to NGINX Controller / NGINX Instance Manager / BIG-IQ is based on 
   - Support for plaintext SMTP, STARTTLS, SMTP over TLS, SMTP authentication, custom SMTP port
   - Configurable push interval (in days)
 - HTTP(S) proxy support
-- CVE tracking
-- Resource and applications telemetry (currently supported for BIG-IQ, when running as native python code and docker image only)
+- CVE tracking (currently supported for BIG-IQ and NGINX Instance Manager 2.x)
+- Resource and applications telemetry (currently supported for BIG-IQ)
 
 ## Additional tools
 
