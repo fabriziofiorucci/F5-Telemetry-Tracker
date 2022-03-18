@@ -94,9 +94,22 @@ sequenceDiagram
 
 # How to build and run
 
-## For Kubernetes/Openshift
+## On docker
 
-The F5 Telemetry Tracker image is available on Docker Hub as:
+Set the correct values for `DATAPLANE_TYPE`, `DATAPLANE_FQDN`, `DATAPLANE_USERNAME` and `DATAPLANE_PASSWORD` and run on docker using:
+
+```
+docker run --name f5tt -p 5000:5000 \
+    -e DATAPLANE_TYPE=NGINX_MANAGEMENT_SYSTEM \
+    -e DATAPLANE_FQDN=https://nim2.f5.ff.lan \
+    -e DATAPLANE_USERNAME=admin \
+    -e DATAPLANE_PASSWORD=nimadmin \
+    fiorucci/f5-telemetry-tracker:latest
+```
+
+## On Kubernetes/Openshift
+
+F5 Telemetry Tracker image is available on Docker Hub as:
 
 ```
 fiorucci/f5-telemetry-tracker:latest
