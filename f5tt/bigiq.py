@@ -382,7 +382,15 @@ def bigIqInventory(mode):
 
                 inventoryData['inventoryStatus'] = "full"
                 inventoryData['registrationKey'] = invDevice['infoState']['license']['registrationKey']
-                inventoryData['activeModules'] = invDevice['infoState']['license']['activeModules']
+
+                activeModulesArray = invDevice['infoState']['license']['activeModules']
+                inventoryData['activeModules'] = activeModulesArray
+                inventoryData['elaPlatform'] = ""
+
+                for am in activeModulesArray:
+                  if am.startswith('ELA'):
+                    inventoryData['elaPlatform'] = am.split('|')[0]
+
                 if 'chassisSerialNumber' in invDevice['infoState']:
                   inventoryData['chassisSerialNumber'] = invDevice['infoState']['chassisSerialNumber'].strip()
                 else:
