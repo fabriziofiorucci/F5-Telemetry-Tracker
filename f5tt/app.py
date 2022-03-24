@@ -170,11 +170,16 @@ def getInstances(request: Request,type: Optional[str] = None):
           reply,code = nms.nmsInstances(mode='JSON')
         elif type == 'CVE':
           reply,code = nms.nmsCVEjson()
+        else:
+          reply = {}
+          code = 404
     elif nc_mode == 'BIG_IQ':
         if type == None:
           reply,code = bigiq.bigIqInventory(mode='JSON')
         elif type == 'CVE':
           reply,code = bigiq.bigIqCVEjson()
+        elif type == 'SwOnHw':
+          reply,code = bigiq.bigIqSwOnHwjson()
         else:
           reply = {}
           code = 404
