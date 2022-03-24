@@ -156,11 +156,11 @@ A dynamically updated report in xls format can be downloaded by accessing either
 This is currently available when querying BIG-IQ
 
 
-# Visualization
+## Visualization
 
 See [Grafana](/contrib/grafana)
 
 
-# Sample report e-mail
+## Sample report e-mail
 
 <img src="./images/reporting-mail.png"/>
