@@ -58,7 +58,6 @@ the `type` query string parameter can be used to retrieve a logical view of the 
 
 - Retrieve the standard full JSON: `curl -s http://f5tt.ff.lan/instances | jq`
 - Retrieve the CVE-centric JSON: `curl -s http://f5tt.ff.lan/instances?type=CVE | jq`
-- Retrieve the "Software on Hardware" JSON: `curl -s http://f5tt.ff.lan/instances?type=SwOnHw | jq`
 
 ```
 $ curl -s http://f5tt.ff.lan/instances | jq 
@@ -435,6 +434,7 @@ the `type` query string parameter can be used to retrieve a logical view of the 
 
 - Retrieve the standard full JSON: `curl -s http://f5tt.ff.lan/instances | jq`
 - Retrieve a CVE-centric JSON: `curl -s http://f5tt.ff.lan/instances?type=CVE | jq`
+- Retrieve the "Software on Hardware" JSON: `curl -s http://f5tt.ff.lan/instances?type=SwOnHw | jq`
 
 ```
 $ curl -s http://f5tt.ff.lan/instances | jq
