@@ -385,11 +385,11 @@ def bigIqInventory(mode):
 
                 activeModulesArray = invDevice['infoState']['license']['activeModules']
                 inventoryData['activeModules'] = activeModulesArray
-                inventoryData['elaPlatform'] = []
+                inventoryData['elaPlatform'] = ''
 
                 for am in activeModulesArray:
-                  if am.startswith('ELA'):
-                    inventoryData['elaPlatform'].append(am.split('|')[0])
+                  if am.startswith('ELA,'):
+                    inventoryData['elaPlatform'] = am.split('|')[0]
 
                 if 'chassisSerialNumber' in invDevice['infoState']:
                   inventoryData['chassisSerialNumber'] = invDevice['infoState']['chassisSerialNumber'].strip()
@@ -570,30 +570,35 @@ def bigIqSwOnHwjson():
   vCMPHostModules = {}
 
   for d in fullJSON['details']:
-    bigipSN = d['chassisSerialNumber'] if 'chassisSerialNumber' in d else ''
-    bigipRegKey = d['registrationKey'] if 'registrationKey' in d else ''
-    bigipSku = d['platform']['sku'] if 'platform' in d else ''
-    bigipElaPlatform = d['elaPlatform'] if 'elaPlatform' in d else ''
+    if d['inventoryStatus'] == "full":
+      deviceJSON = {}
 
-    if bigipSN != '':
-      if bigipSN not in vCMPHostModules and bigipSku == 'F5-VE-VCMP':
-        vCMPHostModules[bigipSN] = []
+      bigipSN = d['chassisSerialNumber'] if 'chassisSerialNumber' in d else ''
+      bigipRegKey = d['registrationKey'] if 'registrationKey' in d else ''
+      bigipSku = d['platform']['sku'] if 'platform' in d else ''
 
-    deviceJSON = {}
-    deviceJSON['chassisSerialNumber'] = bigipSN
-    deviceJSON['registrationKey'] = bigipRegKey
-    deviceJSON['elaPlatform'] = bigipElaPlatform
-    deviceJSON['sku'] = bigipSku
-    deviceJSON['provisionedModules'] = []
 
-    for m in d['provisionedModules']:
-      if m['level'] == 'nominal' or m['level'] == 'dedicated':
-        deviceJSON['provisionedModules'].append(m['sku'])
-        if bigipSN in vCMPHostModules:
-          if m['sku'] not in vCMPHostModules[bigipSN]:
-            vCMPHostModules[bigipSN].append(m['sku'])
+      if 'elaPlatform' in d:
+        if d['elaPlatform'] != '':
+          deviceJSON['elaPlatform'] = d['elaPlatform']
 
-    swOnHwJSON.append(deviceJSON)
+          if bigipSN != '':
+            if bigipSN not in vCMPHostModules and bigipSku == 'F5-VE-VCMP':
+              vCMPHostModules[bigipSN] = []
+
+          deviceJSON['chassisSerialNumber'] = bigipSN
+          deviceJSON['registrationKey'] = bigipRegKey
+          deviceJSON['sku'] = bigipSku
+          deviceJSON['provisionedModules'] = []
+
+          for m in d['provisionedModules']:
+            if m['level'] == 'nominal' or m['level'] == 'dedicated' or m['level'] == 'minimum':
+              deviceJSON['provisionedModules'].append(m['sku'])
+              if bigipSN in vCMPHostModules:
+                if m['sku'] not in vCMPHostModules[bigipSN]:
+                  vCMPHostModules[bigipSN].append(m['sku'])
+
+          swOnHwJSON.append(deviceJSON)
 
   # Fill out vCMP host TMOS modules usage
   for sn in vCMPHostModules:
@@ -601,17 +606,35 @@ def bigIqSwOnHwjson():
     for i in range(0,len(swOnHwJSON)):
       d = swOnHwJSON[i]
 
-      if d['chassisSerialNumber'] == sn and d['sku'] != 'F5-VE-VCMP':
-        # Found a vCMP host, update TMOS modules SKU and fill provisionedModules
-        vCMPHostModulesRewritten = []
-        skuModel = '-'.join(d['sku'].split('-')[2:])
-        for j in range(0,len(vCMPHostModules[sn])):
-          updatedSKU = skuModel + '-' + '-'.join(vCMPHostModules[sn][j].split('-')[2:])
-          vCMPHostModulesRewritten.append(updatedSKU)
+      if d['chassisSerialNumber'] == sn:
+        if d['sku'] != 'F5-VE-VCMP':
+          # Found a vCMP host, update TMOS modules SKU and fill provisionedModules using 'PLATFORMTYPE'-'MODULE'
+          vCMPHostModulesRewritten = []
+          skuModel = '-'.join(d['sku'].split('-')[2:])
+          for j in range(0,len(vCMPHostModules[sn])):
+            updatedSKU = skuModel + '-' + '-'.join(vCMPHostModules[sn][j].split('-')[2:])
+            vCMPHostModulesRewritten.append(updatedSKU)
 
-        d['provisionedModules'] = vCMPHostModulesRewritten
+          d['provisionedModules'] = vCMPHostModulesRewritten
+        else:
+          # Found a vCMP guest, update the SKU from VE-VCMP-XXX to PLATFORMTYPE-XXX
+          vCMPGuestModulesRewritten = []
+          skuModel = d['elaPlatform'].split(' ')[-1].upper()
+          for j in range(0,len(vCMPHostModules[sn])):
+            updatedSKU = skuModel + '-' + '-'.join(vCMPHostModules[sn][j].split('-')[2:])
+            vCMPGuestModulesRewritten.append(updatedSKU)
 
-  return swOnHwJSON,200
+          d['provisionedModules'] = vCMPGuestModulesRewritten
+
+  timeNow = datetime.datetime.now()
+  monthAgo = timeNow - datetime.timedelta(days=30)
+
+  wholeJSON = {}
+  wholeJSON['periodStarted'] = monthAgo.strftime("%Y-%m-%dT%H:%M:%SZ")
+  wholeJSON['periodEnded'] = timeNow.strftime("%Y-%m-%dT%H:%M:%SZ")
+  wholeJSON['swOnHw'] = swOnHwJSON
+
+  return wholeJSON,200
 
 
 # Builds BIG-IQ telemetry request body by entities
