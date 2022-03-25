@@ -29,6 +29,11 @@ the `type` query string parameter can be used to retrieve a logical view of the 
 - Retrieve a CVE-centric JSON: `curl -s http://f5tt.ff.lan/instances?type=CVE | jq`
 - Retrieve the "Software on Hardware" JSON: `curl -s http://f5tt.ff.lan/instances?type=SwOnHw | jq`
 
+A dynamically updated report in xls format can be downloaded by accessing either:
+
+- `curl -s http://f5tt.ff.lan/reporting/xls`
+- `curl -s http://f5tt.ff.lan/f5tt/reporting/xls`
+
 ### Prometheus endpoint:
 
 Pulling from NGINX Instance Manager
@@ -144,16 +149,6 @@ Authorization: Basic YWE6YmI=
   ...
 }
 ```
-
-
-## High level reporting
-
-A dynamically updated report in xls format can be downloaded by accessing either:
-
-- `/reporting/xls`
-- `/f5tt/reporting/xls`
-
-This is currently available when querying BIG-IQ
 
 
 ## Visualization
