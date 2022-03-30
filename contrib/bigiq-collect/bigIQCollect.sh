@@ -71,11 +71,10 @@ then
 	exit
 fi
 
-INV_ID=`echo $INVENTORIES | jq -r 'select(.items[].status=="FINISHED")|.items[0].resultsReference.link' | head -n1 | awk -F \/ '{print $9}'`
-if [ "$INV_ID" == "" ]
-then
-	INV_ID=`restcurl -u $BIGIQ_USERNAME:$BIGIQ_PASSWORD /mgmt/cm/device/tasks/device-inventory | jq -r 'select(.items[].status=="FAILED")|.items[0].resultsReference.link' | head -n1 | awk -F \/ '{print $9}'`
-fi
+echo "-> Inventories summary"
+echo $INVENTORIES | jq -r '.items[].status' | sort | uniq -c
+
+INV_ID=`echo $INVENTORIES | jq -r '.items['$(expr $INVENTORIES_LEN - 1)'].resultsReference.link' | head -n1 | awk -F \/ '{print $9}'`
 
 if [ ! "$INV_ID" = "" ]
 then
@@ -163,6 +162,8 @@ do
 done
 
 ## Datapoints telemetry
+
+AUTH_TOKEN=`curl -ks -X POST 'https://127.0.0.1/mgmt/shared/authn/login' -H 'Content-Type: text/plain' -d '{"username": "'$BIGIQ_USERNAME'","password": "'$BIGIQ_PASSWORD'"}' | jq '.token.token' -r`
 
 for TDP_HOSTNAME in $ALL_HOSTNAMES
 do

@@ -52,6 +52,11 @@ Password:
 -> Reading system provisioning
 -> Reading device inventory
 -> Reading device inventory details
+-> Found 28 inventories
+-> Inventories summary
+      5 FAILED
+     22 FINISHED
+      1 STARTED
 -> Reading device info for [1346a1f5-49aa-422f-8c4d-19b0119b3927]
 -> Reading device info for [aabcaca7-6986-4d0b-b9fe-b72e3473144e]
 -> Reading device telemetry
