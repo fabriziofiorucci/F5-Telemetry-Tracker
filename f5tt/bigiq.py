@@ -575,8 +575,8 @@ def bigIqSwOnHwjson():
 
       bigipSN = d['chassisSerialNumber'] if 'chassisSerialNumber' in d else ''
       bigipRegKey = d['registrationKey'] if 'registrationKey' in d else ''
-      bigipSku = d['platform']['sku'] if 'platform' in d else ''
-
+      if 'sku' in d['platform']:
+        bigipSku = d['platform']['sku'] if 'platform' in d else ''
 
       if 'elaPlatform' in d:
         if d['elaPlatform'] != '':
