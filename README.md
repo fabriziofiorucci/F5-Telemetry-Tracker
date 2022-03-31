@@ -134,6 +134,7 @@ F5 Telemetry Tracker requires:
 - [Requests](https://docs.python-requests.org/en/master/)
 - [XLSX Writer](https://pypi.org/project/XlsxWriter/)
 - [Pandas](https://pandas.pydata.org/)
+- [json2html](https://pypi.org/project/json2html/)
 
 f5tt/f5tt.sh is a sample script to run F5 Telemetry Tracker from bash
 

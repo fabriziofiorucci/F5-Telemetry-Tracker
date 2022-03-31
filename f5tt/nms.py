@@ -92,15 +92,12 @@ def nmsInstances(mode):
     subscriptionDict['version'] = instanceVersion
     subscriptionDict['serial'] = instanceSerial
 
-    instancesDict = {}
-    instancesDict['nginx_plus_online'] = plusManaged
-    instancesDict['nginx_oss_online'] = int(totalManaged)-int(plusManaged)
-
     output = {}
     output['subscription'] = subscriptionDict
-    output['instances'] = instancesDict
     output['details'] = []
 
+    onlineNginxPlus = 0
+    onlineNginxOSS = 0
 
     for i in system['items']:
       systemId=i['uid']
@@ -125,12 +122,10 @@ def nmsInstances(mode):
         detailsDict['instance_id'] = instance['uid']
         detailsDict['osInfo'] = systemDetails['osRelease']
         detailsDict['hypervisor'] = systemDetails['processor'][0]['hypervisor']
-        if instanceDetails['build']['nginxPlus'] == False:
-          detailsDict['type'] = "oss"
-        else:
-          detailsDict['type'] = "plus"
+        detailsDict['type'] = "oss" if instanceDetails['build']['nginxPlus'] == False else "plus"
         detailsDict['version'] = instanceDetails['build']['version']
         detailsDict['last_seen'] = instance['status']['lastStatusReport']
+        detailsDict['state'] = instance['status']['state']
         detailsDict['createtime'] = instance['startTime']
         detailsDict['modules'] = instanceDetails['loadableModules']
         detailsDict['networkconfig'] = {}
@@ -140,7 +135,23 @@ def nmsInstances(mode):
         detailsDict['CVE'] = []
         detailsDict['CVE'].append(allCVE)
 
+        if detailsDict['state'] == 'online':
+          onlineNginxOSS = onlineNginxOSS + 1 if detailsDict['type'] == "oss" else onlineNginxOSS
+          onlineNginxPlus = onlineNginxPlus + 1 if detailsDict['type'] == "plus" else onlineNginxPlus
+
         output['details'].append(detailsDict)
+
+    instancesDict = {}
+    instancesDict['nginx_plus'] = {}
+    instancesDict['nginx_oss'] = {}
+    instancesDict['nginx_plus']['managed'] = plusManaged
+    instancesDict['nginx_plus']['online'] = onlineNginxPlus
+    instancesDict['nginx_plus']['offline'] = plusManaged - onlineNginxPlus
+    instancesDict['nginx_oss']['managed'] = int(totalManaged)-int(plusManaged)
+    instancesDict['nginx_oss']['online'] = onlineNginxOSS
+    instancesDict['nginx_oss']['offline'] = int(totalManaged)-int(plusManaged)-onlineNginxOSS
+
+    output['instances'] = instancesDict
 
   elif mode == 'PROMETHEUS' or mode == 'PUSHGATEWAY':
     if mode == 'PROMETHEUS':

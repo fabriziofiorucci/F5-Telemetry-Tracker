@@ -3,12 +3,14 @@
 ## REST API mode
 
 For `/instances` and `/f5tt/instances` endpoints if the request includes the `Accept-Encoding: gzip` header the response will be compressed
+The `/` endpoint displays a basic HTML view of generated JSON files
 
 To get instance statistics in JSON format:
 
 ### NGINX Instance Manager 1.x
 
 - Retrieve the full JSON: `curl -s http://f5tt.ff.lan/instances | jq`
+- Browser mode: `http://f5tt.ff.lan`
 
 ### NGINX Instance Manager 2.x
 
@@ -17,9 +19,13 @@ the `type` query string parameter can be used to retrieve a logical view of the 
 - Retrieve the full JSON: `curl -s http://f5tt.ff.lan/instances | jq`
 - Retrieve the CVE-centric JSON: `curl -s http://f5tt.ff.lan/instances?type=CVE | jq`
 
+- Browser mode: `http://f5tt.ff.lan` and `http://f5tt.ff.lan?type=CVE`
+
 ### NGINX Controller
 
 - Retrieve the full JSON: `curl -s http://f5tt.ff.lan/instances | jq`
+
+- Browser mode: `http://f5tt.ff.lan`
 
 ### BIG-IQ
 
@@ -28,6 +34,9 @@ the `type` query string parameter can be used to retrieve a logical view of the 
 - Retrieve the standard full JSON: `curl -s http://f5tt.ff.lan/instances | jq`
 - Retrieve a CVE-centric JSON: `curl -s http://f5tt.ff.lan/instances?type=CVE | jq`
 - Retrieve the "Software on Hardware" JSON: `curl -s http://f5tt.ff.lan/instances?type=SwOnHw | jq`
+
+- Browser mode: `http://f5tt.ff.lan`, `http://f5tt.ff.lan?type=CVE` and `http://f5tt.ff.lan?type=SwOnHw`
+
 
 A dynamically updated report in xls format can be downloaded by accessing either:
 

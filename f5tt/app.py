@@ -3,6 +3,7 @@
 from fastapi import FastAPI, Response, Request
 from fastapi.responses import JSONResponse,StreamingResponse
 from typing import Optional
+from json2html import *
 import os
 import sys
 import ssl
@@ -160,6 +161,7 @@ def scheduledEmail(email_server, email_server_port, email_server_type, email_aut
 # Returns stats in json format
 @app.get("/instances")
 @app.get("/f5tt/instances")
+@app.get("/")
 def getInstances(request: Request,type: Optional[str] = None):
     if nc_mode == 'NGINX_CONTROLLER':
         reply,code = nc.ncInstances(fqdn=nc_fqdn, username=nc_user, password=nc_pass, mode='JSON', proxy=proxyDict)
@@ -168,7 +170,7 @@ def getInstances(request: Request,type: Optional[str] = None):
     elif nc_mode == 'NGINX_MANAGEMENT_SYSTEM':
         if type == None:
           reply,code = nms.nmsInstances(mode='JSON')
-        elif type == 'CVE':
+        elif type.lower() == 'cve':
           reply,code = nms.nmsCVEjson()
         else:
           reply = {}
@@ -176,25 +178,41 @@ def getInstances(request: Request,type: Optional[str] = None):
     elif nc_mode == 'BIG_IQ':
         if type == None:
           reply,code = bigiq.bigIqInventory(mode='JSON')
-        elif type == 'CVE':
+        elif type.lower() == 'cve':
           reply,code = bigiq.bigIqCVEjson()
-        elif type == 'SwOnHw':
+        elif type.lower() == 'swonhw':
           reply,code = bigiq.bigIqSwOnHwjson()
         else:
           reply = {}
           code = 404
 
+    # Web UI
+    if request.url.path == '/':
+      attributes = 'id=\"info-table\" class=\"table table-bordered table-hover\"'
+      f5tt_output = json2html.convert(json=reply,table_attributes=attributes)
+      f5tt_output_media_type = 'text/html'
+    else:
+      f5tt_output = reply
+      f5tt_output_media_type = 'application/json'
+
     # gzip responses supported if the client sends header "Accept-Encoding: gzip"
     responseSent = False
 
-    if "Accept-Encoding" in request.headers:
+    if 'Accept-Encoding' in request.headers:
         if request.headers['Accept-Encoding'] == 'gzip':
-            deflatedReply = gzip.compress(json.dumps(reply).encode('utf-8'))
-            responseSent = True
-            return Response(content=deflatedReply,media_type="application/json",headers={ 'Content-Encoding': 'gzip' })
+          if request.url.path == '/':
+            deflatedReply = gzip.compress(f5tt_output)
+          else:
+            deflatedReply = gzip.compress(json.dumps(f5tt_output).encode('utf-8'))
+
+          responseSent = True
+          return Response(content=deflatedReply,media_type=f5tt_output_media_type,headers={ 'Content-Encoding': 'gzip' })
 
     if responseSent == False:
-        return JSONResponse(content=reply,status_code=code)
+        if request.url.path == '/':
+          return Response(content=f5tt_output,media_type=f5tt_output_media_type,headers={ 'Content-Type': 'text/html' })
+        else:
+          return JSONResponse(content=f5tt_output,status_code=code)
 
 
 # Returns stats in prometheus format
