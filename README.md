@@ -7,7 +7,7 @@ This tool helps tracking NGINX Plus instances managed by NGINX Controller and NG
 It has been tested against:
 
 - NGINX Controller 3.18, 3.18.2, apim-3.19.2
-- NGINX Instance Manager 1.0.1, 1.0.2, 1.0.3, 1.0.4, 2.0, 2.0.1
+- NGINX Instance Manager 1.0.1, 1.0.2, 1.0.3, 1.0.4, 2.0, 2.0.1, 2.1.0
 - BIG-IQ 8.1.0, 8.1.0.2
 
 Communication to NGINX Controller / NGINX Instance Manager / BIG-IQ is based on REST API, current features are:
@@ -83,7 +83,7 @@ sequenceDiagram
 - Private registry to push the F5 Telemetry Tracker image
 - One of:
   - NGINX Controller 3.18, 3.18.2, apim-3.19.2
-  - NGINX Instance Manager 1.0.1, 1.0.2, 1.0.3, 1.0.4, 2.0, 2.0.1
+  - NGINX Instance Manager 1.0.1, 1.0.2, 1.0.3, 1.0.4, 2.0, 2.0.1, 2.1.0
   - BIG-IQ 8.1.0, 8.1.0.2
 - SMTP server if automated email reporting is used
 - NIST NVD REST API Key for full CVE tracking (https://nvd.nist.gov/developers/request-an-api-key)
