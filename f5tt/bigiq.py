@@ -381,9 +381,9 @@ def bigIqInventory(mode):
                 platformInsights['code']=platformCode
 
                 inventoryData['inventoryStatus'] = "full"
-                inventoryData['registrationKey'] = invDevice['infoState']['license']['registrationKey']
+                inventoryData['registrationKey'] = invDevice['infoState']['license']['registrationKey'] if 'registrationKey' in invDevice['infoState']['license'] else ''
 
-                activeModulesArray = invDevice['infoState']['license']['activeModules']
+                activeModulesArray = invDevice['infoState']['license']['activeModules'] if 'activeModules' in invDevice['infoState']['license'] else ''
                 inventoryData['activeModules'] = activeModulesArray
                 inventoryData['elaPlatform'] = ''
 
