@@ -47,6 +47,14 @@ then
 	exit
 fi
 
+AUTH_CHECK=`curl -ks -X POST 'https://127.0.0.1/mgmt/shared/authn/login' -H 'Content-Type: text/plain' -d '{"username": "'$BIGIQ_USERNAME'","password": "'$BIGIQ_PASSWORD'"}' | jq '.username' -r`
+
+if [ "$AUTH_CHECK" == "null" ]
+then
+	echo "Wrong credentials: authentication failed"
+	exit
+fi
+
 OUTPUTROOT=/tmp
 OUTPUTDIR=`mktemp -d`
 
