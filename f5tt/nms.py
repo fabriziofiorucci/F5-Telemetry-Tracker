@@ -14,6 +14,7 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from email.message import EmailMessage
 
 import cveDB
+import f5ttCH
 
 this = sys.modules[__name__]
 
@@ -25,7 +26,7 @@ this.nms_password=''
 this.nms_proxy={}
 
 # Module initialization
-def init(fqdn,username,password,proxy,nistApiKey):
+def init(fqdn,username,password,proxy,nistApiKey,ch_host,ch_port,ch_user,ch_pass):
   this.nms_fqdn=fqdn
   this.nms_username=username
   this.nms_password=password
@@ -33,6 +34,7 @@ def init(fqdn,username,password,proxy,nistApiKey):
 
   print('Initializing NMS [',this.nms_fqdn,']')
 
+  #f5ttCH.init(ch_host,ch_port,ch_user,ch_pass)
   cveDB.init(nistApiKey=nistApiKey,proxy=proxy)
 
 
@@ -85,86 +87,87 @@ def nmsInstances(mode):
 
   output=''
 
-  if mode == 'JSON':
-    subscriptionDict = {}
-    subscriptionDict['id'] = subscriptionId
-    subscriptionDict['type'] = instanceType
-    subscriptionDict['version'] = instanceVersion
-    subscriptionDict['serial'] = instanceSerial
+  subscriptionDict = {}
+  subscriptionDict['id'] = subscriptionId
+  subscriptionDict['type'] = instanceType
+  subscriptionDict['version'] = instanceVersion
+  subscriptionDict['serial'] = instanceSerial
 
-    output = {}
-    output['subscription'] = subscriptionDict
-    output['details'] = []
+  output = {}
+  output['subscription'] = subscriptionDict
+  output['details'] = []
 
-    onlineNginxPlus = 0
-    onlineNginxOSS = 0
+  onlineNginxPlus = 0
+  onlineNginxOSS = 0
 
-    for i in system['items']:
-      systemId=i['uid']
+  for i in system['items']:
+    systemId=i['uid']
 
-      # Fetch system details
-      status,systemDetails = nmsRESTCall(method='GET',uri='/api/platform/v1/systems/'+systemId+'?showDetails=true')
+    # Fetch system details
+    status,systemDetails = nmsRESTCall(method='GET',uri='/api/platform/v1/systems/'+systemId+'?showDetails=true')
+    if status != 200:
+      return {'error': 'fetching system details failed for '+systemId},status
+
+    for instance in i['nginxInstances']:
+      # Fetch instance details
+      instanceUID = instance['uid']
+
+      status,instanceDetails = nmsRESTCall(method='GET',uri='/api/platform/v1/systems/'+systemId+'/instances/'+instanceUID)
       if status != 200:
-        return {'error': 'fetching system details failed for '+systemId},status
+        return {'error': 'fetching instance details failed for '+systemId+' / '+instanceUID},status
 
-      for instance in i['nginxInstances']:
-        # Fetch instance details
-        instanceUID = instance['uid']
+      # Fetch CVEs
+      allCVE=cveDB.getNGINX(version=instanceDetails['build']['version'])
 
-        status,instanceDetails = nmsRESTCall(method='GET',uri='/api/platform/v1/systems/'+systemId+'/instances/'+instanceUID)
-        if status != 200:
-          return {'error': 'fetching instance details failed for '+systemId+' / '+instanceUID},status
+      detailsDict = {}
+      detailsDict['instance_id'] = instance['uid']
+      detailsDict['osInfo'] = systemDetails['osRelease']
+      detailsDict['hypervisor'] = systemDetails['processor'][0]['hypervisor']
+      detailsDict['type'] = "oss" if instanceDetails['build']['nginxPlus'] == False else "plus"
+      detailsDict['version'] = instanceDetails['build']['version']
+      detailsDict['last_seen'] = instance['status']['lastStatusReport']
+      detailsDict['state'] = instance['status']['state']
+      detailsDict['createtime'] = instance['startTime']
+      detailsDict['modules'] = instanceDetails['loadableModules']
+      detailsDict['networkconfig'] = {}
+      detailsDict['networkconfig']['networkInterfaces'] = systemDetails['networkInterfaces']
+      detailsDict['hostname'] = systemDetails['hostname']
+      detailsDict['name'] = systemDetails['displayName']
+      detailsDict['CVE'] = []
+      detailsDict['CVE'].append(allCVE)
 
-        # Fetch CVEs
-        allCVE=cveDB.getNGINX(version=instanceDetails['build']['version'])
+      if detailsDict['state'] == 'online':
+        onlineNginxOSS = onlineNginxOSS + 1 if detailsDict['type'] == "oss" else onlineNginxOSS
+        onlineNginxPlus = onlineNginxPlus + 1 if detailsDict['type'] == "plus" else onlineNginxPlus
 
-        detailsDict = {}
-        detailsDict['instance_id'] = instance['uid']
-        detailsDict['osInfo'] = systemDetails['osRelease']
-        detailsDict['hypervisor'] = systemDetails['processor'][0]['hypervisor']
-        detailsDict['type'] = "oss" if instanceDetails['build']['nginxPlus'] == False else "plus"
-        detailsDict['version'] = instanceDetails['build']['version']
-        detailsDict['last_seen'] = instance['status']['lastStatusReport']
-        detailsDict['state'] = instance['status']['state']
-        detailsDict['createtime'] = instance['startTime']
-        detailsDict['modules'] = instanceDetails['loadableModules']
-        detailsDict['networkconfig'] = {}
-        detailsDict['networkconfig']['networkInterfaces'] = systemDetails['networkInterfaces']
-        detailsDict['hostname'] = systemDetails['hostname']
-        detailsDict['name'] = systemDetails['displayName']
-        detailsDict['CVE'] = []
-        detailsDict['CVE'].append(allCVE)
+      output['details'].append(detailsDict)
 
-        if detailsDict['state'] == 'online':
-          onlineNginxOSS = onlineNginxOSS + 1 if detailsDict['type'] == "oss" else onlineNginxOSS
-          onlineNginxPlus = onlineNginxPlus + 1 if detailsDict['type'] == "plus" else onlineNginxPlus
+  instancesDict = {}
+  instancesDict['nginx_plus'] = {}
+  instancesDict['nginx_oss'] = {}
+  instancesDict['nginx_plus']['managed'] = plusManaged
+  instancesDict['nginx_plus']['online'] = onlineNginxPlus
+  instancesDict['nginx_plus']['offline'] = plusManaged - onlineNginxPlus
+  instancesDict['nginx_oss']['managed'] = int(totalManaged)-int(plusManaged)
+  instancesDict['nginx_oss']['online'] = onlineNginxOSS
+  instancesDict['nginx_oss']['offline'] = int(totalManaged)-int(plusManaged)-onlineNginxOSS
 
-        output['details'].append(detailsDict)
+  output['instances'] = instancesDict
 
-    instancesDict = {}
-    instancesDict['nginx_plus'] = {}
-    instancesDict['nginx_oss'] = {}
-    instancesDict['nginx_plus']['managed'] = plusManaged
-    instancesDict['nginx_plus']['online'] = onlineNginxPlus
-    instancesDict['nginx_plus']['offline'] = plusManaged - onlineNginxPlus
-    instancesDict['nginx_oss']['managed'] = int(totalManaged)-int(plusManaged)
-    instancesDict['nginx_oss']['online'] = onlineNginxOSS
-    instancesDict['nginx_oss']['offline'] = int(totalManaged)-int(plusManaged)-onlineNginxOSS
-
-    output['instances'] = instancesDict
-
-  elif mode == 'PROMETHEUS' or mode == 'PUSHGATEWAY':
+  if mode == 'PROMETHEUS' or mode == 'PUSHGATEWAY':
     if mode == 'PROMETHEUS':
-      output = '# HELP nginx_oss_online_instances Online NGINX OSS instances\n'
-      output = output + '# TYPE nginx_oss_online_instances gauge\n'
+      pOutput = '# HELP nginx_oss_online_instances Online NGINX OSS instances\n'
+      pOutput = pOutput + '# TYPE nginx_oss_online_instances gauge\n'
 
-    output = output + 'nginx_oss_online_instances{subscription="'+subscriptionId+'",instanceType="'+instanceType+'",instanceVersion="'+instanceVersion+'",instanceSerial="'+instanceSerial+'"} '+str(int(totalManaged)-int(plusManaged))+'\n'
+    pOutput = pOutput + 'nginx_oss_online_instances{subscription="'+output['subscription']['id']+'",instanceType="'+output['subscription']['type']+'",instanceVersion="'+output['subscription']['version']+'",instanceSerial="'+output['subscription']['serial']+'"} '+str(int(totalManaged)-int(plusManaged))+'\n'
 
     if mode == 'PROMETHEUS':
-      output = output + '# HELP nginx_plus_online_instances Online NGINX Plus instances\n'
-      output = output + '# TYPE nginx_plus_online_instances gauge\n'
+      pOutput = pOutput + '# HELP nginx_plus_online_instances Online NGINX Plus instances\n'
+      pOutput = pOutput + '# TYPE nginx_plus_online_instances gauge\n'
 
-    output = output + 'nginx_plus_online_instances{subscription="'+subscriptionId+'",instanceType="'+instanceType+'",instanceVersion="'+instanceVersion+'",instanceSerial="'+instanceSerial+'"} '+str(plusManaged)+'\n'
+    pOutput = pOutput + 'nginx_plus_online_instances{subscription="'+subscriptionId+'",instanceType="'+instanceType+'",instanceVersion="'+instanceVersion+'",instanceSerial="'+instanceSerial+'"} '+str(plusManaged)+'\n'
+
+    output = pOutput
 
   return output,200
 

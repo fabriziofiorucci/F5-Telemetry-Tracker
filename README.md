@@ -111,7 +111,7 @@ F5 Telemetry Tracker image is available on Docker Hub as:
 fiorucci/f5-telemetry-tracker:latest
 ```
 
-The 1.f5tt.yaml file references that by default.
+The `manifests/1.f5tt.yaml` file references that by default.
 
 If you need to build and push NGINX your own image to a private registry:
 
@@ -135,8 +135,9 @@ F5 Telemetry Tracker requires:
 - [XLSX Writer](https://pypi.org/project/XlsxWriter/)
 - [Pandas](https://pandas.pydata.org/)
 - [json2html](https://pypi.org/project/json2html/)
+- [clickhouse-driver](https://pypi.org/project/clickhouse-driver/)
 
-f5tt/f5tt.sh is a sample script to run F5 Telemetry Tracker from bash
+`f5tt/f5tt.sh` is a sample script to run F5 Telemetry Tracker from bash
 
 ## Additional modes of operation
 

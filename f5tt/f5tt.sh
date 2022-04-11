@@ -31,6 +31,11 @@
 #export DATAPLANE_FQDN="https://ubuntu.ff.lan"
 #export DATAPLANE_USERNAME="theusername"
 #export DATAPLANE_PASSWORD="thepassword"
+#export NMS_CH_HOST="127.0.0.1"
+#export NMS_CH_PORT="9000"
+#export NMS_CH_USER="default"
+#export NMS_CH_PASS=""
+#export NMS_CH_SAMPLE_INTERVAL=30
 
 ### Section to use when polling BIG-IQ
 

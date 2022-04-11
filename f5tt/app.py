@@ -297,7 +297,11 @@ if __name__ == '__main__':
             inventoryThread = threading.Thread(target=bigiq.scheduledInventory)
             inventoryThread.start()
         elif nc_mode == 'NGINX_MANAGEMENT_SYSTEM':
-            nms.init(fqdn=nc_fqdn, username=nc_user, password=nc_pass, nistApiKey=nist_apikey, proxy=proxyDict)
+            ch_host = os.environ['NMS_CH_HOST'] if 'NMS_CH_HOST' in os.environ else '127.0.0.1'
+            ch_port = os.environ['NMS_CH_PORT'] if 'NMS_CH_PORT' in os.environ else '9000'
+            ch_user = os.environ['NMS_CH_USER'] if 'NMS_CH_USER' in os.environ else 'default'
+            ch_pass = os.environ['NMS_CH_PASS'] if 'NMS_CH_PASS' in os.environ else ''
+            nms.init(fqdn=nc_fqdn, username=nc_user, password=nc_pass, nistApiKey=nist_apikey, proxy=proxyDict, ch_host=ch_host, ch_port=ch_port, ch_user=ch_user, ch_pass=ch_pass)
 
         if "STATS_PUSH_ENABLE" in os.environ:
             if os.environ['STATS_PUSH_ENABLE'] == 'true':
