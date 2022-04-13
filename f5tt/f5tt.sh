@@ -35,7 +35,7 @@
 #export NMS_CH_PORT="9000"
 #export NMS_CH_USER="default"
 #export NMS_CH_PASS=""
-#export NMS_CH_SAMPLE_INTERVAL=30
+#export NMS_CH_SAMPLE_INTERVAL=1800
 
 ### Section to use when polling BIG-IQ
 

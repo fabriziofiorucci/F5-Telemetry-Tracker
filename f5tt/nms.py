@@ -26,7 +26,7 @@ this.nms_password=''
 this.nms_proxy={}
 
 # Module initialization
-def init(fqdn,username,password,proxy,nistApiKey,ch_host,ch_port,ch_user,ch_pass):
+def init(fqdn,username,password,proxy,nistApiKey,ch_host,ch_port,ch_user,ch_pass,sample_interval):
   this.nms_fqdn=fqdn
   this.nms_username=username
   this.nms_password=password
@@ -34,9 +34,31 @@ def init(fqdn,username,password,proxy,nistApiKey,ch_host,ch_port,ch_user,ch_pass
 
   print('Initializing NMS [',this.nms_fqdn,']')
 
-  #f5ttCH.init(ch_host,ch_port,ch_user,ch_pass)
-  cveDB.init(nistApiKey=nistApiKey,proxy=proxy)
+  cveDB.init(nistApiKey = nistApiKey,proxy=proxy)
 
+  f5ttCH.init(ch_host,ch_port,ch_user,ch_pass)
+  t=threading.Thread(target=pollingThread,args=(sample_interval,))
+  t.start()
+
+
+# Periodic sample thread running every 'sample_interval' minutes
+def pollingThread(sample_interval):
+  print('Starting polling thread every',sample_interval,'minutes')
+
+  while True:
+    now=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    instancesJson,retcode = nmsInstances(mode='JSON')
+    print(now,'Collecting instances usage',instancesJson['instances'] if 'instances' in instancesJson else 'invalid')
+
+    if 'instances' in instancesJson:
+      query='insert into f5tt.tracking (ts,data) values (\''+str(now)+'\',\''+json.dumps(instancesJson['instances'])+'\')'
+
+      f5ttCH.connect()
+      out=f5ttCH.execute(query)
+      f5ttCH.close()
+
+    time.sleep(sample_interval)
 
 ### NGINX Management System REST API
 
@@ -193,3 +215,69 @@ def nmsCVEjson():
       cveJSON[cve]['devices'].append(deviceJSON)
 
   return cveJSON,200
+
+
+# Returns the time-based instances usage distribution JSON
+def nmsTimeBasedJson(monthStats,hourInterval):
+  output = {}
+  output['subscription'] = {}
+  output['instances'] = []
+
+  # Fetching NMS license
+  status,license = nmsRESTCall(method='GET',uri='/api/platform/v1/license')
+
+  if status == 200:
+    output['subscription']['id']=license['currentStatus']['subscription']['id']
+    output['subscription']['type']=license['currentStatus']['state']['currentInstance']['features'][0]['id']
+    output['subscription']['version']=license['currentStatus']['state']['currentInstance']['version']
+    output['subscription']['serial']=license['currentStatus']['state']['currentInstance']['id']
+
+  #query = 'select * from f5tt.tracking'
+  query = " \
+    SELECT \
+      min(ts) as from, \
+      max(ts) as to, \
+      max(toInt64(JSONExtractRaw(data, 'nginx_oss', 'managed'))) AS nginx_oss_managed, \
+      max(toInt64(JSONExtractRaw(data, 'nginx_oss', 'online'))) AS nginx_oss_online, \
+      max(toInt64(JSONExtractRaw(data, 'nginx_oss', 'offline'))) AS nginx_oss_offline, \
+      max(toInt64(JSONExtractRaw(data, 'nginx_plus', 'managed'))) AS nginx_plus_managed, \
+      max(toInt64(JSONExtractRaw(data, 'nginx_plus', 'online'))) AS nginx_plus_online, \
+      max(toInt64(JSONExtractRaw(data, 'nginx_plus', 'offline'))) AS nginx_plus_offline \
+    FROM f5tt.tracking \
+    WHERE ts >= (select timestamp_sub(month,"+str(-monthStats)+",toStartOfMonth(now()))) \
+    AND ts < (addDays(toStartOfMonth(addMonths(now() + toIntervalMonth(1),"+str(monthStats)+")),-1)) \
+    GROUP BY toStartOfInterval(toDateTime(ts), toIntervalHour("+str(hourInterval)+")) \
+    ORDER BY max(ts) ASC \
+  "
+
+  #  WHERE ts >= (select timestamp_sub(month,-monthStats,toStartOfMonth(now()))) \
+  #  AND ts < (SELECT toStartOfMonth(now()) + toIntervalDay(30)) \
+
+  # For testing: current month
+  #  AND ts < (SELECT toStartOfMonth(now()) + toIntervalDay(30)) \
+
+  # Production: previous month
+  # AND ts <= (select timestamp_sub(day,1,toStartOfMonth(now()))) \
+
+  f5ttCH.connect()
+  out=f5ttCH.execute(query)
+  f5ttCH.close()
+
+  for tuple in out:
+    if len(tuple) == 8:
+      item = {}
+      item['ts'] = {}
+      item['ts']['from'] = str(tuple[0])
+      item['ts']['to'] = str(tuple[1])
+      item['nginx_oss'] = {}
+      item['nginx_oss']['managed'] = tuple[2]
+      item['nginx_oss']['online'] = tuple[3]
+      item['nginx_oss']['offline'] = tuple[4]
+      item['nginx_plus'] = {}
+      item['nginx_plus']['managed'] = tuple[5]
+      item['nginx_plus']['online'] = tuple[6]
+      item['nginx_plus']['offline'] = tuple[7]
+
+      output['instances'].append(item)
+
+  return output,200

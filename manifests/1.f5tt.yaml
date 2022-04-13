@@ -41,14 +41,14 @@ spec:
 
           # Example for NGINX Controller
 
-          - name: DATAPLANE_TYPE
-            value: NGINX_CONTROLLER
-          - name: DATAPLANE_FQDN
-            value: "https://nginx-controller.ff.lan:443"
-          - name: DATAPLANE_USERNAME
-            value: "username@domain"
-          - name: DATAPLANE_PASSWORD
-            value: "thepassword"
+          #- name: DATAPLANE_TYPE
+          #  value: NGINX_CONTROLLER
+          #- name: DATAPLANE_FQDN
+          #  value: "https://nginx-controller.ff.lan:443"
+          #- name: DATAPLANE_USERNAME
+          #  value: "username@domain"
+          #- name: DATAPLANE_PASSWORD
+          #  value: "thepassword"
 
           # Example for NGINX Instance Manager 1.x
 
@@ -71,6 +71,16 @@ spec:
           #  value: "username@domain"
           #- name: DATAPLANE_PASSWORD
           #  value: "thepassword"
+          #- name: NMS_CH_HOST
+          #  value: "nim.ff.lan"
+          #- name: NMS_CH_PORT
+          #  value: "9000"
+          #- name: NMS_CH_USER
+          #  value: "default"
+          #- name: NMS_CH_PASS
+          #  value: ""
+          #- name: NMS_CH_SAMPLE_INTERVAL
+          #  value: "1800"
 
           # Example for BIG-IQ
 

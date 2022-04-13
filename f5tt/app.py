@@ -162,7 +162,7 @@ def scheduledEmail(email_server, email_server_port, email_server_type, email_aut
 @app.get("/instances")
 @app.get("/f5tt/instances")
 @app.get("/")
-def getInstances(request: Request,type: Optional[str] = None):
+def getInstances(request: Request,type: Optional[str] = None,month: Optional[int] = -1,slot: Optional[int] = 4):
     if nc_mode == 'NGINX_CONTROLLER':
         reply,code = nc.ncInstances(fqdn=nc_fqdn, username=nc_user, password=nc_pass, mode='JSON', proxy=proxyDict)
     elif nc_mode == 'NGINX_INSTANCE_MANAGER':
@@ -172,6 +172,8 @@ def getInstances(request: Request,type: Optional[str] = None):
           reply,code = nms.nmsInstances(mode='JSON')
         elif type.lower() == 'cve':
           reply,code = nms.nmsCVEjson()
+        elif type.lower() == 'timebased':
+          reply,code = nms.nmsTimeBasedJson(month,slot)
         else:
           reply = {}
           code = 404
@@ -301,7 +303,8 @@ if __name__ == '__main__':
             ch_port = os.environ['NMS_CH_PORT'] if 'NMS_CH_PORT' in os.environ else '9000'
             ch_user = os.environ['NMS_CH_USER'] if 'NMS_CH_USER' in os.environ else 'default'
             ch_pass = os.environ['NMS_CH_PASS'] if 'NMS_CH_PASS' in os.environ else ''
-            nms.init(fqdn=nc_fqdn, username=nc_user, password=nc_pass, nistApiKey=nist_apikey, proxy=proxyDict, ch_host=ch_host, ch_port=ch_port, ch_user=ch_user, ch_pass=ch_pass)
+            ch_sample_interval = int(os.environ['NMS_CH_SAMPLE_INTERVAL']) if 'NMS_CH_SAMPLE_INTERVAL' in os.environ else 1800
+            nms.init(fqdn=nc_fqdn, username=nc_user, password=nc_pass, nistApiKey=nist_apikey, proxy=proxyDict, ch_host=ch_host, ch_port=ch_port, ch_user=ch_user, ch_pass=ch_pass, sample_interval=ch_sample_interval)
 
         if "STATS_PUSH_ENABLE" in os.environ:
             if os.environ['STATS_PUSH_ENABLE'] == 'true':

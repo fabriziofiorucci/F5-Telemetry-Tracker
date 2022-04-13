@@ -1,5 +1,6 @@
 import os
 import sys
+import datetime
 from clickhouse_driver import Client as ClickHouse
 
 this = sys.modules[__name__]
@@ -31,24 +32,39 @@ def init(ch_host, ch_port, ch_user, ch_pass):
     ')
     close()
   except:
-    sys.exit('ClickHouse exception')
+    e = sys.exc_info()[0]
+    print(datetime.datetime.now(),"Clickhouse init failed",e)
 
   return True
 
 
 # ClickHouse connection
 def connect():
-  this.ch = ClickHouse.from_url('clickhouse://'+this.ch_user+':'+this.ch_pass+'@'+this.ch_host+':'+this.ch_port)
+  try:
+    this.ch = ClickHouse.from_url('clickhouse://'+this.ch_user+':'+this.ch_pass+'@'+this.ch_host+':'+this.ch_port)
+  except:
+    e = sys.exc_info()[0]
+    print(datetime.datetime.now(),"Clickhouse connect failed",e)
+    this.ch = ''
 
 # ClickHouse disconnection
 def close():
-  this.ch.disconnect()
+  try:
+    this.ch.disconnect()
+  except:
+    e = sys.exc_info()[0]
+    print(datetime.datetime.now(),"Clickhouse close failed",e)
+
   this.ch=''
 
 # ClickHouse query
 def execute(query):
   if this.ch != '':
-    output = this.ch.execute(query);
-    return output
+    try:
+      output = this.ch.execute(query);
+      return output
+    except:
+      e = sys.exc_info()[0]
+      print(datetime.datetime.now(),"Clickhouse query failed",e)
 
   return None

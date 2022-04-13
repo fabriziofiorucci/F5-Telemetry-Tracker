@@ -111,7 +111,7 @@ F5 Telemetry Tracker image is available on Docker Hub as:
 fiorucci/f5-telemetry-tracker:latest
 ```
 
-The `manifests/1.f5tt.yaml` file references that by default.
+The 1.f5tt.yaml file references that by default.
 
 If you need to build and push NGINX your own image to a private registry:
 
@@ -137,7 +137,7 @@ F5 Telemetry Tracker requires:
 - [json2html](https://pypi.org/project/json2html/)
 - [clickhouse-driver](https://pypi.org/project/clickhouse-driver/)
 
-`f5tt/f5tt.sh` is a sample script to run F5 Telemetry Tracker from bash
+f5tt/f5tt.sh is a sample script to run F5 Telemetry Tracker from bash
 
 ## Additional modes of operation
 
@@ -166,14 +166,19 @@ Edit `1.f5tt.yaml` to customize:
 | Variable  | Description |
 | ------------- |-------------|
 | F5TT_ADDRESS | optional IP address F5 Telemetry Tracker should listen on. Default is 0.0.0.0 |
-| F5TT_PORT| optional TCP port F5 Telemetry Tracker should listen on. Default is 5000
-| HTTP_PROXY| to be set if HTTP proxy must be used to connect to NGINX Controller, NGINX Instance Manager or BIG-IQ
-| HTTPS_PROXY| to be set if HTTPS proxy must be used to connect to NGINX Controller, NGINX Instance Manager or BIG-IQ
-| NIST_API_KEY| API Key for full NIST NVD CVE tracking (get your key at https://nvd.nist.gov/developers/request-an-api-key)
-| DATAPLANE_TYPE| can be NGINX_CONTROLLER, NGINX_INSTANCE_MANAGER (NIM 1.x), NGINX_MANAGEMENT_SYSTEM (NIM 2.x) or BIG_IQ
-| DATAPLANE_FQDN| the FQDN of your NGINX Controller / NGINX Instance Manager 1.x-2.x / BIG-IQ instance| format must be http[s]://FQDN:port
-| DATAPLANE_USERNAME| the username for authentication
-| DATAPLANE_PASSWORD| the password for authentication
+| F5TT_PORT| optional TCP port F5 Telemetry Tracker should listen on. Default is 5000 |
+| HTTP_PROXY| to be set if HTTP proxy must be used to connect to NGINX Controller, NGINX Instance Manager or BIG-IQ |
+| HTTPS_PROXY| to be set if HTTPS proxy must be used to connect to NGINX Controller, NGINX Instance Manager or BIG-IQ |
+| NIST_API_KEY| API Key for full NIST NVD CVE tracking (get your key at https://nvd.nist.gov/developers/request-an-api-key) |
+| DATAPLANE_TYPE| can be NGINX_CONTROLLER, NGINX_INSTANCE_MANAGER (NIM 1.x), NGINX_MANAGEMENT_SYSTEM (NIM 2.x) or BIG_IQ |
+| DATAPLANE_FQDN| the FQDN of your NGINX Controller / NGINX Instance Manager 1.x-2.x / BIG-IQ instance| format must be http[s]://FQDN:port |
+| DATAPLANE_USERNAME| the username for authentication |
+| DATAPLANE_PASSWORD| the password for authentication |
+| NMS_CH_HOST | if DATAPLANE_TYPE=NGINX_MANAGEMENT_SYSTEM (NGINX Instance Manager 2.x) - ClickHouse IP address (optional, default: 127.0.0.1) |
+| NMS_CH_PORT | if DATAPLANE_TYPE=NGINX_MANAGEMENT_SYSTEM (NGINX Instance Manager 2.x) - ClickHouse TCP port (optional, default: 9000) |
+| NMS_CH_USER | if DATAPLANE_TYPE=NGINX_MANAGEMENT_SYSTEM (NGINX Instance Manager 2.x) - ClickHouse username (optional, default: 'default') |
+| NMS_CH_PASS | if DATAPLANE_TYPE=NGINX_MANAGEMENT_SYSTEM (NGINX Instance Manager 2.x) - ClickHouse password (optional, default: no password) |
+| NMS_SAMPLE_INTERVAL | if DATAPLANE_TYPE=NGINX_MANAGEMENT_SYSTEM instances sample interval in seconds (optional, default: 60) |
 | STATS_PUSH_ENABLE | if set to "true" push mode is enabled, disabled if set to "false" |
 | STATS_PUSH_MODE | either CUSTOM or PUSHGATEWAY, to push (HTTP POST) JSON to custom URL and to push metrics to pushgateway, respectively |
 | STATS_PUSH_URL | the URL where to push statistics |
