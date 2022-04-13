@@ -19,7 +19,7 @@ the `type` query string parameter can be used to retrieve a logical view of the 
 - Browser mode: `http://f5tt.ff.lan` and `http://f5tt.ff.lan?type=CVE`
 - Retrieve the full JSON: `curl -s http://f5tt.ff.lan/instances | jq`
 - Retrieve the CVE-centric JSON: `curl -s http://f5tt.ff.lan/instances?type=CVE | jq`
-- Retrieve the time-based usage JSON (N = aggregation based on N-hours timeslots): `curl -s http://f5tt.ff.lan/instances?type=timebased&month=M&slot=N | jq`
+- Retrieve the time-based usage JSON: `curl -s http://f5tt.ff.lan/instances?type=timebased&month=M&slot=N | jq`
 ```
 M = 0 to get time-based usage for the current month, -1 for previous month (defaults to -1 if not specified)
 N = Aggregation based on N-hours timeslot (defaults to 4 is not specified)
