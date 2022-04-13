@@ -137,7 +137,7 @@ F5 Telemetry Tracker requires:
 - [json2html](https://pypi.org/project/json2html/)
 - [clickhouse-driver](https://pypi.org/project/clickhouse-driver/)
 
-f5tt/f5tt.sh is a sample script to run F5 Telemetry Tracker from bash
+`f5tt/f5tt.sh` is a sample script to run F5 Telemetry Tracker from bash
 
 ## Additional modes of operation
 
