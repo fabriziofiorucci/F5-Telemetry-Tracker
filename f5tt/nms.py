@@ -250,6 +250,8 @@ def nmsTimeBasedJson(monthStats,hourInterval):
     ORDER BY max(ts) ASC \
   "
 
+  print('QUERY',query)
+
   #  WHERE ts >= (select timestamp_sub(month,-monthStats,toStartOfMonth(now()))) \
   #  AND ts < (SELECT toStartOfMonth(now()) + toIntervalDay(30)) \
 
@@ -263,21 +265,26 @@ def nmsTimeBasedJson(monthStats,hourInterval):
   out=f5ttCH.execute(query)
   f5ttCH.close()
 
-  for tuple in out:
-    if len(tuple) == 8:
-      item = {}
-      item['ts'] = {}
-      item['ts']['from'] = str(tuple[0])
-      item['ts']['to'] = str(tuple[1])
-      item['nginx_oss'] = {}
-      item['nginx_oss']['managed'] = tuple[2]
-      item['nginx_oss']['online'] = tuple[3]
-      item['nginx_oss']['offline'] = tuple[4]
-      item['nginx_plus'] = {}
-      item['nginx_plus']['managed'] = tuple[5]
-      item['nginx_plus']['online'] = tuple[6]
-      item['nginx_plus']['offline'] = tuple[7]
+  print('XXXXXXXXXXX',out)
 
-      output['instances'].append(item)
+  if out != None:
+    if out != []:
+      for tuple in out:
+        if len(tuple) == 8:
+          item = {}
+          item['ts'] = {}
+          item['ts']['from'] = str(tuple[0])
+          item['ts']['to'] = str(tuple[1])
+          item['nginx_oss'] = {}
+          item['nginx_oss']['managed'] = tuple[2]
+          item['nginx_oss']['online'] = tuple[3]
+          item['nginx_oss']['offline'] = tuple[4]
+          item['nginx_plus'] = {}
+          item['nginx_plus']['managed'] = tuple[5]
+          item['nginx_plus']['online'] = tuple[6]
+          item['nginx_plus']['offline'] = tuple[7]
 
-  return output,200
+          output['instances'].append(item)
+    return output,200
+  else:
+    return {"message":"ClickHouse unreachable"},503
