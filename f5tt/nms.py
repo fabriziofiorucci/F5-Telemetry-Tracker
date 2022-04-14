@@ -232,7 +232,7 @@ def nmsTimeBasedJson(monthStats,hourInterval):
     output['subscription']['version']=license['currentStatus']['state']['currentInstance']['version']
     output['subscription']['serial']=license['currentStatus']['state']['currentInstance']['id']
 
-  #query = 'select * from f5tt.tracking'
+  # Clickhouse data aggregation
   query = " \
     SELECT \
       min(ts) as from, \
@@ -250,22 +250,9 @@ def nmsTimeBasedJson(monthStats,hourInterval):
     ORDER BY max(ts) ASC \
   "
 
-  print('QUERY',query)
-
-  #  WHERE ts >= (select timestamp_sub(month,-monthStats,toStartOfMonth(now()))) \
-  #  AND ts < (SELECT toStartOfMonth(now()) + toIntervalDay(30)) \
-
-  # For testing: current month
-  #  AND ts < (SELECT toStartOfMonth(now()) + toIntervalDay(30)) \
-
-  # Production: previous month
-  # AND ts <= (select timestamp_sub(day,1,toStartOfMonth(now()))) \
-
   f5ttCH.connect()
   out=f5ttCH.execute(query)
   f5ttCH.close()
-
-  print('XXXXXXXXXXX',out)
 
   if out != None:
     if out != []:
