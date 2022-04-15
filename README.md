@@ -100,6 +100,11 @@ docker run --name f5tt -p 5000:5000 \
     -e DATAPLANE_FQDN=https://nim2.f5.ff.lan \
     -e DATAPLANE_USERNAME=admin \
     -e DATAPLANE_PASSWORD=nimadmin \
+    -e NMS_CH_HOST=clickhouse-address \
+    -e NMS_CH_PORT=9000 \
+    -e NMS_CH_USER=default \
+    -e NMS_CH_PASS="" \
+    -e NMS_CH_SAMPLE_INTERVAL=1800 \
     fiorucci/f5-telemetry-tracker:latest
 ```
 
