@@ -539,7 +539,7 @@ def bigIqInventory(mode):
   return metricsOutput,200
 
 
-# Returns the CVE-centric JSON
+# Returns the CVE-centric JSON, summarized by CVE
 def bigIqCVEjson():
   fullJSON,retcode = bigIqInventory(mode='JSON')
   cveJSON = {}
@@ -560,6 +560,34 @@ def bigIqCVEjson():
       cveJSON[cve]['devices'].append(deviceJSON)
 
   return cveJSON,200
+
+
+# Returns the CVE-centric JSON, summarized by device
+def bigIqCVEbyDevicejson():
+  fullJSON,retcode = bigIqInventory(mode='JSON')
+  devicecveJSON = {}
+
+  for d in fullJSON['details']:
+    thisDevice = {}
+    thisDevice['hostname'] = d['hostname']
+    thisDevice['chassisSerialNumber'] = d['chassisSerialNumber']
+    thisDevice['version'] = d['version']
+    thisDevice['CVE'] = []
+
+    for cve in d['CVE'][0]:
+      c = d['CVE'][0][cve]
+      thisCVE = {}
+      thisCVE['id'] = c['id']
+      thisCVE['url'] = c['url']
+      thisCVE['baseSeverity'] = c['baseSeverity']
+      thisCVE['baseScore'] = c['baseScore']
+      thisCVE['exploitabilityScore'] = c['exploitabilityScore']
+
+      thisDevice['CVE'].append(thisCVE)
+
+    devicecveJSON[d['hostname']]=thisDevice
+
+  return devicecveJSON,200
 
 
 # Returns the software on hardware JSON

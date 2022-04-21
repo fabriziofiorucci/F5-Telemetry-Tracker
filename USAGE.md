@@ -37,7 +37,8 @@ N = Aggregation based on N-hours timeslot (defaults to 4 is not specified)
 the `type` query string parameter can be used to retrieve a logical view of the full JSON file:
 
 - Retrieve the standard full JSON: `curl -s http://f5tt.ff.lan/instances | jq`
-- Retrieve a CVE-centric JSON: `curl -s http://f5tt.ff.lan/instances?type=CVE | jq`
+- Retrieve a CVE-centric JSON summarized by CVE: `curl -s http://f5tt.ff.lan/instances?type=CVE | jq`
+- Retrieve a CVE-centric JSON summarized by device: `curl -s http://f5tt.ff.lan/instances?type=CVEbyDevice | jq`
 - Retrieve the "Software on Hardware" JSON: `curl -s http://f5tt.ff.lan/instances?type=SwOnHw | jq`
 
 - Browser mode: `http://f5tt.ff.lan`, `http://f5tt.ff.lan?type=CVE` and `http://f5tt.ff.lan?type=SwOnHw`

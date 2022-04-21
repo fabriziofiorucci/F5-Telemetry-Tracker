@@ -92,7 +92,7 @@ def getF5(product="*",version="*"):
   matchingCVE={}
 
   try:
-    allCVE = __getFromNist(vendor="f5",product=product,version=version)
+    allCVE = __getFromNist(vendor="f5",product="*",version=version)
   except:
     return matchingCVE
 
