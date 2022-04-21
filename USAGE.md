@@ -43,7 +43,6 @@ the `type` query string parameter can be used to retrieve a logical view of the 
 
 - Browser mode: `http://f5tt.ff.lan`, `http://f5tt.ff.lan?type=CVE` and `http://f5tt.ff.lan?type=SwOnHw`
 
-
 A dynamically updated report in xls format can be downloaded by accessing either:
 
 - `curl -s http://f5tt.ff.lan/reporting/xls`
