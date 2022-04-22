@@ -25,7 +25,6 @@ M = 0 to get time-based usage for the current month, -1 for previous month (defa
 N = Aggregation based on N-hours timeslot (defaults to 4 is not specified)
 ```
 
-
 ### NGINX Controller
 
 - Retrieve the full JSON: `curl -s http://f5tt.ff.lan/instances | jq`
@@ -41,7 +40,7 @@ the `type` query string parameter can be used to retrieve a logical view of the 
 - Retrieve a CVE-centric JSON summarized by device: `curl -s http://f5tt.ff.lan/instances?type=CVEbyDevice | jq`
 - Retrieve the "Software on Hardware" JSON: `curl -s http://f5tt.ff.lan/instances?type=SwOnHw | jq`
 
-- Browser mode: `http://f5tt.ff.lan`, `http://f5tt.ff.lan?type=CVE` and `http://f5tt.ff.lan?type=SwOnHw`
+- All JSON can be accessed with a browser omitting the `/instances` portion of the URI (ie. `http://f5tt.ff.lantype=CVE`)
 
 A dynamically updated report in xls format can be downloaded by accessing either:
 
