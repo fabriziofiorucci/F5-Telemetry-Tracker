@@ -2,6 +2,8 @@
 
 ## REST API mode
 
+API Documentation is available at `/docs` and OpenAPI JSON can be fetched at `/openapi.json`
+
 For `/instances` and `/f5tt/instances` endpoints if the request includes the `Accept-Encoding: gzip` header the response will be compressed
 The `/` endpoint displays a basic HTML view of generated JSON files
 
