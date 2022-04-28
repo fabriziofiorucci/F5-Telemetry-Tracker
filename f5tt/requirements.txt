@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+requests
+xlsxwriter
+pandas
+json2html
+clickhouse-driver
