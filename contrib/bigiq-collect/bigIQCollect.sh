@@ -105,6 +105,9 @@ bigip-cpu|cpu-usage|avg-value-per-event|-30D|12|HOURS
 bigip-memory|free-ram|avg-value-per-event|-1H|5|MINUTES
 bigip-memory|free-ram|avg-value-per-event|-1W|3|HOURS
 bigip-memory|free-ram|avg-value-per-event|-30D|12|HOURS
+bigip-disk-usage|disk-available-size|avg-value-per-event|-1H|5|MINUTES
+bigip-disk-usage|disk-available-size|avg-value-per-event|-1W|3|HOURS
+bigip-disk-usage|disk-available-size|avg-value-per-event|-30D|12|HOURS
 bigip-traffic-summary|server-connections|avg-value-per-sec|-1H|5|MINUTES
 bigip-traffic-summary|server-connections|avg-value-per-sec|-1W|3|HOURS
 bigip-traffic-summary|server-connections|avg-value-per-sec|-30D|12|HOURS
