@@ -8,5 +8,3 @@
 <img src="/contrib/grafana/grafana-bigiq.jpg"/>
 
 <img src="/contrib/grafana/grafana-nim.jpg"/>
-
-<img src="/contrib/grafana/grafana-nc.jpg"/>
