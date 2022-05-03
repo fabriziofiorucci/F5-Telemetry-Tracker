@@ -734,6 +734,7 @@ def _getTelemetryRequestBodyByTime(module,metricSet,metric,timeRange,granDuratio
 
 
 # Returns TMOS instances telemetry
+# https://clouddocs.f5.com/products/big-iq/mgmt-api/v8.0.0/ApiReferences/bigiq_public_api_ref/r_analytics_entities.html
 def bigIqTelemetry(mode):
   telemetryURI = "/mgmt/ap/query/v1/tenants/default/products/device/metric-query"
 
@@ -744,6 +745,9 @@ def bigIqTelemetry(mode):
     { "module":"bigip-memory","metricSet":"free-ram","metric":"avg-value-per-event","timeRange":"-1H","granDuration":5,"granUnit":"MINUTES" },
     { "module":"bigip-memory","metricSet":"free-ram","metric":"avg-value-per-event","timeRange":"-1W","granDuration":3,"granUnit":"HOURS" },
     { "module":"bigip-memory","metricSet":"free-ram","metric":"avg-value-per-event","timeRange":"-30D","granDuration":12,"granUnit":"HOURS" },
+    { "module":"bigip-disk-usage","metricSet":"disk-available-size","metric":"avg-value-per-event","timeRange":"-1H","granDuration":5,"granUnit":"MINUTES" },
+    { "module":"bigip-disk-usage","metricSet":"disk-available-size","metric":"avg-value-per-event","timeRange":"-1W","granDuration":3,"granUnit":"HOURS" },
+    { "module":"bigip-disk-usage","metricSet":"disk-available-size","metric":"avg-value-per-event","timeRange":"-30D","granDuration":12,"granUnit":"HOURS" },
     { "module":"bigip-traffic-summary","metricSet":"server-connections","metric":"avg-value-per-sec","timeRange":"-1H","granDuration":5,"granUnit":"MINUTES" },
     { "module":"bigip-traffic-summary","metricSet":"server-connections","metric":"avg-value-per-sec","timeRange":"-1W","granDuration":3,"granUnit":"HOURS" },
     { "module":"bigip-traffic-summary","metricSet":"server-connections","metric":"avg-value-per-sec","timeRange":"-30D","granDuration":12,"granUnit":"HOURS" },
