@@ -24,7 +24,7 @@ the `type` query string parameter can be used to retrieve a logical view of the 
 - Retrieve the time-based usage JSON: `curl -s http://f5tt.ff.lan/instances?type=timebased&month=M&slot=N | jq`
 ```
 M = 0 to get time-based usage for the current month, -1 for previous month (defaults to -1 if not specified)
-N = Aggregation based on N-hours timeslot (defaults to 4 is not specified)
+N = Aggregation based on N-hours timeslot (defaults to 4 if not specified)
 ```
 
 ### NGINX Controller
