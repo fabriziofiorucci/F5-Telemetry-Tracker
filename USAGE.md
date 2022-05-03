@@ -7,6 +7,8 @@ API Documentation is available at `/docs`, `/redoc` and OpenAPI JSON can be fetc
 For `/instances` and `/f5tt/instances` endpoints if the request includes the `Accept-Encoding: gzip` header the response will be compressed
 The `/` endpoint displays a basic HTML view of generated JSON files
 
+A sample Postman collection is [available here](/contrib/postman)
+
 To get instance statistics in JSON format:
 
 ### NGINX Instance Manager 1.x
@@ -42,7 +44,7 @@ the `type` query string parameter can be used to retrieve a logical view of the 
 - Retrieve a CVE-centric JSON summarized by device: `curl -s http://f5tt.ff.lan/instances?type=CVEbyDevice | jq`
 - Retrieve the "Software on Hardware" JSON: `curl -s http://f5tt.ff.lan/instances?type=SwOnHw | jq`
 
-- All JSON can be accessed with a browser omitting the `/instances` portion of the URI (ie. `http://f5tt.ff.lantype=CVE`)
+- All JSON can be accessed with a browser omitting the `/instances` portion of the URI (ie. `http://f5tt.ff.lan?type=CVE`)
 
 A dynamically updated report in xls format can be downloaded by accessing either:
 
