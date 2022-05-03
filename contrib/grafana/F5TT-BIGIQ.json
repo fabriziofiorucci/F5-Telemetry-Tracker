@@ -21,7 +21,7 @@
       "type": "grafana",
       "id": "grafana",
       "name": "Grafana",
-      "version": "8.4.2"
+      "version": "8.4.6"
     },
     {
       "type": "panel",
@@ -39,6 +39,12 @@
       "type": "panel",
       "id": "stat",
       "name": "Stat",
+      "version": ""
+    },
+    {
+      "type": "panel",
+      "id": "timeseries",
+      "name": "Time series",
       "version": ""
     }
   ],
@@ -65,11 +71,12 @@
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
   "id": null,
+  "iteration": 1651609088619,
   "links": [],
   "liveNow": false,
   "panels": [
     {
-      "collapsed": false,
+      "collapsed": true,
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -77,8 +84,374 @@
         "y": 0
       },
       "id": 11,
-      "panels": [],
+      "panels": [
+        {
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [],
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 6,
+            "w": 3,
+            "x": 0,
+            "y": 1
+          },
+          "id": 4,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "text": {},
+            "textMode": "auto"
+          },
+          "pluginVersion": "8.4.6",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${DS_PROMETHEUS}"
+              },
+              "exemplar": true,
+              "expr": "bigip_online_instances{job=\"f5tt\"}",
+              "instant": false,
+              "interval": "",
+              "legendFormat": "",
+              "refId": "A"
+            }
+          ],
+          "title": "Total BIG-IP",
+          "type": "stat"
+        },
+        {
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                }
+              },
+              "mappings": [],
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 12,
+            "w": 7,
+            "x": 3,
+            "y": 1
+          },
+          "id": 2,
+          "options": {
+            "displayLabels": [
+              "name",
+              "value"
+            ],
+            "legend": {
+              "displayMode": "table",
+              "placement": "right",
+              "values": [
+                "value"
+              ]
+            },
+            "pieType": "pie",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "8.0.6",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${DS_PROMETHEUS}"
+              },
+              "exemplar": false,
+              "expr": "bigip_hwtotals{job=\"f5tt\"}",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "legendFormat": "{{bigip_sku}}",
+              "queryType": "randomWalk",
+              "refId": "A"
+            }
+          ],
+          "title": "Hardware totals",
+          "type": "piechart"
+        },
+        {
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                }
+              },
+              "mappings": [],
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 12,
+            "w": 7,
+            "x": 10,
+            "y": 1
+          },
+          "id": 18,
+          "options": {
+            "displayLabels": [
+              "name",
+              "value"
+            ],
+            "legend": {
+              "displayMode": "table",
+              "placement": "right",
+              "values": [
+                "value"
+              ]
+            },
+            "pieType": "pie",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "8.0.6",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${DS_PROMETHEUS}"
+              },
+              "exemplar": false,
+              "expr": "bigip_swtotals{job=\"f5tt\"}",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "legendFormat": "{{bigip_module}}",
+              "queryType": "randomWalk",
+              "refId": "A"
+            }
+          ],
+          "title": "Software totals",
+          "type": "piechart"
+        },
+        {
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                }
+              },
+              "mappings": [],
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 12,
+            "w": 7,
+            "x": 17,
+            "y": 1
+          },
+          "id": 19,
+          "options": {
+            "displayLabels": [
+              "name",
+              "value"
+            ],
+            "legend": {
+              "displayMode": "table",
+              "placement": "right",
+              "values": [
+                "value"
+              ]
+            },
+            "pieType": "pie",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "8.0.6",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${DS_PROMETHEUS}"
+              },
+              "exemplar": false,
+              "expr": "bigip_tmos_releases{job=\"f5tt\"}",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "legendFormat": "{{tmos_release}}",
+              "queryType": "randomWalk",
+              "refId": "A"
+            }
+          ],
+          "title": "TMOS releases",
+          "type": "piechart"
+        }
+      ],
       "title": "BIG-IQ Summary",
+      "type": "row"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 1
+      },
+      "id": 25,
+      "panels": [
+        {
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 5
+                  }
+                ]
+              },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 24,
+            "x": 0,
+            "y": 2
+          },
+          "id": 21,
+          "options": {
+            "displayMode": "gradient",
+            "orientation": "vertical",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showUnfilled": true
+          },
+          "pluginVersion": "8.4.6",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${DS_PROMETHEUS}"
+              },
+              "exemplar": true,
+              "expr": "bigip_tmos_cve{job=\"f5tt\"}",
+              "format": "time_series",
+              "instant": false,
+              "interval": "",
+              "legendFormat": "{{tmos_cve}}",
+              "refId": "A"
+            }
+          ],
+          "title": "CVE Summary",
+          "type": "bargauge"
+        }
+      ],
+      "title": "CVE",
+      "type": "row"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 2
+      },
+      "id": 23,
+      "panels": [],
+      "title": "System - $hostname",
       "type": "row"
     },
     {
@@ -86,281 +459,35 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "min": 0,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "unit": "none"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 6,
-        "w": 3,
-        "x": 0,
-        "y": 1
-      },
-      "id": 4,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "none",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "text": {},
-        "textMode": "auto"
-      },
-      "pluginVersion": "8.4.2",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "exemplar": true,
-          "expr": "bigip_online_instances",
-          "instant": false,
-          "interval": "",
-          "legendFormat": "",
-          "refId": "A"
-        }
-      ],
-      "title": "Total BIG-IP",
-      "type": "stat"
-    },
-    {
-      "description": "",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
             "mode": "palette-classic"
           },
           "custom": {
+            "axisLabel": "Used RAM",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
             "hideFrom": {
               "legend": false,
               "tooltip": false,
               "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
             }
-          },
-          "mappings": [],
-          "unit": "none"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 12,
-        "w": 7,
-        "x": 3,
-        "y": 1
-      },
-      "id": 2,
-      "options": {
-        "displayLabels": [
-          "name",
-          "value"
-        ],
-        "legend": {
-          "displayMode": "table",
-          "placement": "right",
-          "values": [
-            "value"
-          ]
-        },
-        "pieType": "pie",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "pluginVersion": "8.0.6",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "exemplar": false,
-          "expr": "bigip_hwtotals",
-          "hide": false,
-          "instant": false,
-          "interval": "",
-          "legendFormat": "{{bigip_sku}}",
-          "queryType": "randomWalk",
-          "refId": "A"
-        }
-      ],
-      "title": "Hardware totals",
-      "type": "piechart"
-    },
-    {
-      "description": "",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            }
-          },
-          "mappings": [],
-          "unit": "none"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 12,
-        "w": 7,
-        "x": 10,
-        "y": 1
-      },
-      "id": 18,
-      "options": {
-        "displayLabels": [
-          "name",
-          "value"
-        ],
-        "legend": {
-          "displayMode": "table",
-          "placement": "right",
-          "values": [
-            "value"
-          ]
-        },
-        "pieType": "pie",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "pluginVersion": "8.0.6",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "exemplar": false,
-          "expr": "bigip_swtotals",
-          "hide": false,
-          "instant": false,
-          "interval": "",
-          "legendFormat": "{{bigip_module}}",
-          "queryType": "randomWalk",
-          "refId": "A"
-        }
-      ],
-      "title": "Software totals",
-      "type": "piechart"
-    },
-    {
-      "description": "",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            }
-          },
-          "mappings": [],
-          "unit": "none"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 12,
-        "w": 7,
-        "x": 17,
-        "y": 1
-      },
-      "id": 19,
-      "options": {
-        "displayLabels": [
-          "name",
-          "value"
-        ],
-        "legend": {
-          "displayMode": "table",
-          "placement": "right",
-          "values": [
-            "value"
-          ]
-        },
-        "pieType": "pie",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "pluginVersion": "8.0.6",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "exemplar": false,
-          "expr": "bigip_tmos_releases",
-          "hide": false,
-          "instant": false,
-          "interval": "",
-          "legendFormat": "{{tmos_release}}",
-          "queryType": "randomWalk",
-          "refId": "A"
-        }
-      ],
-      "title": "TMOS releases",
-      "type": "piechart"
-    },
-    {
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
           },
           "mappings": [],
           "thresholds": {
@@ -372,7 +499,580 @@
               },
               {
                 "color": "red",
-                "value": 5
+                "value": 80
+              }
+            ]
+          },
+          "unit": "deckbytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 0,
+        "y": 3
+      },
+      "id": 27,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "min",
+            "max",
+            "mean"
+          ],
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "8.4.6",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "exemplar": true,
+          "expr": "rate(bigip_tmos_telemetry{hostname=\"$hostname\",timespan=\"$timerange\",stat=\"free-ram\",job=\"f5tt\"}[30m])",
+          "format": "time_series",
+          "hide": false,
+          "instant": false,
+          "interval": "",
+          "legendFormat": "{{hostname}} {{stat}} {{timerange}}",
+          "refId": "B"
+        }
+      ],
+      "title": "RAM usage - $hostname",
+      "type": "timeseries"
+    },
+    {
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "% CPU usage",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "bigip2.f5.ff.lan free-ram "
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "custom.axisLabel",
+                "value": "Free RAM"
+              },
+              {
+                "id": "unit",
+                "value": "none"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "bigip1.f5.ff.lan cpu-usage "
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "dark-red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 3
+      },
+      "id": 29,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "min",
+            "max",
+            "mean"
+          ],
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "8.4.6",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "exemplar": true,
+          "expr": "rate(bigip_tmos_telemetry{hostname=\"$hostname\",timespan=\"$timerange\",stat=\"cpu-usage\",job=\"f5tt\"}[30m])",
+          "format": "time_series",
+          "hide": false,
+          "instant": false,
+          "interval": "",
+          "legendFormat": "{{hostname}} {{stat}} {{timerange}}",
+          "refId": "A"
+        }
+      ],
+      "title": "CPU usage - $hostname",
+      "type": "timeseries"
+    },
+    {
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "Available space",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "bigip1.f5.ff.lan disk-available-size "
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "dark-yellow",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 0,
+        "y": 13
+      },
+      "id": 28,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "min",
+            "max",
+            "mean"
+          ],
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "8.4.6",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "exemplar": true,
+          "expr": "rate(bigip_tmos_telemetry{hostname=\"$hostname\",timespan=\"$timerange\",stat=\"disk-available-size\",job=\"f5tt\"}[30m])",
+          "format": "time_series",
+          "hide": false,
+          "instant": false,
+          "interval": "",
+          "legendFormat": "{{hostname}} {{stat}} {{timerange}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Available disk - $hostname",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 23
+      },
+      "id": 31,
+      "panels": [],
+      "title": "Traffic - $hostname",
+      "type": "row"
+    },
+    {
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "Input bytes",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "KBs"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 0,
+        "y": 24
+      },
+      "id": 32,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "min",
+            "max",
+            "mean"
+          ],
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "8.4.6",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "exemplar": true,
+          "expr": "rate(bigip_tmos_telemetry{hostname=\"$hostname\",timespan=\"$timerange\",stat=\"client-bytes-in\",job=\"f5tt\"}[30m])",
+          "format": "time_series",
+          "hide": false,
+          "instant": false,
+          "interval": "",
+          "legendFormat": "{{hostname}} {{stat}} {{timerange}}",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "exemplar": true,
+          "expr": "rate(bigip_tmos_telemetry{hostname=\"$hostname\",timespan=\"$timerange\",stat=\"client-bytes-out\",job=\"f5tt\"}[30m])",
+          "format": "time_series",
+          "hide": false,
+          "instant": false,
+          "interval": "",
+          "legendFormat": "{{hostname}} {{stat}} {{timerange}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Client Traffic - $hostname",
+      "type": "timeseries"
+    },
+    {
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "Input bytes",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "KBs"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 24
+      },
+      "id": 33,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "min",
+            "max",
+            "mean"
+          ],
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "8.4.6",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "exemplar": true,
+          "expr": "rate(bigip_tmos_telemetry{hostname=\"$hostname\",timespan=\"$timerange\",stat=\"server-bytes-in\",job=\"f5tt\"}[30m])",
+          "format": "time_series",
+          "hide": false,
+          "instant": false,
+          "interval": "",
+          "legendFormat": "{{hostname}} {{stat}} {{timerange}}",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "exemplar": true,
+          "expr": "rate(bigip_tmos_telemetry{hostname=\"$hostname\",timespan=\"$timerange\",stat=\"server-bytes-out\",job=\"f5tt\"}[30m])",
+          "format": "time_series",
+          "hide": false,
+          "instant": false,
+          "interval": "",
+          "legendFormat": "{{hostname}} {{stat}} {{timerange}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Server Traffic - $hostname",
+      "type": "timeseries"
+    },
+    {
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "Input bytes",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
               }
             ]
           },
@@ -382,24 +1082,28 @@
       },
       "gridPos": {
         "h": 10,
-        "w": 24,
+        "w": 12,
         "x": 0,
-        "y": 13
+        "y": 34
       },
-      "id": 21,
+      "id": 34,
       "options": {
-        "displayMode": "gradient",
-        "orientation": "vertical",
-        "reduceOptions": {
+        "legend": {
           "calcs": [
-            "lastNotNull"
+            "lastNotNull",
+            "min",
+            "max",
+            "mean"
           ],
-          "fields": "",
-          "values": false
+          "displayMode": "table",
+          "placement": "bottom"
         },
-        "showUnfilled": true
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
       },
-      "pluginVersion": "8.4.2",
+      "pluginVersion": "8.4.6",
       "targets": [
         {
           "datasource": {
@@ -407,33 +1111,95 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "exemplar": true,
-          "expr": "bigip_tmos_cve",
+          "expr": "rate(bigip_tmos_telemetry{hostname=\"$hostname\",timespan=\"$timerange\",stat=\"server-connections\",job=\"f5tt\"}[30m])",
           "format": "time_series",
+          "hide": false,
           "instant": false,
           "interval": "",
-          "legendFormat": "{{tmos_cve}}",
-          "refId": "A"
+          "legendFormat": "{{hostname}} {{stat}} {{timerange}}",
+          "refId": "B"
         }
       ],
-      "title": "CVE Summary",
-      "type": "bargauge"
+      "title": "Server Connections - $hostname",
+      "type": "timeseries"
     }
   ],
-  "refresh": "",
+  "refresh": false,
   "schemaVersion": 35,
   "style": "dark",
   "tags": [],
   "templating": {
-    "list": []
+    "list": [
+      {
+        "current": {},
+        "definition": "label_values(hostname)",
+        "hide": 0,
+        "includeAll": false,
+        "label": "Hostname",
+        "multi": false,
+        "name": "hostname",
+        "options": [],
+        "query": {
+          "query": "label_values(hostname)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query",
+        "datasource": "${DS_PROMETHEUS}"
+      },
+      {
+        "current": {},
+        "definition": "label_values({hostname=\"$hostname\"},stat)",
+        "hide": 2,
+        "includeAll": false,
+        "label": "Metrics",
+        "multi": false,
+        "name": "stat",
+        "options": [],
+        "query": {
+          "query": "label_values({hostname=\"$hostname\"},stat)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query",
+        "datasource": "${DS_PROMETHEUS}"
+      },
+      {
+        "current": {},
+        "definition": "label_values({hostname=\"$hostname\",stat=\"$stat\"},timespan)",
+        "hide": 0,
+        "includeAll": false,
+        "label": "Time range",
+        "multi": false,
+        "name": "timerange",
+        "options": [],
+        "query": {
+          "query": "label_values({hostname=\"$hostname\",stat=\"$stat\"},timespan)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query",
+        "datasource": "${DS_PROMETHEUS}"
+      }
+    ]
   },
   "time": {
-    "from": "now-3h",
-    "to": "now"
+    "from": "2022-05-03T20:44:31.739Z",
+    "to": "2022-05-03T20:55:33.421Z"
   },
   "timepicker": {},
   "timezone": "",
   "title": "BIG-IQ Telemetry",
   "uid": "f5tt-bigiq",
-  "version": 13,
+  "version": 46,
   "weekStart": ""
 }

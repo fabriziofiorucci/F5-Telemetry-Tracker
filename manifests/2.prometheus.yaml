@@ -16,14 +16,25 @@ data:
       #  scrape_interval: 10s
       #  scrape_timeout: 8s
       #  static_configs:
-      #  - targets: ['f5tt.ff.lan']
+      #  - targets:
+      #    - f5tt.ff.lan
 
       # Configuration for push mode
+      #- job_name: 'pushgateway'
+      #  scrape_interval: 120s
+      #  scrape_timeout: 120s
+      #  static_configs:
+      #  - targets:
+      #    - pushgateway.f5tt.ff.lan
+
+      # Configuration for push and pull mode
       - job_name: 'pushgateway'
-        scrape_interval: 10s
-        scrape_timeout: 8s
+        scrape_interval: 120s
+        scrape_timeout: 120s
         static_configs:
-        - targets: ['pushgateway.f5tt.ff.lan']
+        - targets:
+          - pushgateway.f5tt.ff.lan
+          - f5tt.ff.lan
 
 ---
 apiVersion: v1

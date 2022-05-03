@@ -536,6 +536,10 @@ def bigIqInventory(mode):
   for c in cves:
     metricsOutput += 'bigip_tmos_cve{dataplane_type="BIG-IQ",dataplane_url="'+bigiq_fqdn+'",tmos_cve="'+c+'"} '+str(cves[c])+'\n'
 
+  # TMOS Telemetry
+  telemetry = bigIqTelemetry('PROMETHEUS')
+  metricsOutput += telemetry
+
   return metricsOutput,200
 
 
@@ -767,44 +771,47 @@ def bigIqTelemetry(mode):
 
   telemetryBody={}
 
-  if mode == 'JSON':
-    for stat in allStats:
-      res,body = bigIQcallRESTURI(method = "POST", uri = telemetryURI, body = _getTelemetryRequestBodyByEntities(module=stat['module'],metricSet=stat['metricSet'],metric=stat['metric'],timeRange=stat['timeRange'],granDuration=stat['granDuration'],granUnit=stat['granUnit']) )
+  for stat in allStats:
+    res,body = bigIQcallRESTURI(method = "POST", uri = telemetryURI, body = _getTelemetryRequestBodyByEntities(module=stat['module'],metricSet=stat['metricSet'],metric=stat['metric'],timeRange=stat['timeRange'],granDuration=stat['granDuration'],granUnit=stat['granUnit']) )
 
-      if res == 200 and "result" in body:
-        for r in body['result']['result']: 
-          telHostname = r['hostname']
-          telTimeRange = stat['timeRange']
-          telVarName = stat['metricSet']
-          #telVarValue = r[stat['metricSet']+'$avg-value-per-event']
-          telVarValue = r[stat['metricSet']+'$'+stat['metric']]
+    if res == 200 and "result" in body:
+      for r in body['result']['result']: 
+        telHostname = r['hostname']
+        telTimeRange = stat['timeRange']
+        telVarName = stat['metricSet']
+        telVarValue = r[stat['metricSet']+'$'+stat['metric']]
 
-          if telHostname not in telemetryBody:
-            telemetryBody[telHostname] = {}
+        if telHostname not in telemetryBody:
+          telemetryBody[telHostname] = {}
 
-          if telVarName not in telemetryBody[telHostname]:
-            telemetryBody[telHostname][telVarName] = {}
+        if telVarName not in telemetryBody[telHostname]:
+          telemetryBody[telHostname][telVarName] = {}
 
-          # Telemetry overall average
-          telemetryBody[telHostname][telVarName][telTimeRange] = {}
-          telemetryBody[telHostname][telVarName][telTimeRange]['aggregate'] = telVarValue
-          telemetryBody[telHostname][telVarName][telTimeRange]['datapoints'] = []
+        # Telemetry overall average
+        telemetryBody[telHostname][telVarName][telTimeRange] = {}
+        telemetryBody[telHostname][telVarName][telTimeRange]['aggregate'] = telVarValue
+        telemetryBody[telHostname][telVarName][telTimeRange]['datapoints'] = []
 
-          # Telemetry datapoints
-          res,bodyDataPoints = bigIQcallRESTURI(method = "POST", uri = telemetryURI, body = _getTelemetryRequestBodyByTime(module=stat['module'],metricSet=stat['metricSet'],metric=stat['metric'],timeRange=stat['timeRange'],granDuration=stat['granDuration'],granUnit=stat['granUnit'],hostname=telHostname) )
-          if res == 200:
-            for dp in bodyDataPoints['result']['result']:
-              datapoint = {}
-              datapoint['ts'] = dp['timeMillis']//1000 if 'timeMillis' in dp else 0
+        # Telemetry datapoints
+        res,bodyDataPoints = bigIQcallRESTURI(method = "POST", uri = telemetryURI, body = _getTelemetryRequestBodyByTime(module=stat['module'],metricSet=stat['metricSet'],metric=stat['metric'],timeRange=stat['timeRange'],granDuration=stat['granDuration'],granUnit=stat['granUnit'],hostname=telHostname) )
+        if res == 200:
+          for dp in bodyDataPoints['result']['result']:
+            datapoint = {}
+            datapoint['ts'] = dp['timeMillis']//1000 if 'timeMillis' in dp else 0
+            datapoint['value'] = dp[stat['metricSet']+'$'+stat['metric']]
 
-              #datapoint['value'] = dp[stat['metricSet']+'$avg-value-per-event']
-              datapoint['value'] = dp[stat['metricSet']+'$'+stat['metric']]
+            telemetryBody[telHostname][telVarName][telTimeRange]['datapoints'].append(datapoint)
 
-              telemetryBody[telHostname][telVarName][telTimeRange]['datapoints'].append(datapoint)
+  if mode == 'PROMETHEUS' or mode == 'PUSHGATEWAY':
+    output = '# HELP bigip_tmos_telemetry TMOS Telemetry\n# TYPE bigip_tmos_telemetry gauge\n' if (mode == 'PROMETHEUS') else ''
 
-    return telemetryBody
-  elif mode == 'PROMETHEUS' or mode == 'PUSHGATEWAY':
-    print("PROMETHEUS/PUSHGATEWAY")
+    for host in telemetryBody:
+      for stat in telemetryBody[host]:
+        for timespan in telemetryBody[host][stat]:
+          for datapoint in telemetryBody[host][stat][timespan]['datapoints']:
+            output += 'bigip_tmos_telemetry{dataplane_type="BIG-IQ",dataplane_url="'+bigiq_fqdn+'",hostname="'+host+'",stat="'+stat+'",timespan="'+timespan+'"} '+str(datapoint['value'])+' '+str(datapoint['ts']*1000)+'\n'
+
+    return output
   else:
     return telemetryBody
 
