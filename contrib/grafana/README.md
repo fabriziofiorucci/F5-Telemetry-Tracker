@@ -5,6 +5,8 @@
 
 # Sample output
 
+<img src="/contrib/grafana/grafana-summary.png"/>
+
 <img src="/contrib/grafana/grafana-bigiq.jpg"/>
 
 <img src="/contrib/grafana/grafana-nim.jpg"/>
