@@ -520,7 +520,15 @@ def bigIqInventory(mode):
     else:
       tmosRel[d['version']] = 1
 
+    metricsOutput += '# HELP bigip_tmos_cve_details TMOS CVE details\n# TYPE bigip_tmos_cve_details counter\n' if (mode == 'PROMETHEUS') else ''
     for c in d['CVE'][0]:
+      metricsOutput += 'bigip_tmos_cve_details{dataplane_type="BIG-IQ",dataplane_url="'+bigiq_fqdn+ \
+        '",hostname="'+d['hostname']+ \
+        '",tmos_cve="'+c+ \
+        '",severity="'+str(d['CVE'][0][c]['baseSeverity'])+ \
+        '",base_score="'+str(d['CVE'][0][c]['baseScore'])+ \
+        '",exploitability_score="'+str(d['CVE'][0][c]['exploitabilityScore'])+ \
+        '"} '+str(d['CVE'][0][c]['baseScore'])+'\n'
       if c in cves:
         cves[c] += 1
       else:

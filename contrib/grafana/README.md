@@ -9,4 +9,6 @@
 
 <img src="/contrib/grafana/grafana-bigiq.jpg"/>
 
+<img src="/contrib/grafana/grafana-cve.jpg"/>
+
 <img src="/contrib/grafana/grafana-nim.jpg"/>
