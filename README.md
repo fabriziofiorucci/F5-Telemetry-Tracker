@@ -7,7 +7,7 @@ This tool helps tracking NGINX Plus instances managed by NGINX Controller and NG
 It has been tested against:
 
 - NGINX Controller 3.18, 3.18.2, apim-3.19.2
-- NGINX Instance Manager 1.0.1, 1.0.2, 1.0.3, 1.0.4, 2.0, 2.0.1, 2.1.0
+- NGINX Instance Manager 1.0.1, 1.0.2, 1.0.3, 1.0.4, 2.1.0
 - BIG-IQ 8.1.0, 8.1.0.2, 8.2.0
 
 Communication to NGINX Controller / NGINX Instance Manager / BIG-IQ is based on REST API, current features are:
@@ -24,8 +24,21 @@ Communication to NGINX Controller / NGINX Instance Manager / BIG-IQ is based on 
   - Support for plaintext SMTP, STARTTLS, SMTP over TLS, SMTP authentication, custom SMTP port
   - Configurable push interval (in days)
 - HTTP(S) proxy support
-- CVE tracking (currently supported for BIG-IQ and NGINX Instance Manager 2.x)
+- CVE tracking
 - Resource and applications telemetry (currently supported for BIG-IQ)
+
+## Reporting and visualization
+
+For additional dashboards see the [grafana page](/contrib/grafana)
+
+BIG-IQ analytics
+
+<img src="/contrib/grafana/images/bigiq/grafana-cve-summary.jpg"/>
+
+NGINX Instance Manager analytics
+
+<img src="/contrib/grafana/images/nim/nim-cve-details.jpg"/>
+
 
 ## Additional tools
 
@@ -84,7 +97,7 @@ sequenceDiagram
 - Private registry to push the F5 Telemetry Tracker image
 - One of:
   - NGINX Controller 3.18, 3.18.2, apim-3.19.2
-  - NGINX Instance Manager 1.0.1, 1.0.2, 1.0.3, 1.0.4, 2.0, 2.0.1, 2.1.0
+  - NGINX Instance Manager 1.0.1, 1.0.2, 1.0.3, 1.0.4, 2.1.0
   - BIG-IQ 8.1.0, 8.1.0.2, 8.2.0
 - SMTP server if automated email reporting is used
 - NIST NVD REST API Key for full CVE tracking (https://nvd.nist.gov/developers/request-an-api-key)
@@ -161,6 +174,7 @@ See the [contrib section](/contrib/)
 - [Report Generator](/contrib/report-generator) - Offline report generator
 - [Grafana](/contrib/grafana) - Sample Grafana dashboard
 - [FastAPI](/contrib/FastAPI) - FastAPI backend with integrated agent
+- [Docker compose](/contrib/docker-compose) - Run with Docker compose
 
 # How to deploy
 

@@ -110,7 +110,6 @@ spec:
       containers:
       - name: grafana
         image: grafana/grafana
-        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 3000
         volumeMounts:

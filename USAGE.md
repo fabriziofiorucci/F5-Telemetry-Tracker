@@ -4,6 +4,10 @@
 
 API Documentation is available at `/docs`, `/redoc` and OpenAPI JSON can be fetched at `/openapi.json`
 
+Main endpoints are:
+- `/instances` or `/f5tt/instances`
+- `/metrics` or `/f5tt/metrics`
+
 For `/instances` and `/f5tt/instances` endpoints if the request includes the `Accept-Encoding: gzip` header the response will be compressed
 The `/` endpoint displays a basic HTML view of generated JSON files
 

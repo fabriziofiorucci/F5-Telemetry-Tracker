@@ -176,22 +176,71 @@ def nmsInstances(mode):
 
   output['instances'] = instancesDict
 
-  if mode == 'PROMETHEUS' or mode == 'PUSHGATEWAY':
-    if mode == 'PROMETHEUS':
-      pOutput = '# HELP nginx_oss_online_instances Online NGINX OSS instances\n'
-      pOutput = pOutput + '# TYPE nginx_oss_online_instances gauge\n'
+  if mode == 'JSON':
+    return output,200
 
-    pOutput = pOutput + 'nginx_oss_online_instances{subscription="'+output['subscription']['id']+'",instanceType="'+output['subscription']['type']+'",instanceVersion="'+output['subscription']['version']+'",instanceSerial="'+output['subscription']['serial']+'"} '+str(int(totalManaged)-int(plusManaged))+'\n'
+  # PROMETHEUS or PUSHGATEWAY mode
+  metricsOutput = ''
 
-    if mode == 'PROMETHEUS':
-      pOutput = pOutput + '# HELP nginx_plus_online_instances Online NGINX Plus instances\n'
-      pOutput = pOutput + '# TYPE nginx_plus_online_instances gauge\n'
+  # NGINX instance counting
+  metricsOutput += '# HELP nginx_instances_online Online NGINX OSS instances\n' if (mode == 'PROMETHEUS') else ''
+  metricsOutput += '# TYPE nginx_instances_online gauge\n' if (mode == 'PROMETHEUS') else ''
+  metricsOutput += 'nginx_instances_online{subscription="'+output['subscription']['id']+'",instanceType="'+output['subscription']['type']+ \
+    '",type="nginx_plus"} '+ \
+    str(output['instances']['nginx_plus']['online'])+'\n'
+  metricsOutput += 'nginx_instances_online{subscription="'+output['subscription']['id']+'",instanceType="'+output['subscription']['type']+ \
+    '",type="nginx_oss"} '+ \
+    str(output['instances']['nginx_oss']['online'])+'\n'
 
-    pOutput = pOutput + 'nginx_plus_online_instances{subscription="'+subscriptionId+'",instanceType="'+instanceType+'",instanceVersion="'+instanceVersion+'",instanceSerial="'+instanceSerial+'"} '+str(plusManaged)+'\n'
+  metricsOutput += '# HELP nginx_instances_offline Online NGINX OSS instances\n' if (mode == 'PROMETHEUS') else ''
+  metricsOutput += '# TYPE nginx_instances_offline gauge\n' if (mode == 'PROMETHEUS') else ''
+  metricsOutput += 'nginx_instances_offline{subscription="'+output['subscription']['id']+'",instanceType="'+output['subscription']['type']+ \
+    '",type="nginx_plus"} '+ \
+    str(output['instances']['nginx_plus']['offline'])+'\n'
+  metricsOutput += 'nginx_instances_offline{subscription="'+output['subscription']['id']+'",instanceType="'+output['subscription']['type']+ \
+    '",type="nginx_oss"} '+ \
+    str(output['instances']['nginx_oss']['offline'])+'\n'
 
-    output = pOutput
+  # CVE
+  nginxRel = {}
+  cves = {}
+  for d in output['details']:
+    if d['version'] in nginxRel:
+      nginxRel[d['version']] += 1
+    else:
+      nginxRel[d['version']] = 1
 
-  return output,200
+    metricsOutput += '# HELP nginx_cve_details NGINX CVE details\n# TYPE nginx_cve_details counter\n' if (mode == 'PROMETHEUS') else ''
+    for c in d['CVE'][0]:
+      metricsOutput += 'nginx_cve_details{subscription="'+subscriptionId+'",instanceType="'+instanceType+ \
+        '",hostname="'+d['hostname']+ \
+        '",version="'+d['version']+ \
+        '",type="'+d['type']+ \
+        '",state="'+d['state']+ \
+        '",cve="'+c+ \
+        '",severity="'+str(d['CVE'][0][c]['baseSeverity'])+ \
+        '",base_score="'+str(d['CVE'][0][c]['baseScore'])+ \
+        '",exploitability_score="'+str(d['CVE'][0][c]['exploitabilityScore'])+ \
+        '"} '+str(d['CVE'][0][c]['baseScore'])+'\n'
+
+      if c in cves:
+        cves[c] += 1
+      else:
+        cves[c] = 1
+
+  # CVE totals
+  metricsOutput += '# HELP nginx_cve NGINX CVE count\n# TYPE nginx_cve gauge\n' if (mode == 'PROMETHEUS') else ''
+  for c in cves:
+    metricsOutput += 'nginx_cve_totals{subscription="'+output['subscription']['id']+'",instanceType="'+output['subscription']['type']+ \
+      '",cve="'+c+'"} '+str(cves[c])+'\n'
+
+  # NGINX releases
+  metricsOutput += '# HELP nginx_releases NGINX releases count\n# TYPE nginx_releases gauge\n' if (mode == 'PROMETHEUS') else ''
+  for v in nginxRel:
+    metricsOutput += 'nginx_releases{subscription="'+output['subscription']['id']+'",instanceType="'+output['subscription']['type']+ \
+      '",release="'+v+'"} '+str(nginxRel[v])+'\n'
+
+  return metricsOutput,200
 
 
 # Returns the CVE-centric JSON
