@@ -1,17 +1,42 @@
 services:
 
+  clickhouse:
+    image: clickhouse/clickhouse-server
+    user: "${USERID}:${USERGROUP}"
+    container_name: "clickhouse"
+    restart: always
+    ports:
+      - "9000:9000"
+    ulimits:
+      nofile: "262144"
+    environment:
+      - CLICKHOUSE_USER=default
+      - CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT=1
+      - CLICKHOUSE_PASSWORD=f5tt
+    volumes:
+      - /opt/f5tt/clickhouse/data:/var/lib/clickhouse:rw
+      - /opt/f5tt/clickhouse/logs:/var/log/clickhouse-server:rw
+
   f5tt:
     image: fiorucci/f5-telemetry-tracker:latest
     user: "${USERID}:${USERGROUP}"
     container_name: "f5tt-nim"
     restart: always
+    depends_on:
+      - clickhouse
     ports:
-      - "5000:5000"
+      - "5001:5000"
     environment:
       - DATAPLANE_TYPE=NGINX_MANAGEMENT_SYSTEM
       - DATAPLANE_FQDN=${DATAPLANE_FQDN}
       - DATAPLANE_USERNAME=${DATAPLANE_USERNAME}
       - DATAPLANE_PASSWORD=${DATAPLANE_PASSWORD}
+      - NMS_CH_HOST=clickhouse
+      - NMS_CH_PORT=9000
+      - NMS_CH_USER=default
+      - NMS_CH_PASS=f5tt
+      #- NMS_CH_SAMPLE_INTERVAL=1800
+      - NMS_CH_SAMPLE_INTERVAL=15
 
       # Optional HTTP(S) Proxy
       #- HTTP_PROXY="http(s)://username:password@proxy_ip:port"

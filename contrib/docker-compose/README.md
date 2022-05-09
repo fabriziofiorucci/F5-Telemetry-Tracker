@@ -57,12 +57,15 @@ Starting F5 Telemetry Tracker for NGINX Instance Manager:
 ```
 $ ./f5tt-compose.sh -c start -t nim -s https://<NIM_ADDRESS> -u admin -p mypassword
 -> Deploying F5 Telemetry Tracker for nim at https://<NIM_ADDRESS>
+Creating persistent storage directories under /opt/f5tt ...
 Enter sudo password if prompted
 Password: 
 Creating network "f5tt-nim_default" with the default driver
-Creating f5tt-nim   ... done
-Creating prometheus ... done
 Creating grafana    ... done
+Creating prometheus ... done
+Creating nginx      ... done
+Creating clickhouse ... done
+Creating f5tt-nim   ... done
 $
 ```
 
@@ -71,12 +74,16 @@ Stopping F5 Telemetry Tracker for NGINX Instance Manager:
 ```
 $ ./f5tt-compose.sh -c stop -t nim
 -> Undeploying F5 Telemetry Tracker for nim
-Stopping grafana    ... done
 Stopping f5tt-nim   ... done
+Stopping clickhouse ... done
+Stopping grafana    ... done
 Stopping prometheus ... done
-Removing grafana    ... done
+Stopping nginx      ... done
 Removing f5tt-nim   ... done
+Removing clickhouse ... done
+Removing grafana    ... done
 Removing prometheus ... done
+Removing nginx      ... done
 Removing network f5tt-nim_default
 $
 ```
@@ -91,6 +98,7 @@ Password:
 Creating network "f5tt-bigiq_default" with the default driver
 Creating f5tt-bigiq ... done
 Creating prometheus ... done
+Creating nginx      ... done
 Creating grafana    ... done
 $
 ```
@@ -102,9 +110,11 @@ $ ./f5tt-compose.sh -c stop -t bigiq
 -> Undeploying F5 Telemetry Tracker for bigiq
 Stopping grafana    ... done
 Stopping f5tt-bigiq ... done
+Stopping nginx      ... done
 Stopping prometheus ... done
 Removing grafana    ... done
 Removing f5tt-bigiq ... done
+Removing nginx      ... done
 Removing prometheus ... done
 Removing network f5tt-bigiq_default
 $

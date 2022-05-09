@@ -48,11 +48,17 @@ export DATAPLANE_USERNAME=$3
 export DATAPLANE_PASSWORD=$4
 
 echo "-> Deploying F5 Telemetry Tracker for $MODE at $DATAPLANE_FQDN" 
-echo "Creating work directories under /opt/f5tt ..."
+echo "Creating persistent storage directories under /opt/f5tt ..."
 echo "Enter sudo password if prompted"
 
 sudo bash -c "mkdir -p /opt/f5tt;chown $USERID:$USERGROUP /opt/f5tt"
-mkdir -p /opt/f5tt/{prometheus,grafana/data,grafana/log,grafana/plugins}
+
+if [ "$MODE" = "nim" ]
+then
+	mkdir -p /opt/f5tt/{prometheus,grafana/data,grafana/log,grafana/plugins,clickhouse/data,clickhouse/logs}
+else
+	mkdir -p /opt/f5tt/{prometheus,grafana/data,grafana/log,grafana/plugins}
+fi
 
 COMPOSE_HTTP_TIMEOUT=240 docker-compose -p $PROJECT_NAME-$MODE -f $DOCKER_COMPOSE_YAML-$MODE.yaml up -d --remove-orphans
 }
