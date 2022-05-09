@@ -94,3 +94,18 @@ Creating prometheus ... done
 Creating grafana    ... done
 $
 ```
+
+Stopping F5 Telemetry Tracker for BIG-IQ:
+
+```
+$ ./f5tt-compose.sh -c stop -t bigiq
+-> Undeploying F5 Telemetry Tracker for bigiq
+Stopping grafana    ... done
+Stopping f5tt-bigiq ... done
+Stopping prometheus ... done
+Removing grafana    ... done
+Removing f5tt-bigiq ... done
+Removing prometheus ... done
+Removing network f5tt-bigiq_default
+$
+```
