@@ -50,6 +50,7 @@ Additional tools can be found [here](/contrib)
 - [Grafana](/contrib/grafana) - Sample Grafana dashboards
 - [FastAPI](/contrib/FastAPI) - FastAPI backend with integrated agent
 - [Postman](/contrib/postman) - Sample Postman collection to test and run F5TT
+- [Docker compose](/contrib/docker-compose) - RUn F5TT on docker-compose
 
 ## Deployment modes
 
