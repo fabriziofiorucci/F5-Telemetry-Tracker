@@ -43,7 +43,7 @@ services:
       #- HTTPS_PROXY="http(s)://username:password@proxy_ip:port"
 
       # Optional NIST NVD CVE tracking REST API key (https://nvd.nist.gov/developers/request-an-api-key)
-      #- NIST_API_KEY="xxxxxxxxxxxx"
+      - NIST_API_KEY=${NIST_API_KEY}
 
       # Optional automated e-mail reporting
       #- EMAIL_ENABLED="true"

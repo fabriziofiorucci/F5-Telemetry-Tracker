@@ -15,6 +15,7 @@ $0 [options]\n\n
 -s [url]\t\t- BIG-IQ/NGINX Instance Manager URL\n
 -u [username]\t\t- BIG-IQ/NGINX Instance Manager username\n
 -p [password]\t\t- BIG-IQ/NGINX Instance Manager password\n\n
+-k [NIST API key]\t- NIST CVE REST API Key (https://nvd.nist.gov/developers/request-an-api-key)\n\n
 === Examples:\n\n
 Deploy F5TT for BIG-IQ:\t\t\t$0 -c start -t bigiq -s https://<BIGIQ_ADDRESS> -u <username> -p <password>\n
 Remove F5TT for BIG-IQ:\t\t\t$0 -c stop -t bigiq\n
@@ -28,10 +29,10 @@ exit 1
 
 #
 # F5TT deployment
-# parameters: [bigiq|nginx] [controlplane URL] [username] [password]
+# parameters: [bigiq|nginx] [controlplane URL] [username] [password] [NIST CVD key]
 #
 f5tt_start() {
-if [ "$#" != 4 ]
+if [ "$#" -lt 4 ]
 then
 	exit
 fi
@@ -46,6 +47,7 @@ export USERGROUP=`id -g $USERNAME`
 export DATAPLANE_FQDN=$2
 export DATAPLANE_USERNAME=$3
 export DATAPLANE_PASSWORD=$4
+export NIST_API_KEY=$5
 
 echo "-> Deploying F5 Telemetry Tracker for $MODE at $DATAPLANE_FQDN" 
 echo "Creating persistent storage directories under /opt/f5tt ..."
@@ -83,6 +85,7 @@ export USERGROUP=`id -g $USERNAME`
 export DATAPLANE_FQDN=""
 export DATAPLANE_USERNAME=""
 export DATAPLANE_PASSWORD=""
+export NIST_API_KEY=""
 
 echo "-> Undeploying F5 Telemetry Tracker for $MODE"
 
@@ -95,13 +98,13 @@ COMPOSE_HTTP_TIMEOUT=240 docker-compose -p $PROJECT_NAME-$MODE -f $DOCKER_COMPOS
 
 DOCKER_COMPOSE_YAML=f5tt-compose
 PROJECT_NAME=f5tt
+NIST_API_KEY=""
 
-while getopts 'hc:t:s:u:p:' OPTION
+while getopts 'hc:t:s:u:p:k:' OPTION
 do
         case "$OPTION" in
                 h)
-                        echo -e $BANNER
-                        exit
+			usage
                 ;;
                 c)
                         ACTION=$OPTARG
@@ -118,6 +121,9 @@ do
 		p)
 			DATAPLANE_PASSWORD=$OPTARG
 		;;
+		k)
+			NIST_API_KEY=$OPTARG
+		;;
         esac
 done
 
@@ -127,4 +133,4 @@ then
 	usage
 fi
 
-f5tt_$ACTION $MODE $DATAPLANE_URL $DATAPLANE_USERNAME $DATAPLANE_PASSWORD
+f5tt_$ACTION $MODE $DATAPLANE_URL $DATAPLANE_USERNAME $DATAPLANE_PASSWORD $NIST_API_KEY

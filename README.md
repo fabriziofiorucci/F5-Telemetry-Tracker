@@ -1,13 +1,13 @@
 # F5 Telemetry Tracker
 
-## Description
+## Description and features
 
-This tool helps tracking NGINX Plus instances managed by NGINX Controller and NGINX Instance Manager, and TMOS (BIG-IP, VIPRION, VE) instances managed by BIG-IQ
+This tool helps tracking NGINX Plus instances managed by NGINX Controller and NGINX Instance Manager, and TMOS (BIG-IP, VIPRION, BIG-IP Virtual Edition) instances managed by BIG-IQ
 
 It has been tested against:
 
 - NGINX Controller 3.18, 3.18.2, apim-3.19.2
-- NGINX Instance Manager 1.0.1, 1.0.2, 1.0.3, 1.0.4, 2.1.0
+- NGINX Instance Manager 2.1.0
 - BIG-IQ 8.1.0, 8.1.0.2, 8.2.0
 
 Communication to NGINX Controller / NGINX Instance Manager / BIG-IQ is based on REST API, current features are:
@@ -39,20 +39,7 @@ NGINX Instance Manager analytics
 
 <img src="/contrib/grafana/images/nim/nim-cve-details.jpg"/>
 
-
-## Additional tools
-
-Additional tools can be found [here](/contrib)
-
-- [BIG-IQ Collector](/contrib/bigiq-collect) - Offline BIG-IQ inventory processing
-- [F5TT on BIG-IQ Docker](/contrib/bigiq-docker) - Run F5TT onboard BIG-IQ CM virtual machine
-- [Report Generator](/contrib/report-generator) - Offline report generator
-- [Grafana](/contrib/grafana) - Sample Grafana dashboards
-- [FastAPI](/contrib/FastAPI) - FastAPI backend with integrated agent
-- [Postman](/contrib/postman) - Sample Postman collection to test and run F5TT
-- [Docker compose](/contrib/docker-compose) - RUn F5TT on docker-compose
-
-## Deployment modes
+## Architecture
 
 JSON telemetry mode
 
@@ -94,54 +81,21 @@ sequenceDiagram
 
 ## Prerequisites
 
-- Kubernetes or Openshift cluster
+- Kubernetes/Openshift cluster or Linux host with Docker support
 - Private registry to push the F5 Telemetry Tracker image
 - One of:
   - NGINX Controller 3.18, 3.18.2, apim-3.19.2
-  - NGINX Instance Manager 1.0.1, 1.0.2, 1.0.3, 1.0.4, 2.1.0
+  - NGINX Instance Manager 2.1.0
   - BIG-IQ 8.1.0, 8.1.0.2, 8.2.0
 - SMTP server if automated email reporting is used
 - NIST NVD REST API Key for full CVE tracking (https://nvd.nist.gov/developers/request-an-api-key)
 
-# How to build and run
+# How to run
 
-## On docker
+## On Docker Compose
 
-Set the correct values for `DATAPLANE_TYPE`, `DATAPLANE_FQDN`, `DATAPLANE_USERNAME` and `DATAPLANE_PASSWORD` and run on docker using:
-
-```
-docker run --name f5tt -p 5000:5000 \
-    -e DATAPLANE_TYPE=NGINX_MANAGEMENT_SYSTEM \
-    -e DATAPLANE_FQDN=https://nim2.f5.ff.lan \
-    -e DATAPLANE_USERNAME=admin \
-    -e DATAPLANE_PASSWORD=nimadmin \
-    -e NMS_CH_HOST=clickhouse-address \
-    -e NMS_CH_PORT=9000 \
-    -e NMS_CH_USER=default \
-    -e NMS_CH_PASS="" \
-    -e NMS_CH_SAMPLE_INTERVAL=1800 \
-    fiorucci/f5-telemetry-tracker:latest
-```
-
-## On Kubernetes/Openshift
-
-F5 Telemetry Tracker image is available on Docker Hub as:
-
-```
-fiorucci/f5-telemetry-tracker:latest
-```
-
-The 1.f5tt.yaml file references that by default.
-
-If you need to build and push NGINX your own image to a private registry:
-
-```
-git clone fabriziofiorucci/F5-Telemetry-Tracker
-cd F5-Telemetry-Tracker/f5tt
-
-docker build --no-cache -t PRIVATE_REGISTRY:PORT/f5-telemetry-tracker:latest .
-docker push PRIVATE_REGISTRY:PORT/f5-telemetry-tracker:latest
-```
+This is the recommended method to run F5 Telemetry Tracker on a Linux virtual machine.
+Refer to [installation instructions](/contrib/docker-compose)
 
 ## As a native python application
 
@@ -166,20 +120,27 @@ $ pip install -r requirements.txt
 
 `f5tt/f5tt.sh` is a sample script to run F5 Telemetry Tracker from bash
 
-## Additional modes of operation
+## On Kubernetes/Openshift
 
-See the [contrib section](/contrib/)
+F5 Telemetry Tracker image is available on Docker Hub as:
 
-- [BIG-IQ Collector](/contrib/bigiq-collect) - Offline BIG-IQ inventory processing
-- [F5TT on BIG-IQ Docker](/contrib/bigiq-docker) - Run F5TT onboard BIG-IQ CM virtual machine
-- [Report Generator](/contrib/report-generator) - Offline report generator
-- [Grafana](/contrib/grafana) - Sample Grafana dashboard
-- [FastAPI](/contrib/FastAPI) - FastAPI backend with integrated agent
-- [Docker compose](/contrib/docker-compose) - Run with Docker compose
+```
+fiorucci/f5-telemetry-tracker:latest
+```
 
-# How to deploy
+The 1.f5tt.yaml file references that by default.
 
-## For Kubernetes/Openshift
+If you need to build and push NGINX your own image to a private registry:
+
+```
+git clone fabriziofiorucci/F5-Telemetry-Tracker
+cd F5-Telemetry-Tracker/f5tt
+
+docker build --no-cache -t PRIVATE_REGISTRY:PORT/f5-telemetry-tracker:latest .
+docker push PRIVATE_REGISTRY:PORT/f5-telemetry-tracker:latest
+```
+
+Deploy on Kubernetes/Openshift:
 
 ```
 cd F5-Telemetry-Tracker/manifests
@@ -202,10 +163,10 @@ Edit `1.f5tt.yaml` to customize:
 | DATAPLANE_FQDN| the FQDN of your NGINX Controller / NGINX Instance Manager 1.x-2.x / BIG-IQ instance| format must be http[s]://FQDN:port |
 | DATAPLANE_USERNAME| the username for authentication |
 | DATAPLANE_PASSWORD| the password for authentication |
-| NMS_CH_HOST | if DATAPLANE_TYPE=NGINX_MANAGEMENT_SYSTEM (NGINX Instance Manager 2.x) - ClickHouse IP address (optional, default: 127.0.0.1) |
-| NMS_CH_PORT | if DATAPLANE_TYPE=NGINX_MANAGEMENT_SYSTEM (NGINX Instance Manager 2.x) - ClickHouse TCP port (optional, default: 9000) |
-| NMS_CH_USER | if DATAPLANE_TYPE=NGINX_MANAGEMENT_SYSTEM (NGINX Instance Manager 2.x) - ClickHouse username (optional, default: 'default') |
-| NMS_CH_PASS | if DATAPLANE_TYPE=NGINX_MANAGEMENT_SYSTEM (NGINX Instance Manager 2.x) - ClickHouse password (optional, default: no password) |
+| NMS_CH_HOST | if DATAPLANE_TYPE=NGINX_MANAGEMENT_SYSTEM (NGINX Instance Manager 2.1.0+) - ClickHouse IP address (optional, default: 127.0.0.1) |
+| NMS_CH_PORT | if DATAPLANE_TYPE=NGINX_MANAGEMENT_SYSTEM (NGINX Instance Manager 2.1.0+) - ClickHouse TCP port (optional, default: 9000) |
+| NMS_CH_USER | if DATAPLANE_TYPE=NGINX_MANAGEMENT_SYSTEM (NGINX Instance Manager 2.1.0+) - ClickHouse username (optional, default: 'default') |
+| NMS_CH_PASS | if DATAPLANE_TYPE=NGINX_MANAGEMENT_SYSTEM (NGINX Instance Manager 2.1.0+) - ClickHouse password (optional, default: no password) |
 | NMS_SAMPLE_INTERVAL | if DATAPLANE_TYPE=NGINX_MANAGEMENT_SYSTEM instances sample interval in seconds (optional, default: 60) |
 | STATS_PUSH_ENABLE | if set to "true" push mode is enabled, disabled if set to "false" |
 | STATS_PUSH_MODE | either CUSTOM or PUSHGATEWAY, to push (HTTP POST) JSON to custom URL and to push metrics to pushgateway, respectively |
@@ -255,11 +216,19 @@ Service names created by default as Ingress resources are:
 - `prometheus.f5tt.ff.lan` - Prometheus web GUI
 - `grafana.f5tt.ff.lan` - Grafana visualization web GUI
 
-## As a native python application
+## Additional tools
 
-Edit `f5tt/f5tt.sh` and run it
+Additional tools can be found [here](/contrib)
 
-## Using F5 Support solutions
+- [BIG-IQ Collector](/contrib/bigiq-collect) - Offline BIG-IQ inventory processing
+- [F5TT on BIG-IQ Docker](/contrib/bigiq-docker) - Run F5TT onboard BIG-IQ CM virtual machine
+- [Report Generator](/contrib/report-generator) - Offline report generator
+- [Grafana](/contrib/grafana) - Sample Grafana dashboards
+- [FastAPI](/contrib/FastAPI) - FastAPI backend with integrated agent
+- [Postman](/contrib/postman) - Sample Postman collection to test and run F5TT
+- [Docker compose](/contrib/docker-compose) - Run F5TT on docker-compose
+
+## F5 Support solutions
 
 See F5 Support solutions:
 

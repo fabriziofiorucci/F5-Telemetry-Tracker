@@ -29,6 +29,8 @@ F5 Telemetry Tracker - https://github.com/fabriziofiorucci/F5-Telemetry-Tracker
  -u [username]          - BIG-IQ/NGINX Instance Manager username
  -p [password]          - BIG-IQ/NGINX Instance Manager password
 
+ -k [NIST API key]      - NIST CVE REST API Key (https://nvd.nist.gov/developers/request-an-api-key)
+
  === Examples:
 
  Deploy F5TT for BIG-IQ:                        ./f5tt-compose.sh -c start -t bigiq -s https://<BIGIQ_ADDRESS> -u <username> -p <password>

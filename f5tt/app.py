@@ -287,7 +287,7 @@ if __name__ == '__main__':
 
         # CVE tracking
         nist_apikey = ''
-        if "NIST_API_KEY" in os.environ:
+        if "NIST_API_KEY" in os.environ and os.environ['NIST_API_KEY'] != "":
             nist_apikey = os.environ['NIST_API_KEY']
             print('CVE Tracking enabled using key', nist_apikey)
         else:
