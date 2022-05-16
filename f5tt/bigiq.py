@@ -386,10 +386,12 @@ def bigIqInventory(mode):
                 activeModulesArray = invDevice['infoState']['license']['activeModules'] if 'activeModules' in invDevice['infoState']['license'] else ''
                 inventoryData['activeModules'] = activeModulesArray
                 inventoryData['elaPlatform'] = ''
+                elaPlatformType = ''
 
                 for am in activeModulesArray:
                   if am.startswith('ELA,'):
                     inventoryData['elaPlatform'] = am.split('|')[0]
+                    elaPlatformType = am.split('|')[0].split(' ')[1].upper()
 
                 if 'chassisSerialNumber' in invDevice['infoState']:
                   inventoryData['chassisSerialNumber'] = invDevice['infoState']['chassisSerialNumber'].strip()
@@ -424,7 +426,11 @@ def bigIqInventory(mode):
           if platformType == '' or moduleName == '':
             moduleSKU = ''
           else:
-            moduleSKU = platformType+"-"+moduleName
+            if platformType == 'VE-VCMP':
+              moduleSKU = elaPlatformType + '-' + moduleName
+            else:
+              moduleSKU = platformType + "-" + moduleName
+
             moduleProvisioningLevel=prov['level']
 
             if moduleProvisioningLevel != 'none':
