@@ -186,6 +186,8 @@ def getInstances(request: Request,type: Optional[str] = None,month: Optional[int
           reply,code = bigiq.bigIqCVEbyDevicejson()
         elif type.lower() == 'swonhw':
           reply,code = bigiq.bigIqSwOnHwjson()
+        elif type.lower() == 'fullswonhw':
+          reply,code = bigiq.bigIqFullSwOnHwjson()
         else:
           reply = {}
           code = 404

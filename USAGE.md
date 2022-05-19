@@ -24,14 +24,13 @@ To get instance statistics in JSON format:
 
 the `type` query string parameter can be used to retrieve a logical view of the full JSON file:
 
-- Browser mode: `http://f5tt.ff.lan` and `http://f5tt.ff.lan?type=CVE`
-- Retrieve the full JSON: `curl -s http://f5tt.ff.lan/instances | jq`
-- Retrieve the CVE-centric JSON: `curl -s http://f5tt.ff.lan/instances?type=CVE | jq`
-- Retrieve the time-based usage JSON: `curl -s http://f5tt.ff.lan/instances?type=timebased&month=M&slot=N | jq`
-```
-M = 0 to get time-based usage for the current month, -1 for previous month (defaults to -1 if not specified)
-N = Aggregation based on N-hours timeslot (defaults to 4 if not specified)
-```
+| Output type | URI | Description |
+|---|:---|:---|
+| HTML | / | Full data visualization |
+| HTML | /?type=CVE | CVE data visualization |
+| JSON | /instances | NGINX instances inventory and CVE details |
+| JSON | /instances?type=CVE | NGINX instances CVE details |
+| JSON | /instances?type=timebased&month=M&slot=N |M = 0 to get time-based usage for the current month, -1 for previous month (defaults to -1 if not specified) - N = Aggregation based on N-hours timeslot (defaults to 4 if not specified) |
 
 ### NGINX Controller
 
@@ -43,10 +42,13 @@ N = Aggregation based on N-hours timeslot (defaults to 4 if not specified)
 
 the `type` query string parameter can be used to retrieve a logical view of the full JSON file:
 
-- Retrieve the standard full JSON: `curl -s http://f5tt.ff.lan/instances | jq`
-- Retrieve a CVE-centric JSON summarized by CVE: `curl -s http://f5tt.ff.lan/instances?type=CVE | jq`
-- Retrieve a CVE-centric JSON summarized by device: `curl -s http://f5tt.ff.lan/instances?type=CVEbyDevice | jq`
-- Retrieve the "Software on Hardware" JSON: `curl -s http://f5tt.ff.lan/instances?type=SwOnHw | jq`
+| Output type | URI | Description |
+|---|:---|:---|
+| JSON | /instances | TMOS devices inventory and CVE details |
+| JSON | /instances?type=CVE | CVE details summarized by CVE |
+| JSON | /instances?type=CVEbyDevice | CVE details summarized by device |
+| JSON | /instances?type=SwOnHw | "Software on Hardware" report |
+| JSON | /instances?type=fullSwOnHw | TMOS devices inventory, CVE details and "Software on Hardware" report |
 
 - All JSON can be accessed with a browser omitting the `/instances` portion of the URI (ie. `http://f5tt.ff.lan?type=CVE`)
 

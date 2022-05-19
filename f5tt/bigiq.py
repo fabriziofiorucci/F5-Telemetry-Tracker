@@ -588,7 +588,7 @@ def bigIqCVEbyDevicejson():
   for d in fullJSON['details']:
     thisDevice = {}
     thisDevice['hostname'] = d['hostname']
-    thisDevice['chassisSerialNumber'] = d['chassisSerialNumber']
+    thisDevice['chassisSerialNumber'] = d['chassisSerialNumber'] if 'chassisSerialNumber' in d else ''
     thisDevice['version'] = d['version']
     thisDevice['CVE'] = []
 
@@ -681,6 +681,16 @@ def bigIqSwOnHwjson():
   wholeJSON['swOnHw'] = swOnHwJSON
 
   return wholeJSON,200
+
+
+# Returns a full JSON that includes the software on hardware JSON
+def bigIqFullSwOnHwjson():
+  fullJson,code = bigIqInventory(mode='JSON')
+  swonhw,code = bigIqSwOnHwjson()
+
+  fullJson['swonhw'] = swonhw
+
+  return fullJson,200
 
 
 # Builds BIG-IQ telemetry request body by entities
