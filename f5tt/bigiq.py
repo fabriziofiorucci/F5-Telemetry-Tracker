@@ -558,8 +558,10 @@ def bigIqInventory(mode):
 
 
 # Returns the CVE-centric JSON, summarized by CVE
-def bigIqCVEjson():
-  fullJSON,retcode = bigIqInventory(mode='JSON')
+def bigIqCVEjson(fullJSON=None):
+  if fullJSON is None:
+    fullJSON,retcode = bigIqInventory(mode='JSON')
+
   cveJSON = {}
 
   for d in fullJSON['details']:
@@ -581,8 +583,9 @@ def bigIqCVEjson():
 
 
 # Returns the CVE-centric JSON, summarized by device
-def bigIqCVEbyDevicejson():
-  fullJSON,retcode = bigIqInventory(mode='JSON')
+def bigIqCVEbyDevicejson(fullJSON=None):
+  if fullJSON is None:
+    fullJSON,retcode = bigIqInventory(mode='JSON')
   devicecveJSON = {}
 
   for d in fullJSON['details']:
@@ -609,8 +612,9 @@ def bigIqCVEbyDevicejson():
 
 
 # Returns the software on hardware JSON
-def bigIqSwOnHwjson():
-  fullJSON,retcode = bigIqInventory(mode='JSON')
+def bigIqSwOnHwjson(fullJSON=None):
+  if fullJSON is None:
+    fullJSON,retcode = bigIqInventory(mode='JSON')
   swOnHwJSON = []
 
   vCMPHostModules = {}
@@ -685,12 +689,28 @@ def bigIqSwOnHwjson():
 
 # Returns a full JSON that includes the software on hardware JSON
 def bigIqFullSwOnHwjson():
-  fullJson,code = bigIqInventory(mode='JSON')
-  swonhw,code = bigIqSwOnHwjson()
+  fullJSON,code = bigIqInventory(mode='JSON')
+  swonhw,code = bigIqSwOnHwjson(fullJSON)
 
-  fullJson['swonhw'] = swonhw
+  fullJSON['swonhw'] = swonhw
 
-  return fullJson,200
+  return fullJSON,200
+
+
+# Returns a JSON containing defails, counter output, per-device CVE, telemetry and utility billing
+def bigIqCompletejson():
+  fullJSON,code = bigIqInventory(mode='JSON')
+  swonhw,code = bigIqSwOnHwjson(fullJSON)
+  cveByDevice,code = bigIqCVEbyDevicejson(fullJSON)
+
+  # Removes CVE information from device details
+  for i in range(len(fullJSON['details'])):
+    del fullJSON['details'][i]['CVE']
+
+  # Adds CVE by device
+  fullJSON['CVE'] = cveByDevice
+
+  return fullJSON,200
 
 
 # Builds BIG-IQ telemetry request body by entities

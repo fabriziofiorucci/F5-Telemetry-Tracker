@@ -188,6 +188,8 @@ def getInstances(request: Request,type: Optional[str] = None,month: Optional[int
           reply,code = bigiq.bigIqSwOnHwjson()
         elif type.lower() == 'fullswonhw':
           reply,code = bigiq.bigIqFullSwOnHwjson()
+        elif type.lower() == 'complete':
+          reply,code = bigiq.bigIqCompletejson()
         else:
           reply = {}
           code = 404
