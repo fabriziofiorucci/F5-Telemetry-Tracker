@@ -1,0 +1,425 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: f5tt
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-clickhouse-data
+  namespace: f5tt
+  annotations:
+    nfs.io/storage-path: clickhouse-data
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-clickhouse-logs
+  namespace: f5tt
+  annotations:
+    nfs.io/storage-path: clickhouse-logs
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 100Mi
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: clickhouse
+  namespace: f5tt
+  labels:
+    app: clickhouse
+spec:
+  selector:
+    matchLabels:
+      app: clickhouse
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: clickhouse
+    spec:
+      containers:
+      - name: clickhouse
+        image: clickhouse/clickhouse-server
+        ports:
+        - containerPort: 9000
+        volumeMounts:
+        - name: clickhouse-data
+          mountPath: /var/lib/clickhouse
+        - name: clickhouse-logs
+          mountPath: /var/log/clickhouse-server
+      volumes:
+      - name: clickhouse-data
+        persistentVolumeClaim:
+          claimName: pvc-clickhouse-data
+      - name: clickhouse-logs
+        persistentVolumeClaim:
+          claimName: pvc-clickhouse-logs
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: clickhouse
+  namespace: f5tt
+  labels:
+    app: clickhouse
+spec:
+  ports:
+  - port: 9000
+  selector:
+    app: clickhouse
+  type: ClusterIP
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: f5tt
+  namespace: f5tt
+  labels:
+    app: f5tt
+spec:
+  selector:
+    matchLabels:
+      app: f5tt
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: f5tt
+    spec:
+      containers:
+      - name: f5tt
+        image: fiorucci/f5-telemetry-tracker:latest
+        ports:
+        - containerPort: 5000
+        env:
+          ### Optional HTTP(S) Proxy
+          #- name: HTTP_PROXY
+          #  value: "http(s)://username:password@proxy_ip:port"
+          #- name: HTTPS_PROXY
+          #  value: "http(s)://username:password@proxy_ip:port"
+
+          ### Optional NIST NVD CVE tracking REST API key (https://nvd.nist.gov/developers/request-an-api-key)
+          #- name: NIST_API_KEY
+          #  value: xxxxxxxxxxxx
+
+          # Example for NGINX Instance Manager 2.x
+
+          - name: DATAPLANE_TYPE
+            value: NGINX_MANAGEMENT_SYSTEM
+          - name: DATAPLANE_FQDN
+            value: "https://nim.f5.ff.lan"
+          - name: DATAPLANE_USERNAME
+            value: "admin"
+          - name: DATAPLANE_PASSWORD
+            value: "nimadmin"
+
+          - name: NMS_CH_HOST
+            value: "clickhouse"
+          - name: NMS_CH_PORT
+            value: "9000"
+          - name: NMS_CH_USER
+            value: "default"
+          - name: NMS_CH_PASS
+            value: ""
+          - name: NMS_CH_SAMPLE_INTERVAL
+            value: "1800"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: f5tt
+  namespace: f5tt
+  labels:
+    app: f5tt
+spec:
+  ports:
+  - name: http
+    port: 5000
+  selector:
+    app: f5tt
+  type: ClusterIP
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: f5tt
+  namespace: f5tt
+  labels:
+    app: f5tt
+spec:
+  rules:
+    - host: f5tt.ff.lan
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: f5tt
+                port:
+                  number: 5000
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+  namespace: f5tt
+data:
+  prometheus.yml: |-
+    global:
+      scrape_interval: 15s
+      scrape_timeout: 8s
+    rule_files:
+    scrape_configs:
+      - job_name: 'f5tt'
+        scrape_interval: 120s
+        scrape_timeout: 120s
+        static_configs:
+        - targets:
+          - f5tt:5000
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-prometheus
+  namespace: f5tt
+  annotations:
+    nfs.io/storage-path: prometheus
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 20Gi
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus
+  namespace: f5tt
+  labels:
+    app: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: prometheus
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: prometheus
+    spec:
+      containers:
+      - name: prometheus
+        image: prom/prometheus
+        ports:
+        - containerPort: 9090
+        volumeMounts:
+        - name: prometheus-config
+          mountPath: /etc/prometheus/prometheus.yml
+          subPath: prometheus.yml
+        - name: prometheus-data
+          mountPath: /prometheus
+        args:
+          - "--storage.tsdb.retention.time=730d"
+          - "--config.file=/etc/prometheus/prometheus.yml"
+          - "--web.enable-admin-api"
+      volumes:
+      - name: prometheus-config
+        configMap:
+          name: prometheus-config
+      - name: prometheus-data
+        persistentVolumeClaim:
+          claimName: pvc-prometheus
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus
+  namespace: f5tt
+  labels:
+    app: prometheus
+spec:
+  ports:
+  - port: 9090
+  selector:
+    app: prometheus
+  type: ClusterIP
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-config
+  namespace: f5tt
+data:
+  grafana.ini: |-
+    [paths]
+    [server]
+    domain = grafana.ff.lan
+    root_url = https://grafana.ff.lan
+    [database]
+    [session]
+    [dataproxy]
+    [analytics]
+    [security]
+    [snapshots]
+    [users]
+    [auth]
+    [auth.anonymous]
+    enabled = true
+    [auth.github]
+    [auth.google]
+    [auth.generic_oauth]
+    [auth.grafana_com]
+    [auth.proxy]
+    [auth.basic]
+    enabled = false
+    [auth.ldap]
+    [smtp]
+    [emails]
+    [log]
+    mode = console file
+    [log.console]
+    [log.file]
+    [log.syslog]
+    [event_publisher]
+    [dashboards.json]
+    [alerting]
+    [metrics]
+    [metrics.graphite]
+    [grafana_com]
+    [external_image_storage]
+    [external_image_storage.s3]
+    [external_image_storage.webdav]
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-grafana-data
+  namespace: f5tt
+  annotations:
+    nfs.io/storage-path: grafana/data
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-grafana-log
+  namespace: f5tt
+  annotations:
+    nfs.io/storage-path: grafana/log
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana
+  namespace: f5tt
+  labels:
+    app: grafana
+spec:
+  selector:
+    matchLabels:
+      app: grafana
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: grafana
+    spec:
+      containers:
+      - name: grafana
+        image: grafana/grafana
+        ports:
+        - containerPort: 3000
+        volumeMounts:
+        - name: grafana-config
+          mountPath: /etc/grafana/grafana.ini
+          subPath: grafana.ini
+        - name: grafana-data
+          mountPath: /var/lib/grafana
+        - name: grafana-log
+          mountPath: /var/log/grafana
+      volumes:
+      - name: grafana-config
+        configMap:
+          name: grafana-config
+      - name: grafana-data
+        persistentVolumeClaim:
+          claimName: pvc-grafana-data
+      - name: grafana-log
+        persistentVolumeClaim:
+          claimName: pvc-grafana-log
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana
+  namespace: f5tt
+  labels:
+    app: grafana
+spec:
+  ports:
+  - port: 3000
+  selector:
+    app: grafana
+  type: ClusterIP
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: grafana
+  namespace: f5tt
+  labels:
+    app: grafana
+spec:
+  rules:
+    - host: grafana.ff.lan
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: grafana
+                port:
+                  number: 3000
+
