@@ -370,6 +370,6 @@ if __name__ == '__main__':
         if "F5TT_PORT" in os.environ:
             f5ttPort = os.environ['F5TT_PORT']
         if "F5TT_ADDRESS" in os.environ:
-            f5ttAddress = os.environ['F5tt_ADDRESS']
+            f5ttAddress = os.environ['F5TT_ADDRESS']
 
         uvicorn.run("app:app", host=f5ttAddress, port=f5ttPort)
