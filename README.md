@@ -227,6 +227,7 @@ Additional tools can be found [here](/contrib)
 - [FastAPI](/contrib/FastAPI) - FastAPI backend with integrated agent
 - [Postman](/contrib/postman) - Sample Postman collection to test and run F5TT
 - [Docker compose](/contrib/docker-compose) - Run F5TT on docker-compose
+- [Kubernetes](/contrib/kubernetes) - Run F5TT on kubernetes to track NGINX usage based on NGINX Instance Manager
 
 ## F5 Support solutions
 
