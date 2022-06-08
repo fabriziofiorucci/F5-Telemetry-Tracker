@@ -130,18 +130,24 @@ $ curl -s "http://f5tt.ff.lan/instances?type=timebased" | jq
   "instances": [
     {
       "ts": {
-        "from": "2022-05-30 22:24:25",
-        "to": "2022-05-30 23:05:23"
+        "from": "2022-06-08 22:36:24",
+        "to": "2022-06-08 22:40:36"
       },
       "nginx_oss": {
-        "managed": 1,
-        "online": 1,
-        "offline": 0
+        "managed": "1",
+        "online": "1",
+        "offline": "0"
       },
       "nginx_plus": {
-        "managed": 4,
-        "online": 4,
-        "offline": 0
+        "managed": "4",
+        "online": "4",
+        "offline": "0"
+      },
+      "modules": {
+        "ngx_http_app_protect_module": "2",
+        "ngx_http_app_protect_dos_module": "",
+        "ngx_http_js_module": "4",
+        "ngx_stream_js_module": "4"
       }
     }
   ]
