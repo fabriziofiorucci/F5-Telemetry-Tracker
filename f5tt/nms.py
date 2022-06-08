@@ -49,10 +49,15 @@ def pollingThread(sample_interval):
     now=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     instancesJson,retcode = nmsInstances(mode='JSON')
-    print(now,'Collecting instances usage',instancesJson['instances'] if 'instances' in instancesJson else 'invalid')
+
+    trackingJson = {}
+    trackingJson['instances'] = instancesJson['instances']
+    trackingJson['modules'] = instancesJson['modules']
+
+    print(now,'Collecting instances usage',trackingJson)
 
     if 'instances' in instancesJson:
-      query='insert into f5tt.tracking (ts,data) values (\''+str(now)+'\',\''+json.dumps(instancesJson['instances'])+'\')'
+      query='insert into f5tt.tracking (ts,data) values (\''+str(now)+'\',\''+json.dumps(trackingJson)+'\')'
 
       f5ttCH.connect()
       out=f5ttCH.execute(query)
@@ -176,6 +181,19 @@ def nmsInstances(mode):
 
   output['instances'] = instancesDict
 
+  modulesTracking = {}
+
+  if 'details' in output:
+    for d in output['details']:
+      if 'modules' in d:
+        for m in d['modules']:
+          if m in modulesTracking:
+            modulesTracking[m] = modulesTracking[m] + 1
+          else:
+            modulesTracking[m] = 1
+
+  output['modules'] = modulesTracking
+
   if mode == 'JSON':
     return output,200
 
@@ -286,12 +304,16 @@ def nmsTimeBasedJson(monthStats,hourInterval):
     SELECT \
       min(ts) as from, \
       max(ts) as to, \
-      max(toInt64(JSONExtractRaw(data, 'nginx_oss', 'managed'))) AS nginx_oss_managed, \
-      max(toInt64(JSONExtractRaw(data, 'nginx_oss', 'online'))) AS nginx_oss_online, \
-      max(toInt64(JSONExtractRaw(data, 'nginx_oss', 'offline'))) AS nginx_oss_offline, \
-      max(toInt64(JSONExtractRaw(data, 'nginx_plus', 'managed'))) AS nginx_plus_managed, \
-      max(toInt64(JSONExtractRaw(data, 'nginx_plus', 'online'))) AS nginx_plus_online, \
-      max(toInt64(JSONExtractRaw(data, 'nginx_plus', 'offline'))) AS nginx_plus_offline \
+      max(JSON_VALUE(data, '$.instances.nginx_oss.managed')) AS nginx_oss_managed, \
+      max(JSON_VALUE(data, '$.instances.nginx_oss.online')) AS nginx_oss_online, \
+      max(JSON_VALUE(data, '$.instances.nginx_oss.offline')) AS nginx_oss_offline, \
+      max(JSON_VALUE(data, '$.instances.nginx_plus.managed')) AS nginx_plus_managed, \
+      max(JSON_VALUE(data, '$.instances.nginx_plus.online')) AS nginx_plus_online, \
+      max(JSON_VALUE(data, '$.instances.nginx_plus.offline')) AS nginx_plus_offline, \
+      max(JSON_VALUE(data, '$.modules.ngx_http_app_protect_module')) AS ngx_http_app_protect_module, \
+      max(JSON_VALUE(data, '$.modules.ngx_http_app_protect_dos_module')) AS ngx_http_app_protect_dos_module, \
+      max(JSON_VALUE(data, '$.modules.ngx_http_js_module')) AS ngx_http_js_module, \
+      max(JSON_VALUE(data, '$.modules.ngx_stream_js_module')) AS ngx_stream_js_module \
     FROM f5tt.tracking \
     WHERE ts >= (select timestamp_sub(month,"+str(-monthStats)+",toStartOfMonth(now()))) \
     AND ts < (addDays(toStartOfMonth(addMonths(now() + toIntervalMonth(1),"+str(monthStats)+")),-1)) \
@@ -306,7 +328,7 @@ def nmsTimeBasedJson(monthStats,hourInterval):
   if out != None:
     if out != []:
       for tuple in out:
-        if len(tuple) == 8:
+        if len(tuple) == 12:
           item = {}
           item['ts'] = {}
           item['ts']['from'] = str(tuple[0])
@@ -319,6 +341,11 @@ def nmsTimeBasedJson(monthStats,hourInterval):
           item['nginx_plus']['managed'] = tuple[5]
           item['nginx_plus']['online'] = tuple[6]
           item['nginx_plus']['offline'] = tuple[7]
+          item['modules'] = {}
+          item['modules']['ngx_http_app_protect_module'] = tuple[8]
+          item['modules']['ngx_http_app_protect_dos_module'] = tuple[9]
+          item['modules']['ngx_http_js_module'] = tuple[10]
+          item['modules']['ngx_stream_js_module'] = tuple[11]
 
           output['instances'].append(item)
     return output,200

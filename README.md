@@ -41,6 +41,45 @@ NGINX Instance Manager analytics
 
 ## Architecture
 
+High level
+
+```mermaid
+graph TD
+BIGIQ([BIG-IQ CM])
+NIM([NGINX Instance Manager])
+
+User([User / external app])
+P2S[[F5 Telemetry Tracker]]
+EMAIL[[e-mail server]]
+BROWSER([Browser])
+MYF5([External REST endpoint])
+
+TMOSVE([TMOS VE])
+BIGIP([BIG-IP])
+VIPRION([VIPRION])
+NGINXOSS([NGINX OSS])
+NGINXPLUS([NGINX Plus])
+
+P2S -- REST API --> BIGIQ 
+P2S -- REST API --> NIM
+
+BIGIQ --> TMOSVE
+BIGIQ --> BIGIP
+BIGIQ --> VIPRION
+
+NIM --> NGINXOSS
+NIM --> NGINXPLUS
+
+User -- REST API --> P2S
+P2S -- Usage JSON --> User
+
+P2S -- e-mail w/JSON attachment --> EMAIL
+
+BROWSER -- HTTP --> P2S
+P2S -- Grafana Dashboard --> BROWSER
+P2S -- Telemetry Call Home --> MYF5
+```
+
 JSON telemetry mode
 
 ```mermaid
