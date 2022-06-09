@@ -641,8 +641,9 @@ def bigIqSwOnHwjson(fullJSON=None):
           deviceJSON['sku'] = bigipSku
           deviceJSON['provisionedModules'] = []
 
+          enabledLevels = ['nominal', 'dedicated', 'minimum']
           for m in d['provisionedModules']:
-            if m['level'] == 'nominal' or m['level'] == 'dedicated' or m['level'] == 'minimum':
+            if m['level'] in enabledLevels:
               deviceJSON['provisionedModules'].append(m['sku'])
               if bigipSN in vCMPHostModules:
                 if m['sku'] not in vCMPHostModules[bigipSN]:
@@ -662,7 +663,7 @@ def bigIqSwOnHwjson(fullJSON=None):
           vCMPHostModulesRewritten = []
           skuModel = '-'.join(d['sku'].split('-')[2:])
           for j in range(0,len(vCMPHostModules[sn])):
-            updatedSKU = skuModel + '-' + '-'.join(vCMPHostModules[sn][j].split('-')[2:])
+            updatedSKU = skuModel + '-'.join(vCMPHostModules[sn][j].split(skuModel)[1:])
             vCMPHostModulesRewritten.append(updatedSKU)
 
           d['provisionedModules'] = vCMPHostModulesRewritten
@@ -671,7 +672,7 @@ def bigIqSwOnHwjson(fullJSON=None):
           vCMPGuestModulesRewritten = []
           skuModel = d['elaPlatform'].split(' ')[-1].upper()
           for j in range(0,len(vCMPHostModules[sn])):
-            updatedSKU = skuModel + '-' + '-'.join(vCMPHostModules[sn][j].split('-')[2:])
+            updatedSKU = skuModel + '-'.join(vCMPHostModules[sn][j].split(skuModel)[1:])
             vCMPGuestModulesRewritten.append(updatedSKU)
 
           d['provisionedModules'] = vCMPGuestModulesRewritten
