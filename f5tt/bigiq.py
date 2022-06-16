@@ -491,6 +491,13 @@ def bigIqInventory(mode):
   instancesDict['swTotals'].append(swSKUGrandTotals)
 
   output = {}
+
+  timeNow = datetime.datetime.now()
+  monthAgo = timeNow - datetime.timedelta(days=30)
+
+  output['periodStarted'] = monthAgo.strftime("%Y-%m-%dT%H:%M:%SZ")
+  output['periodEnded'] = timeNow.strftime("%Y-%m-%dT%H:%M:%SZ")
+
   output['instances'] = []
   output['instances'].append(instancesDict)
   output['details'] = wholeInventory
