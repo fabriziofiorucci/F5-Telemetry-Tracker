@@ -15,11 +15,6 @@ A sample Postman collection is [available here](/contrib/postman)
 
 To get instance statistics in JSON format:
 
-### NGINX Instance Manager 1.x
-
-- Retrieve the full JSON: `curl -s http://f5tt.ff.lan/instances | jq`
-- Browser mode: `http://f5tt.ff.lan`
-
 ### NGINX Instance Manager 2.x
 
 the `type` query string parameter can be used to retrieve a logical view of the full JSON file:
@@ -31,12 +26,6 @@ the `type` query string parameter can be used to retrieve a logical view of the 
 | JSON | /instances | NGINX instances inventory and CVE details |
 | JSON | /instances?type=CVE | NGINX instances CVE details |
 | JSON | /instances?type=timebased&month=M&slot=N |M = 0 to get time-based usage for the current month, -1 for previous month (defaults to -1 if not specified) - N = Aggregation based on N-hours timeslot (defaults to 4 if not specified) |
-
-### NGINX Controller
-
-- Retrieve the full JSON: `curl -s http://f5tt.ff.lan/instances | jq`
-
-- Browser mode: `http://f5tt.ff.lan`
 
 ### BIG-IQ
 
@@ -70,24 +59,6 @@ nginx_oss_online_instances{subscription="NGX-Subscription-1-TRL-064788",instance
 # HELP nginx_plus_online_instances Online NGINX Plus instances
 # TYPE nginx_plus_online_instances gauge
 nginx_plus_online_instances{subscription="NGX-Subscription-1-TRL-064788",instanceType="INSTANCE_MANAGER",instanceVersion="1.0.2",instanceSerial="6232847160738694"} 0
-```
-
-Pulling from NGINX Controller
-
-```
-$ curl -s http://f5tt.ff.lan/metrics
-# HELP nginx_plus_online_instances Online NGINX Plus instances
-# TYPE nginx_plus_online_instances gauge
-nginx_plus_online_instances{subscription="NGX-Subscription-1-TRL-046027",instanceType="NGINX Controller",instanceVersion="3.18.2",location="test"} 0
-# HELP nginx_plus_offline_instances Offline NGINX Plus instances
-# TYPE nginx_plus_offline_instances gauge
-nginx_plus_offline_instances{subscription="NGX-Subscription-1-TRL-046027",instanceType="NGINX Controller",instanceVersion="3.18.2",location="test"} 0
-# HELP nginx_plus_online_instances Online NGINX Plus instances
-# TYPE nginx_plus_online_instances gauge
-nginx_plus_online_instances{subscription="NGX-Subscription-1-TRL-046027",instanceType="NGINX Controller",instanceVersion="3.18.2",location="unspecified"} 2
-# HELP nginx_plus_offline_instances Offline NGINX Plus instances
-# TYPE nginx_plus_offline_instances gauge
-nginx_plus_offline_instances{subscription="NGX-Subscription-1-TRL-046027",instanceType="NGINX Controller",instanceVersion="3.18.2",location="unspecified"} 283
 ```
 
 Pulling from BIG-IQ
