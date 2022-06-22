@@ -84,6 +84,8 @@ echo $INVENTORIES | jq -r '.items[].status' | sort | uniq -c
 
 INV_ID=`echo $INVENTORIES | jq -r '.items['$(expr $INVENTORIES_LEN - 1)'].resultsReference.link' | head -n1 | awk -F \/ '{print $9}'`
 
+echo "-> Using inventory [$INV_ID]"
+
 if [ ! "$INV_ID" = "" ]
 then
 
