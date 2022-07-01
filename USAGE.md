@@ -39,6 +39,7 @@ the `type` query string parameter can be used to retrieve a logical view of the 
 | JSON | /instances?type=SwOnHw | "Software on Hardware" report |
 | JSON | /instances?type=fullSwOnHw | TMOS devices inventory, CVE details and "Software on Hardware" report |
 | JSON | /instances?type=complete | TMOS devices inventory, CVE details summarized by CVE, telemetry |
+| JSON | /instances?type=utilityBilling | Utility billing data for hardware units and virtual editions |
 
 - All JSON can be accessed with a browser omitting the `/instances` portion of the URI (ie. `http://f5tt.ff.lan?type=CVE`)
 
