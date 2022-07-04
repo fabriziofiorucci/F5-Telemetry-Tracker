@@ -2,15 +2,14 @@
 
 ## Description and features
 
-This tool helps tracking NGINX Plus instances managed by NGINX Controller and NGINX Instance Manager, and TMOS (BIG-IP, VIPRION, BIG-IP Virtual Edition) instances managed by BIG-IQ
+This tool helps tracking NGINX OSS and NGINX Plus instances managed by NGINX Instance Manager/NGINX Management Suite, and TMOS (BIG-IP, VIPRION, BIG-IP Virtual Edition) instances managed by BIG-IQ
 
 It has been tested against:
 
-- NGINX Controller 3.18, 3.18.2, apim-3.19.2 (deprecated)
-- NGINX Instance Manager 2.1.0, 2.2.0, 2.3.0
+- NGINX Instance Manager/NGINX Management Suite 2.1.0, 2.2.0, 2.3.0
 - BIG-IQ 8.1.0, 8.1.0.2, 8.2.0
 
-Communication to NGINX Controller (deprecated) / NGINX Instance Manager / BIG-IQ is based on REST API, current features are:
+Communication to NGINX Instance Manager / BIG-IQ is based on REST API, current features are:
 
 - REST API and high level reporting - see [usage page](/USAGE.md)
 - JSON Telemetry mode
@@ -20,11 +19,11 @@ Communication to NGINX Controller (deprecated) / NGINX Instance Manager / BIG-IQ
 - Grafana visualization mode
   - Pushes instance statistics to pushgateway (STATS_PUSH_MODE: PUSHGATEWAY)
 - Automated e-mail reporting
-  - Sends an email containing the report JSON file as an attachment named nginx_report.json for NGINX Instance Manager and NGINX Controller, and bigip_report.json for BIG-IQ
+  - Sends an email containing the report JSON file as an attachment named nginx_report.json for NGINX Instance Manager, and bigip_report.json for BIG-IQ
   - Support for plaintext SMTP, STARTTLS, SMTP over TLS, SMTP authentication, custom SMTP port
   - Configurable push interval (in days)
 - HTTP(S) proxy support
-- CVE tracking
+- Realtime CVE tracking
 - Resource and applications telemetry (currently supported for BIG-IQ)
 
 ## Reporting and visualization
@@ -123,7 +122,6 @@ sequenceDiagram
 - Kubernetes/Openshift cluster or Linux host with Docker support
 - Private registry to push the F5 Telemetry Tracker image
 - One of:
-  - NGINX Controller 3.18, 3.18.2, apim-3.19.2 (deprecated)
   - NGINX Instance Manager 2.1.0, 2.2.0, 2.3.0
   - BIG-IQ 8.1.0, 8.1.0.2, 8.2.0
 - SMTP server if automated email reporting is used
@@ -273,7 +271,6 @@ Additional tools can be found [here](/contrib)
 See F5 Support solutions:
 
 - K83394355: How to count the number of NGINX instances with F5 Telemetry Tracker on NGINX Instance Manager - https://support.f5.com/csp/article/K83394355
-- K45028541: How to count the number of NGINX instances with F5 Telemetry Tracker on NGINX Controller - https://support.f5.com/csp/article/K45028541 (deprecated)
 - K29144504: How to install and use (Offline) F5 Telemetry collection Script on BIG-IQ - https://support.f5.com/csp/article/K29144504
 - K94129313: How to install and use Docker F5 Telemetry collection script - https://support.f5.com/csp/article/K94129313
 

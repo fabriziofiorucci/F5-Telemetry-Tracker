@@ -15,6 +15,7 @@ from email.message import EmailMessage
 
 import cveDB
 import f5ttCH
+import utils
 
 this = sys.modules[__name__]
 
@@ -51,8 +52,8 @@ def pollingThread(sample_interval):
     instancesJson,retcode = nmsInstances(mode='JSON')
 
     trackingJson = {}
-    trackingJson['instances'] = instancesJson['instances']
-    trackingJson['modules'] = instancesJson['modules']
+    trackingJson['instances'] = instancesJson['instances'] if 'instances' in instancesJson else ''
+    trackingJson['modules'] = instancesJson['modules'] if 'modules' in instancesJson else ''
 
     print(now,'Collecting instances usage',trackingJson)
 
@@ -112,8 +113,6 @@ def nmsInstances(mode):
       if instance['build']['nginxPlus'] == True:
         plusManaged+=1
 
-  output=''
-
   subscriptionDict = {}
   subscriptionDict['id'] = subscriptionId
   subscriptionDict['type'] = instanceType
@@ -121,6 +120,7 @@ def nmsInstances(mode):
   subscriptionDict['serial'] = instanceSerial
 
   output = {}
+  output['report'] = utils.getVersionJson(reportType='Full',dataplane='NGINX Management Suite')
   output['subscription'] = subscriptionDict
   output['details'] = []
 
@@ -185,7 +185,7 @@ def nmsInstances(mode):
 
   if 'details' in output:
     for d in output['details']:
-      if 'modules' in d:
+      if d['state'] == 'online' and 'modules' in d:
         for m in d['modules']:
           if m in modulesTracking:
             modulesTracking[m] = modulesTracking[m] + 1
@@ -265,6 +265,7 @@ def nmsInstances(mode):
 def nmsCVEjson():
   fullJSON,retcode = nmsInstances(mode='JSON')
   cveJSON = {}
+  cveJSON['report'] = utils.getVersionJson(reportType='CVE',dataplane='NGINX Instance Manager')
 
   for d in fullJSON['details']:
     nginxHostname = d['hostname']
@@ -287,6 +288,7 @@ def nmsCVEjson():
 # Returns the time-based instances usage distribution JSON
 def nmsTimeBasedJson(monthStats,hourInterval):
   output = {}
+  output['report'] = utils.getVersionJson(reportType='Time-based',dataplane='NGINX Instance Manager')
   output['subscription'] = {}
   output['instances'] = []
 

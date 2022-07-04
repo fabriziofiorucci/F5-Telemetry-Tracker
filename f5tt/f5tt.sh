@@ -11,20 +11,6 @@
 ### Optional NIST API Key for full CVE tracking (https://nvd.nist.gov/developers/request-an-api-key)
 #export NIST_API_KEY=xxxxxxxx
 
-### Section to use when polling NGINX Controller
-
-#export DATAPLANE_TYPE=NGINX_CONTROLLER
-#export DATAPLANE_FQDN="https://nginx-controller.ff.lan:443"
-#export DATAPLANE_USERNAME="username@domain"
-#export DATAPLANE_PASSWORD="thepassword"
-
-### Section to use when polling NGINX Instance Manager 1.x
-
-#export DATAPLANE_TYPE=NGINX_INSTANCE_MANAGER
-#export DATAPLANE_FQDN="http://127.0.0.1:11000"
-#export DATAPLANE_USERNAME="username@domain"
-#export DATAPLANE_PASSWORD="thepassword"
-
 ### Section to use when polling NGINX Instance Manager 2.x
 
 #export DATAPLANE_TYPE=NGINX_MANAGEMENT_SYSTEM

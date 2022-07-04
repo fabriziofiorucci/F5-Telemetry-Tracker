@@ -23,8 +23,6 @@ from email.message import EmailMessage
 
 # All modules
 import bigiq
-import nc
-import nim
 import nms
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
@@ -45,17 +43,7 @@ def scheduledPush(url, username, password, interval, pushmode):
 
     while counter >= 0:
         try:
-            if nc_mode == 'NGINX_CONTROLLER':
-                if pushmode == 'CUSTOM':
-                    payload,code = nc.ncInstances(fqdn=nc_fqdn, username=nc_user, password=nc_pass, mode='JSON', proxy=proxyDict)
-                elif pushmode == 'PUSHGATEWAY':
-                    payload,code = nc.ncInstances(fqdn=nc_fqdn, username=nc_user, password=nc_pass, mode='PUSHGATEWAY', proxy=proxyDict)
-            elif nc_mode == 'NGINX_INSTANCE_MANAGER':
-                if pushmode == 'CUSTOM':
-                    payload,code = nim.nimInstances(fqdn=nc_fqdn, mode='JSON', proxy=proxyDict)
-                elif pushmode == 'PUSHGATEWAY':
-                    payload,code = nim.nimInstances(fqdn=nc_fqdn, mode='PUSHGATEWAY', proxy=proxyDict)
-            elif nc_mode == 'NGINX_MANAGEMENT_SYSTEM':
+            if nc_mode == 'NGINX_MANAGEMENT_SYSTEM':
                 if pushmode == 'CUSTOM':
                     payload = nms.nmsInstances(mode='JSON')
                 elif pushmode == 'PUSHGATEWAY':
@@ -103,17 +91,7 @@ def scheduledEmail(email_server, email_server_port, email_server_type, email_aut
                    email_recipient, email_interval):
     while True:
         try:
-            if nc_mode == 'NGINX_CONTROLLER':
-                payload,code = nc.ncInstances(fqdn=nc_fqdn, username=nc_user, password=nc_pass, mode='JSON', proxy=proxyDict)
-                subscriptionId = '[' + payload['subscription']['id'] + '] '
-                subjectPostfix = 'NGINX Usage Reporting'
-                attachname = 'nginx_report.json'
-            elif nc_mode == 'NGINX_INSTANCE_MANAGER':
-                payload,code = nim.nimInstances(fqdn=nc_fqdn, mode='JSON', proxy=proxyDict)
-                subscriptionId = '[' + payload['subscription']['id'] + '] '
-                subjectPostfix = 'NGINX Usage Reporting'
-                attachname = 'nginx_report.json'
-            elif nc_mode == 'NGINX_MANAGEMENT_SYSTEM':
+            if nc_mode == 'NGINX_MANAGEMENT_SYSTEM':
                 payload = nms.nmsInstances(mode='JSON')
                 jsonPayload = json.loads(payload)
                 subscriptionId = '[' + jsonPayload['subscription']['id'] + '] '
@@ -163,11 +141,7 @@ def scheduledEmail(email_server, email_server_port, email_server_type, email_aut
 @app.get("/f5tt/instances")
 @app.get("/")
 def getInstances(request: Request,type: Optional[str] = None,month: Optional[int] = -1,slot: Optional[int] = 4):
-    if nc_mode == 'NGINX_CONTROLLER':
-        reply,code = nc.ncInstances(fqdn=nc_fqdn, username=nc_user, password=nc_pass, mode='JSON', proxy=proxyDict)
-    elif nc_mode == 'NGINX_INSTANCE_MANAGER':
-        reply,code = nim.nimInstances(fqdn=nc_fqdn, mode='JSON', proxy=proxyDict)
-    elif nc_mode == 'NGINX_MANAGEMENT_SYSTEM':
+    if nc_mode == 'NGINX_MANAGEMENT_SYSTEM':
         if type == None:
           reply,code = nms.nmsInstances(mode='JSON')
         elif type.lower() == 'cve':
@@ -190,6 +164,8 @@ def getInstances(request: Request,type: Optional[str] = None,month: Optional[int
           reply,code = bigiq.bigIqFullSwOnHwjson()
         elif type.lower() == 'complete':
           reply,code = bigiq.bigIqCompletejson()
+        elif type.lower() == 'utilitybilling':
+          reply,code = bigiq.bigIqUtilityBillingjson()
         else:
           reply = {}
           code = 404
@@ -227,11 +203,7 @@ def getInstances(request: Request,type: Optional[str] = None,month: Optional[int
 @app.get("/metrics")
 @app.get("/f5tt/metrics")
 def getMetrics():
-    if nc_mode == 'NGINX_CONTROLLER':
-        reply,code = nc.ncInstances(fqdn=nc_fqdn, username=nc_user, password=nc_pass, mode='PROMETHEUS', proxy=proxyDict)
-    elif nc_mode == 'NGINX_INSTANCE_MANAGER':
-        reply,code = nim.nimInstances(fqdn=nc_fqdn, mode='PROMETHEUS', proxy=proxyDict)
-    elif nc_mode == 'NGINX_MANAGEMENT_SYSTEM':
+    if nc_mode == 'NGINX_MANAGEMENT_SYSTEM':
         reply,code = nms.nmsInstances(mode='PROMETHEUS')
     elif nc_mode == 'BIG_IQ':
         reply,code = bigiq.bigIqInventory(mode='PROMETHEUS')
@@ -269,7 +241,7 @@ def not_found(uri: str):
 
 if __name__ == '__main__':
 
-    if nc_mode != 'NGINX_CONTROLLER' and nc_mode != 'NGINX_INSTANCE_MANAGER' and nc_mode != 'NGINX_MANAGEMENT_SYSTEM' and nc_mode != 'BIG_IQ':
+    if nc_mode != 'NGINX_MANAGEMENT_SYSTEM' and nc_mode != 'BIG_IQ':
         print('Invalid DATAPLANE_TYPE')
     else:
         # optional HTTP(S) proxy

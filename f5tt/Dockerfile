@@ -11,11 +11,10 @@ RUN /deployment/env/bin/pip3 install fastapi uvicorn requests pandas xlsxwriter 
 
 WORKDIR /deployment
 COPY app.py .
-COPY nc.py .
-COPY nim.py .
 COPY nms.py .
 COPY bigiq.py .
 COPY cveDB.py .
 COPY f5ttCH.py .
+COPY utils.py .
 
 CMD env/bin/python3 app.py

@@ -14,8 +14,10 @@ from io import BytesIO
 from requests import Request, Session
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from email.message import EmailMessage
+from dateutil.relativedelta import relativedelta
 
 import cveDB
+import utils
 
 this = sys.modules[__name__]
 
@@ -326,8 +328,6 @@ def bigIqInventory(mode):
   if status != 200:
     return details,status
 
-  output=''
-
   # Gets TMOS modules provisioning state for all devices
   rcode,provisioningDetails = bigIQInstanceProvisioning()
   rcode2,inventoryDetails = bigIQgetInventory()
@@ -491,6 +491,7 @@ def bigIqInventory(mode):
   instancesDict['swTotals'].append(swSKUGrandTotals)
 
   output = {}
+  output['report'] = utils.getVersionJson(reportType='Full',dataplane='BIG-IQ')
 
   timeNow = datetime.datetime.now()
   monthAgo = timeNow - datetime.timedelta(days=30)
@@ -570,6 +571,7 @@ def bigIqCVEjson(fullJSON=None):
     fullJSON,retcode = bigIqInventory(mode='JSON')
 
   cveJSON = {}
+  cveJSON['report'] = utils.getVersionJson(reportType='CVE',dataplane='BIG-IQ')
 
   for d in fullJSON['details']:
     bigipHostname = d['hostname']
@@ -594,6 +596,7 @@ def bigIqCVEbyDevicejson(fullJSON=None):
   if fullJSON is None:
     fullJSON,retcode = bigIqInventory(mode='JSON')
   devicecveJSON = {}
+  devicecveJSON['report'] = utils.getVersionJson(reportType='CVE by Device',dataplane='BIG-IQ')
 
   for d in fullJSON['details']:
     thisDevice = {}
@@ -688,6 +691,7 @@ def bigIqSwOnHwjson(fullJSON=None):
   monthAgo = timeNow - datetime.timedelta(days=30)
 
   wholeJSON = {}
+  wholeJSON['report'] = utils.getVersionJson(reportType='Software on Hardware',dataplane='BIG-IQ')
   wholeJSON['periodStarted'] = monthAgo.strftime("%Y-%m-%dT%H:%M:%SZ")
   wholeJSON['periodEnded'] = timeNow.strftime("%Y-%m-%dT%H:%M:%SZ")
   wholeJSON['swOnHw'] = swOnHwJSON
@@ -700,6 +704,7 @@ def bigIqFullSwOnHwjson():
   fullJSON,code = bigIqInventory(mode='JSON')
   swonhw,code = bigIqSwOnHwjson(fullJSON)
 
+  fullJSON['report'] = utils.getVersionJson(reportType='Full Software on Hardware',dataplane='BIG-IQ')
   fullJSON['swonhw'] = swonhw
 
   return fullJSON,200
@@ -708,6 +713,8 @@ def bigIqFullSwOnHwjson():
 # Returns a JSON containing defails, counter output, per-device CVE, telemetry and utility billing
 def bigIqCompletejson():
   fullJSON,code = bigIqInventory(mode='JSON')
+  fullJSON['report'] = utils.getVersionJson(reportType='Complete',dataplane='BIG-IQ')
+
   swonhw,code = bigIqSwOnHwjson(fullJSON)
   cveByDevice,code = bigIqCVEbyDevicejson(fullJSON)
 
@@ -719,6 +726,37 @@ def bigIqCompletejson():
   fullJSON['CVE'] = cveByDevice
 
   return fullJSON,200
+
+
+# Returns a JSON containing utility billing details for VEs and hardware platforms
+def bigIqUtilityBillingjson():
+  fullJSON,code = bigIqInventory(mode='JSON')
+
+  output = {}
+  output['report'] = utils.getVersionJson(reportType='Utility billing',dataplane='BIG-IQ')
+  output['periodStarted'] = fullJSON['periodStarted']
+  output['periodEnded'] = fullJSON['periodEnded']
+  output['utilityBilling'] = bigIQCollectUtilityBilling()
+  output['records'] = []
+
+  # First day of the previous month
+  asOfDate = datetime.datetime.now().replace(day=1) - relativedelta(months=1)
+  asOfDateStr = asOfDate.strftime("%d-%b-%Y")
+
+  for i in range(len(fullJSON['details'])):
+    details = fullJSON['details'][i]
+
+    device = {}
+    device['address'] = details['address']
+    device['hostname'] = details['hostname']
+    device['registrationKey'] = details['registrationKey'] if 'registrationKey' in details else ''
+    device['AsofDate'] = asOfDateStr
+    device['sku'] = details['platform']['sku'] if 'platform' in details else ''
+    device['provisionedModules'] = details['provisionedModules'] if 'provisionedModules' in details else ''
+
+    output['records'].append(device)
+
+  return output,200
 
 
 # Builds BIG-IQ telemetry request body by entities
