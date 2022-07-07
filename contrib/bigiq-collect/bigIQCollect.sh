@@ -246,13 +246,13 @@ do
 	echo "-> Collecting utility billing for regkey $REGKEY"
 	REPORT_STATUS_JSON=`curl -ks -X POST https://127.0.0.1/mgmt/cm/device/tasks/licensing/utility-billing-reports -H 'X-F5-Auth-Token: '$AUTH_TOKEN -H 'Content-Type: application/json' -d '{"regKey": "'$REGKEY'","submissionMethod": "Automatic"}'`
 	REPORT_STATUS_ID=`echo $REPORT_STATUS_JSON | jq -r '.selfLink' | awk -F\/ '{print $10}'`
-	echo $REPORT_STATUS_JSON > $OUTPUTDIR/utilitybilling-createreport-$REGKEY
+	echo $REPORT_STATUS_JSON > $OUTPUTDIR/utilitybilling-createreport-$REGKEY.json
 
 	sleep 4
 
 	REPORT_DOWNLOAD_JSON=`curl -ks -X GET https://127.0.0.1/mgmt/cm/device/tasks/licensing/utility-billing-reports/$REPORT_STATUS_ID -H 'X-F5-Auth-Token: '$AUTH_TOKEN`
 	REPORT_DOWNLOAD_FILE=`echo $REPORT_DOWNLOAD_JSON | jq -r '.reportUri' | awk -F\/ '{print $9}'`
-	echo $REPORT_DOWNLOAD_JSON > $OUTPUTDIR/utilitybilling-reportstatus-$REPORT_STATUS_ID
+	echo $REPORT_DOWNLOAD_JSON > $OUTPUTDIR/utilitybilling-reportstatus-$REPORT_STATUS_ID.json
 
 	REPORT_JSON=`curl -ks -X GET https://127.0.0.1/mgmt/cm/device/licensing/license-reports-download/$REPORT_DOWNLOAD_FILE -H 'X-F5-Auth-Token: '$AUTH_TOKEN`
 	echo $REPORT_JSON > $OUTPUTDIR/utilitybilling-billingreport-$REPORT_DOWNLOAD_FILE
