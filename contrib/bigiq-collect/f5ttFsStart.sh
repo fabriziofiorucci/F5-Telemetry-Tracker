@@ -1,20 +1,7 @@
 #!/bin/bash
 
-if [ "$1" = "" ]
-then
-        echo "$0 [tgz file]"
-        exit
-fi
-
 TGZFILE=$1
-WORKDIR=`mktemp -d`
-
-echo $WORKDIR
-
-tar zxmf $TGZFILE -C $WORKDIR
-mv $WORKDIR/*/*/*json $WORKDIR
-
-python3 f5ttfs.py $WORKDIR &
+python3 f5ttfs.py $TGZFILE &
 F5TTFS_PID=$!
 
 export DATAPLANE_TYPE=BIG_IQ
@@ -26,6 +13,5 @@ export DATAPLANE_PASSWORD="notused"
 #export NIST_API_KEY=xxxxxxx
 
 python3 ../../f5tt/app.py
-kill $F5TTFS_PID
 
-rm -rf $WORKDIR
+kill $F5TTFS_PID

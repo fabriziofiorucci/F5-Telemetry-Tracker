@@ -3,11 +3,11 @@
 ## Description
 
 The `bigIQCollect.sh` script must be copied and run on a BIG-IQ Centralized Manager instance. It will collect raw JSON files and package them into a single .tgz file:
-the .tgz file can then be processed offline by F5 Telemetry Tracker to generate the final JSON file
+the .tgz file can then be processed offline by F5 Telemetry Tracker to build all target JSON files
 
 sampledata.tgz is provided for testing purposes
 
-## Usage
+## Usage - Data collection
 
 - Copy (scp) `bigIQCollect.sh` from your local host to your BIG-IQ CM instance, under `/tmp/`
 
@@ -81,12 +81,14 @@ $ scp root@bigiq.f5:/tmp/20220113-0005-bigIQCollect.tgz .
 $ 
 ```
 
+## Usage - CLI-based data postprocessing
+
 - Start F5 Telemetry Tracker and the additional fileserver script to process the tgz file and generate the target JSON file
 
 ```
 $ ./f5ttFsStart.sh 20220113-0005-bigIQCollect.tgz
-/tmp/tmp.ekuupTf6nD
-Using JSON directory [ /tmp/tmp.ekuupTf6nD ]
+Using work directory /tmp/SecondSight_5ap6afcs
+Decompressing sampledata.tgz
  * Serving Flask app 'f5ttfs' (lazy loading)
  * Environment: production
    WARNING: This is a development server. Do not use it in a production deployment.
@@ -94,20 +96,16 @@ Using JSON directory [ /tmp/tmp.ekuupTf6nD ]
  * Debug mode: off
  * Running on all addresses.
    WARNING: This is a development server. Do not use it in a production deployment.
- * Running on http://192.168.1.18:5001/ (Press CTRL+C to quit)
+ * Running on http://192.168.1.26:5001/ (Press CTRL+C to quit)
+Basic CVE Tracking - for full tracking get a NIST API key at https://nvd.nist.gov/developers/request-an-api-key
 Running BIG-IQ inventory refresh thread
-2021-11-19 00:03:32.971872 Requesting BIG-IQ inventory refresh
+2022-07-10 22:58:34.262641 Requesting BIG-IQ inventory refresh
 Running REST API/Prometheus metrics server
- * Serving Flask app 'app' (lazy loading)
- * Environment: production
-   WARNING: This is a development server. Do not use it in a production deployment.
-   Use a production WSGI server instead.
- * Debug mode: off
- * Running on all addresses.
-   WARNING: This is a development server. Do not use it in a production deployment.
- * Running on http://192.168.1.18:5000/ (Press CTRL+C to quit)
-192.168.1.18 - - [19/Nov/2021 00:03:32] "POST /mgmt/shared/authn/login HTTP/1.1" 200 -
-192.168.1.18 - - [19/Nov/2021 00:03:32] "POST /mgmt/cm/device/tasks/device-inventory HTTP/1.1" 405 -
+127.0.0.1 - - [10/Jul/2022 22:58:34] "POST /mgmt/shared/authn/login HTTP/1.1" 200 -
+INFO:     Started server process [898181]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:5000 (Press CTRL+C to quit)
 ```
 
 - Query F5 Telemetry Tracker from another terminal session to get the target JSON file
@@ -122,5 +120,62 @@ $ curl http://127.0.0.1:5000/instances
 Compressed output:
 
 ```
-curl -s -H "Accept-Encoding: gzip" ubuntu:5000/instances --output output-json.gz
+curl -s -H "Accept-Encoding: gzip" http://127.0.0.1:5000/instances --output output-json.gz
 ```
+
+## Usage - REST API-based data postprocessing
+
+- Start F5 Telemetry Tracker and the additional fileserver script to process the tgz file and generate the target JSON file
+
+```
+$ ./f5ttFsStart.sh 
+ * Serving Flask app 'f5ttfs' (lazy loading)
+ * Environment: production
+   WARNING: This is a development server. Do not use it in a production deployment.
+   Use a production WSGI server instead.
+ * Debug mode: off
+ * Running on all addresses.
+   WARNING: This is a development server. Do not use it in a production deployment.
+ * Running on http://192.168.1.26:5001/ (Press CTRL+C to quit)
+Basic CVE Tracking - for full tracking get a NIST API key at https://nvd.nist.gov/developers/request-an-api-key
+Running BIG-IQ inventory refresh thread
+2022-07-10 23:02:45.320908 Requesting BIG-IQ inventory refresh
+Running REST API/Prometheus metrics server
+INFO:     Started server process [898243]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:5000 (Press CTRL+C to quit)
+127.0.0.1 - - [10/Jul/2022 23:02:45] "POST /mgmt/shared/authn/login HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jul/2022 23:02:45] "POST /mgmt/cm/device/tasks/device-inventory HTTP/1.1" 405 -
+```
+
+- Load the collected tgz file using the `/upload` REST endpoint (note the `5001` TCP port):
+
+```
+$ curl -i -F 'file=@20220113-0005-bigIQCollect.tgz' http://127.0.0.1:5001/upload
+HTTP/1.1 100 Continue
+
+HTTP/1.0 200 OK
+Content-Type: application/json
+Content-Length: 40
+Server: Werkzeug/2.0.1 Python/3.8.10
+Date: Sun, 10 Jul 2022 22:56:40 GMT
+
+{"status":"file uploaded successfully"}
+```
+
+- Query F5 Telemetry Tracker from another terminal session to get the target JSON file
+
+Uncompressed output:
+
+```
+$ curl http://127.0.0.1:5000/instances
+{"instances":[{"bigip":2,"hwTotals":[{"F5-VE":2}],"swTotals":[{"H-VE-AFM":1,"H-VE-AWF":1,"H-VE-LTM":2,"H-VE-APM":1,"H-VE-DNS":1}]}],"details":[{"inventoryTimestamp":1641986071513,"inventoryStatus":"full"[...]
+```
+
+Compressed output:
+
+```
+curl -s -H "Accept-Encoding: gzip" http://127.0.0.1:5000/instances --output output-json.gz
+```
+

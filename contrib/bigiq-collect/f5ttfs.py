@@ -1,16 +1,48 @@
-#!flask/bin/python
+#!/usr/bin/python3
 
+import os
 import sys
+import shutil
+import tempfile
+import tarfile
 from flask import Flask, jsonify, abort, make_response, request
 
-if len(sys.argv) != 2:
-    sys.exit('Error: run as:\n'+sys.argv[0]+' [JSON directory]')
+this = sys.modules[__name__]
 
-jsonDir=sys.argv[1]
+jsonDir = ''
 
-print ('Using JSON directory [',jsonDir,']')
+def unTarGz(file):
+  global jsonDir
+
+  # Work directory
+  if jsonDir.startswith('/tmp/SecondSight_'):
+    print(f"Removing {jsonDir}")
+    shutil.rmtree(jsonDir,ignore_errors=False)
+
+  jsonDir = tempfile.mkdtemp(prefix='SecondSight_',suffix='')
+  print(f"Setting work directory to {jsonDir}")
+
+  print(f"Decompressing {file}")
+  tgzfile = tarfile.open(file)
+  tgzfile.extractall(jsonDir)
+  tgzfile.close()
+
+  print(f"Removing {file}")
+  os.remove(file)
+
+  for c, tmpDir in enumerate(os.listdir(jsonDir+"/tmp/")):
+    tgzDir = jsonDir+"/tmp/"+tmpDir
+    for i, filename in enumerate(os.listdir(tgzDir)):
+      os.rename(f"{tgzDir}/{filename}", f"{jsonDir}/{filename}")
+
+
+if len(sys.argv) == 2:
+  # tgz filename passed from commandline, untar
+  unTarGz(sys.argv[1])
+
 
 app = Flask(__name__)
+
 
 #
 # Handled calls (all GETs)
@@ -149,6 +181,17 @@ def bigiqLogin():
     "generation": 8,
     "lastUpdateMicros": 1636742559283127
 });
+
+@app.route('/upload', methods = ['POST'])
+def upload_file():
+   if request.method == 'POST':
+      f = request.files['file']
+      print(f"Uploading file {f.filename}")
+      dstFilename = '/tmp/SecondSightData.tgz'
+      f.save(dstFilename)
+      unTarGz(dstFilename)
+
+      return make_response(jsonify({'status': 'file uploaded successfully'}), 200)
 
 @app.errorhandler(404)
 def not_found(error):
