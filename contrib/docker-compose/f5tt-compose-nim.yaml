@@ -8,7 +8,7 @@ services:
     ports:
       - "9000:9000"
     ulimits:
-      nofile: "262144"
+      nofile: 262144
     environment:
       - CLICKHOUSE_USER=default
       - CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT=1
