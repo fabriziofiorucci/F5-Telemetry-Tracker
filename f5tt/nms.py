@@ -265,7 +265,7 @@ def nmsInstances(mode):
 def nmsCVEjson():
   fullJSON,retcode = nmsInstances(mode='JSON')
   cveJSON = {}
-  cveJSON['report'] = utils.getVersionJson(reportType='CVE',dataplane='NGINX Instance Manager')
+  cveJSON['report'] = utils.getVersionJson(reportType='CVE',dataplane='NGINX Management Suite')
 
   for d in fullJSON['details']:
     nginxHostname = d['hostname']
@@ -288,7 +288,7 @@ def nmsCVEjson():
 # Returns the time-based instances usage distribution JSON
 def nmsTimeBasedJson(monthStats,hourInterval):
   output = {}
-  output['report'] = utils.getVersionJson(reportType='Time-based',dataplane='NGINX Instance Manager')
+  output['report'] = utils.getVersionJson(reportType='Time-based',dataplane='NGINX Management Suite')
   output['subscription'] = {}
   output['instances'] = []
 

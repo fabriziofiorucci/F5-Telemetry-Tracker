@@ -651,7 +651,7 @@ def bigIqSwOnHwjson(fullJSON=None):
           deviceJSON['sku'] = bigipSku
           deviceJSON['provisionedModules'] = []
 
-          enabledLevels = ['nominal', 'dedicated', 'minimum']
+          enabledLevels = ['nominal', 'dedicated']
           for m in d['provisionedModules']:
             if m['level'] in enabledLevels:
               deviceJSON['provisionedModules'].append(m['sku'])
@@ -736,7 +736,7 @@ def bigIqUtilityBillingjson():
   output['report'] = utils.getVersionJson(reportType='Utility billing',dataplane='BIG-IQ')
   output['periodStarted'] = fullJSON['periodStarted']
   output['periodEnded'] = fullJSON['periodEnded']
-  output['utilityBilling'] = bigIQCollectUtilityBilling()
+  output['utilityBilling'] = fullJSON['utilityBilling']
   output['records'] = []
 
   # First day of the previous month
@@ -746,15 +746,33 @@ def bigIqUtilityBillingjson():
   for i in range(len(fullJSON['details'])):
     details = fullJSON['details'][i]
 
-    device = {}
-    device['address'] = details['address']
-    device['hostname'] = details['hostname']
-    device['registrationKey'] = details['registrationKey'] if 'registrationKey' in details else ''
-    device['AsofDate'] = asOfDateStr
-    device['sku'] = details['platform']['sku'] if 'platform' in details else ''
-    device['provisionedModules'] = details['provisionedModules'] if 'provisionedModules' in details else ''
+    if 'elaPlatform' in details and details['elaPlatform'] != "":
+      device = {}
+      device['address'] = details['address']
+      device['hostname'] = details['hostname']
+      device['registrationKey'] = details['registrationKey'] if 'registrationKey' in details else ''
+      device['AsofDate'] = asOfDateStr
 
-    output['records'].append(device)
+      # Look for device SKU from BIG-IQ utility billing
+      for i in range(0,len(fullJSON['utilityBilling'])):
+        ubRecords = fullJSON['utilityBilling'][i]
+        if 'records' in ubRecords:
+          for ubRecord in ubRecords['records']:
+            if ubRecord['hostname'] == device['hostname']:
+              device['platformSKU'] = ubRecord['sku']
+
+      # Select "nominal" and "dedicated" provisioned modules
+      if 'provisionedModules' in details:
+        nominalOrDedicatedModules = []
+        for pm in details['provisionedModules']:
+          if pm['level'] in ['nominal','dedicated']:
+            nominalOrDedicatedModules.append(pm)
+
+        device['provisionedModules'] = nominalOrDedicatedModules
+      else:
+        device['provisionedModules'] = ''
+
+      output['records'].append(device)
 
   return output,200
 
