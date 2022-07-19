@@ -165,9 +165,9 @@ F5 Telemetry Tracker image is available on Docker Hub as:
 fiorucci/f5-telemetry-tracker:latest
 ```
 
-The 1.f5tt.yaml file references that by default.
+File `1.f5tt.yaml` references such image by default.
 
-If you need to build and push NGINX your own image to a private registry:
+If you need to build and push the docker image to a private registry:
 
 ```
 git clone fabriziofiorucci/F5-Telemetry-Tracker
