@@ -5,7 +5,7 @@
 The `bigIQCollect.sh` script must be copied and run on a BIG-IQ Centralized Manager instance. It will collect raw JSON files and package them into a single .tgz file:
 the .tgz file can then be processed offline by F5 Telemetry Tracker to build all target JSON files
 
-sampledata.tgz is provided for testing purposes
+`sampledata.tgz` is provided for testing purposes
 
 ## Usage - Data collection
 
@@ -50,22 +50,21 @@ Username: admin
 Password: 
 -> Reading device list
 -> Reading system provisioning
--> Reading device inventory
 -> Reading device inventory details
--> Found 28 inventories
+... 0 inventories found: refresh requested
+... waiting for inventory refresh, sleeping for 5 seconds
+-> Found 1 inventories
 -> Inventories summary
-      5 FAILED
-     22 FINISHED
-      1 STARTED
+      1 FINISHED
+-> Using inventory [3a892dde-f61d-412c-a243-42fcd13b8945]
 -> Reading device info for [1346a1f5-49aa-422f-8c4d-19b0119b3927]
 -> Reading device info for [aabcaca7-6986-4d0b-b9fe-b72e3473144e]
 -> Reading device telemetry
--> Reading device telemetry datapoints for bigip1.f5.ff.lan
--> Reading device telemetry datapoints for bigip2.f5.ff.lan
--> Collecting utility billing for regkey XXXXX-YYYYY-ZZZZZ-TTTTT-OWQAQCD
--> Collecting utility billing for regkey XXXXX-YYYYY-ZZZZZ-TTTTT-NFTJLBM
+-> Reading device telemetry datapoints for [bigip1.f5.ff.lan]
+-> Collecting utility billing for regkey [XXXXX-XXXXX-XXXXX-XXXXX-XXXXXXX]
+-> Collecting utility billing for regkey [XXXXX-XXXXX-XXXXX-XXXXX-XXXXXXX]
 -> Data collection completed, building tarfile
--> All done, copy /tmp/20220126-0121-bigIQCollect.tgz to your local host using scp
+-> All done, copy /tmp/20220721-0031-bigIQCollect.tgz to your local host using scp
 [root@bigiq:Active:Standalone] config # exit
 logout
 Connection to bigiq.f5 closed.
@@ -120,7 +119,7 @@ $ curl http://127.0.0.1:5000/instances
 Compressed output:
 
 ```
-curl -s -H "Accept-Encoding: gzip" http://127.0.0.1:5000/instances --output output-json.gz
+$ curl -s -H "Accept-Encoding: gzip" http://127.0.0.1:5000/instances --output output-json.gz
 ```
 
 ## Usage - REST API-based data postprocessing
@@ -176,6 +175,6 @@ $ curl http://127.0.0.1:5000/instances
 Compressed output:
 
 ```
-curl -s -H "Accept-Encoding: gzip" http://127.0.0.1:5000/instances --output output-json.gz
+$ curl -s -H "Accept-Encoding: gzip" http://127.0.0.1:5000/instances --output output-json.gz
 ```
 

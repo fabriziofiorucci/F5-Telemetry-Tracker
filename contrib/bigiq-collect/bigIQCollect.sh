@@ -64,20 +64,28 @@ restcurl -u $BIGIQ_USERNAME:$BIGIQ_PASSWORD /mgmt/shared/resolver/device-groups/
 echo "-> Reading system provisioning"
 restcurl -u $BIGIQ_USERNAME:$BIGIQ_PASSWORD /mgmt/cm/shared/current-config/sys/provision > $OUTPUTDIR/2.bigIQCollect.json
 
-echo "-> Reading device inventory"
-restcurl -u $BIGIQ_USERNAME:$BIGIQ_PASSWORD /mgmt/cm/device/tasks/device-inventory > $OUTPUTDIR/3.bigIQCollect.json
-
 echo "-> Reading device inventory details"
 INVENTORIES=`restcurl -u $BIGIQ_USERNAME:$BIGIQ_PASSWORD /mgmt/cm/device/tasks/device-inventory`
 INVENTORIES_LEN=`echo $INVENTORIES | jq '.items|length'`
 
+if [ $INVENTORIES_LEN == 0 ]
+then
+  echo "... $INVENTORIES_LEN inventories found: refresh requested"
+  AUTH_TOKEN=`curl -ks -X POST 'https://127.0.0.1/mgmt/shared/authn/login' -H 'Content-Type: text/plain' -d '{"username": "'$BIGIQ_USERNAME'","password": "'$BIGIQ_PASSWORD'"}' | jq '.token.token' -r`
+  curl -ks -X POST 'https://127.0.0.1/mgmt/cm/device/tasks/device-inventory' -H 'X-F5-Auth-Token: '$AUTH_TOKEN -H 'Content-Type: application/json' -d '{"devicesQueryUri": "https://localhost/mgmt/shared/resolver/device-groups/cm-bigip-allBigIpDevices/devices"}' > /dev/null
+
+  while [ $INVENTORIES_LEN == 0 ]
+  do
+    echo "... waiting for inventory refresh, sleeping for 5 seconds"
+    sleep 5
+    INVENTORIES=`restcurl -u $BIGIQ_USERNAME:$BIGIQ_PASSWORD /mgmt/cm/device/tasks/device-inventory`
+    INVENTORIES_LEN=`echo $INVENTORIES | jq '.items|length'`
+  done
+fi
+
 echo "-> Found $INVENTORIES_LEN inventories"
 
-if [ $INVENTORIES_LEN = 0 ]
-then
-	echo "Error: no inventory found - Please refer to https://support.f5.com/csp/article/K29144504 for more details"
-	exit
-fi
+echo $INVENTORIES > $OUTPUTDIR/3.bigIQCollect.json
 
 echo "-> Inventories summary"
 echo $INVENTORIES | jq -r '.items[].status' | sort | uniq -c
@@ -181,7 +189,7 @@ AUTH_TOKEN=`curl -ks -X POST 'https://127.0.0.1/mgmt/shared/authn/login' -H 'Con
 for TDP_HOSTNAME in $ALL_HOSTNAMES
 do
 
-echo "-> Reading device telemetry datapoints for $TDP_HOSTNAME"
+echo "-> Reading device telemetry datapoints for [$TDP_HOSTNAME]"
 
 for TDP in $ALL_TELEMETRY
 do
@@ -241,9 +249,13 @@ echo $UTB_ALLLICENSES > $OUTPUTDIR/utilitybilling-licenses.json
 
 UTB_ALLREGKEYS=`echo $UTB_ALLLICENSES | jq -r '.items[]|.regKey'`
 
+FIRST_DAY_PREV_MONTH=`date --date="$(date +'%Y-%m-01') - 1 month" +%Y-%m-%d`
+LAST_DAY_PREV_MONTH=`date --date="$(date +'%Y-%m-01') - 1 second" +%Y-%m-%d`
+
 for REGKEY in $UTB_ALLREGKEYS
 do
-	echo "-> Collecting utility billing for regkey $REGKEY"
+	echo "-> Collecting utility billing for regkey [$REGKEY]"
+	# https://clouddocs.f5.com/products/big-iq/mgmt-api/v0.0/ApiReferences/bigiq_public_api_ref/r_device_utility_billing_report_task.html
 	REPORT_STATUS_JSON=`curl -ks -X POST https://127.0.0.1/mgmt/cm/device/tasks/licensing/utility-billing-reports -H 'X-F5-Auth-Token: '$AUTH_TOKEN -H 'Content-Type: application/json' -d '{"regKey": "'$REGKEY'","submissionMethod": "Automatic"}'`
 	REPORT_STATUS_ID=`echo $REPORT_STATUS_JSON | jq -r '.selfLink' | awk -F\/ '{print $10}'`
 	echo $REPORT_STATUS_JSON > $OUTPUTDIR/utilitybilling-createreport-$REGKEY.json
