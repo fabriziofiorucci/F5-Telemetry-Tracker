@@ -255,14 +255,17 @@ LAST_DAY_PREV_MONTH=`date --date="$(date +'%Y-%m-01') - 1 second" +%Y-%m-%d`
 for REGKEY in $UTB_ALLREGKEYS
 do
 	echo "-> Collecting utility billing for regkey [$REGKEY]"
-	# https://clouddocs.f5.com/products/big-iq/mgmt-api/v0.0/ApiReferences/bigiq_public_api_ref/r_device_utility_billing_report_task.html
-	REPORT_STATUS_JSON=`curl -ks -X POST https://127.0.0.1/mgmt/cm/device/tasks/licensing/utility-billing-reports -H 'X-F5-Auth-Token: '$AUTH_TOKEN -H 'Content-Type: application/json' -d '{"regKey": "'$REGKEY'","submissionMethod": "Automatic"}'`
+
+	# Licensing reports
+	REPORT_STATUS_JSON=`curl -ks -X POST https://127.0.0.1/mgmt/cm/device/tasks/licensing/reports -H 'X-F5-Auth-Token: '$AUTH_TOKEN -H 'Content-Type: application/json' \
+		-d '{"typeOfReport": "Historical","obfuscateDeviceInfo": false,"reportFileFormat": "JSON","regKey": "'$REGKEY'","reportStartDateTime": "'$FIRST_DAY_PREV_MONTH'T00:00:00Z","reportEndDateTime": "'$LAST_DAY_PREV_MONTH'T23:59:59Z"}'`
+
 	REPORT_STATUS_ID=`echo $REPORT_STATUS_JSON | jq -r '.selfLink' | awk -F\/ '{print $10}'`
 	echo $REPORT_STATUS_JSON > $OUTPUTDIR/utilitybilling-createreport-$REGKEY.json
 
 	sleep 4
 
-	REPORT_DOWNLOAD_JSON=`curl -ks -X GET https://127.0.0.1/mgmt/cm/device/tasks/licensing/utility-billing-reports/$REPORT_STATUS_ID -H 'X-F5-Auth-Token: '$AUTH_TOKEN`
+	REPORT_DOWNLOAD_JSON=`curl -ks -X GET https://127.0.0.1/mgmt/cm/device/tasks/licensing/reports/$REPORT_STATUS_ID -H 'X-F5-Auth-Token: '$AUTH_TOKEN`
 	REPORT_DOWNLOAD_FILE=`echo $REPORT_DOWNLOAD_JSON | jq -r '.reportUri' | awk -F\/ '{print $9}'`
 	echo $REPORT_DOWNLOAD_JSON > $OUTPUTDIR/utilitybilling-reportstatus-$REPORT_STATUS_ID.json
 
