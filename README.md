@@ -1,5 +1,8 @@
 # F5 Telemetry Tracker
 
+**THIS REPOSITORY HAS BEEN MOVED TO https://github.com/F5Networks/SecondSight**
+This copy is archived here for archival purposes.
+
 ## Description and features
 
 This tool helps tracking NGINX OSS and NGINX Plus instances managed by NGINX Instance Manager/NGINX Management Suite, and TMOS (BIG-IP, VIPRION, BIG-IP Virtual Edition) instances managed by BIG-IQ
